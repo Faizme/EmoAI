@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}My Journal - Vibe Journal AI{% endblock %}
+
+{% block content %}
+<div class="journal-container">
+    <div class="floating-shapes"></div>
+    
+    <div class="journal-header glass">
+        <h1 class="glow-text">📖 My Journal</h1>
+        <a href="{{ url_for('chatbot') }}" class="btn-back">← Back to Chat</a>
+    </div>
+    
+    <div class="journal-entries">
+        {% if journals %}
+            {% for journal in journals %}
+            <div class="journal-card glass fade-in">
+                <div class="journal-header-info">
+                    <span class="mood-badge">{{ journal.mood }}</span>
+                    <span class="journal-date">{{ journal.timestamp.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                </div>
+                <div class="journal-content">
+                    <p>{{ journal.summary }}</p>
+                    {% if journal.goal_progress %}
+                    <div class="goal-progress-section">
+                        <strong>Goal Progress:</strong>
+                        <p>{{ journal.goal_progress }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state glass">
+                <h2>No journal entries yet</h2>
+                <p>Start chatting with VILUN to create your first entry!</p>
+                <a href="{{ url_for('chatbot') }}" class="btn-primary glow-btn">Start Chatting</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.journal-container {
+    min-height: 100vh;
+    padding: 40px 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.journal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 40px;
+    backdrop-filter: blur(10px);
+}
+
+.btn-back {
+    background: rgba(168, 85, 247, 0.2);
+    padding: 12px 24px;
+    border-radius: 12px;
+    color: #c084fc;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.btn-back:hover {
+    background: rgba(168, 85, 247, 0.3);
+    transform: translateX(-5px);
+}
+
+.journal-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.journal-card {
+    padding: 30px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    animation: slideUp 0.5s ease-out;
+}
+
+.journal-header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.mood-badge {
+    font-size: 1.5rem;
+    padding: 8px 16px;
+    background: rgba(168, 85, 247, 0.2);
+    border-radius: 12px;
+}
+
+.journal-date {
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+.journal-content p {
+    color: #e9d5ff;
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.goal-progress-section {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(168, 85, 247, 0.1);
+    border-radius: 12px;
+    border-left: 3px solid #a855f7;
+}
+
+.goal-progress-section strong {
+    color: #c084fc;
+}
+
+.goal-progress-section p {
+    margin-top: 10px;
+    font-size: 1rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 80px 40px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.empty-state h2 {
+    color: #c084fc;
+    margin-bottom: 15px;
+}
+
+.empty-state p {
+    color: #9ca3af;
+    margin-bottom: 30px;
+}
+</style>
+{% endblock %}

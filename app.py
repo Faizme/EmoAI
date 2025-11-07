@@ -1,35 +1,142 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_bcrypt import Bcrypt
+from models import db, User, UserProfile, Journal
 import os
 import sys
 import secrets
+from datetime import datetime
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'attached_assets'))
 from ai_core_1762554001118 import get_ai_chat_response, summarize_chat_as_journal
 
-app = Flask(__name__, static_folder='.', static_url_path='', template_folder='.')
-app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vibe_journal.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-def get_chat_history():
-    if 'chat_history' not in session:
-        session['chat_history'] = []
-    return session['chat_history']
+db.init_app(app)
+bcrypt = Bcrypt(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
 
-def save_chat_history(history):
-    session['chat_history'] = history
-    session.modified = True
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+with app.app_context():
+    db.create_all()
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if current_user.is_authenticated:
+        if current_user.profile:
+            return redirect(url_for('chatbot'))
+        else:
+            return redirect(url_for('onboarding'))
+    return redirect(url_for('login'))
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        if not email or not password:
+            flash('Please provide both email and password', 'error')
+            return redirect(url_for('signup'))
+        
+        if User.query.filter_by(email=email).first():
+            flash('Email already registered', 'error')
+            return redirect(url_for('signup'))
+        
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        user = User(email=email, password_hash=hashed_password)
+        db.session.add(user)
+        db.session.commit()
+        
+        login_user(user)
+        return redirect(url_for('about'))
+    
+    return render_template('signup.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        
+        user = User.query.filter_by(email=email).first()
+        
+        if user and bcrypt.check_password_hash(user.password_hash, password):
+            login_user(user)
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid email or password', 'error')
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+@app.route('/about')
+@login_required
+def about():
+    return render_template('about.html')
+
+@app.route('/onboarding', methods=['GET', 'POST'])
+@login_required
+def onboarding():
+    if current_user.profile:
+        return redirect(url_for('chatbot'))
+    
+    if request.method == 'POST':
+        name = request.form.get('name')
+        age = request.form.get('age')
+        goal = request.form.get('goal')
+        
+        if not name or not goal:
+            flash('Name and goal are required', 'error')
+            return redirect(url_for('onboarding'))
+        
+        profile = UserProfile(
+            user_id=current_user.id,
+            name=name,
+            age=int(age) if age else None,
+            goal=goal
+        )
+        db.session.add(profile)
+        db.session.commit()
+        
+        return redirect(url_for('chatbot'))
+    
+    return render_template('onboarding.html')
+
+@app.route('/chatbot')
+@login_required
+def chatbot():
+    if not current_user.profile:
+        return redirect(url_for('onboarding'))
+    return render_template('chatbot.html', user_name=current_user.profile.name)
 
 @app.route('/chat', methods=['POST'])
+@login_required
 def chat():
     user_message = request.json.get('message', '')
     
     if not user_message:
         return jsonify({'error': 'No message provided'}), 400
     
-    chat_history = get_chat_history()
+    chat_history = session.get('chat_history', [])
     
     chat_history.append({
         'role': 'user',
@@ -37,6 +144,15 @@ def chat():
     })
     
     try:
+        user_context = f"""
+        User's name: {current_user.profile.name}
+        User's goal: {current_user.profile.goal}
+        User's age: {current_user.profile.age if current_user.profile.age else 'Not specified'}
+        """
+        
+        context_message = chat_history[0] if len(chat_history) == 1 else chat_history[-1]
+        context_message['parts'][0] = f"{user_context}\n\nUser says: {context_message['parts'][0]}"
+        
         ai_response = get_ai_chat_response(chat_history)
         
         chat_history.append({
@@ -44,7 +160,8 @@ def chat():
             'parts': [ai_response]
         })
         
-        save_chat_history(chat_history)
+        session['chat_history'] = chat_history
+        session.modified = True
         
         return jsonify({
             'response': ai_response,
@@ -56,9 +173,35 @@ def chat():
             'success': False
         }), 500
 
-@app.route('/summarize', methods=['POST'])
-def summarize():
-    chat_history = get_chat_history()
+@app.route('/save_journal', methods=['POST'])
+@login_required
+def save_journal():
+    data = request.json
+    mood = data.get('mood')
+    summary = data.get('summary')
+    goal_progress = data.get('goal_progress', '')
+    
+    if not mood or not summary:
+        return jsonify({'error': 'Mood and summary are required'}), 400
+    
+    journal = Journal(
+        user_id=current_user.id,
+        mood=mood,
+        summary=summary,
+        goal_progress=goal_progress
+    )
+    db.session.add(journal)
+    db.session.commit()
+    
+    session['chat_history'] = []
+    session.modified = True
+    
+    return jsonify({'success': True, 'message': 'Journal entry saved!'})
+
+@app.route('/get_summary', methods=['POST'])
+@login_required
+def get_summary():
+    chat_history = session.get('chat_history', [])
     
     if not chat_history:
         return jsonify({'error': 'No chat history to summarize'}), 400
@@ -69,7 +212,14 @@ def summarize():
             for msg in chat_history
         ])
         
-        summary = summarize_chat_as_journal(full_chat_text)
+        summary_prompt = f"""
+        User's name: {current_user.profile.name}
+        User's main goal: {current_user.profile.goal}
+        
+        {full_chat_text}
+        """
+        
+        summary = summarize_chat_as_journal(summary_prompt)
         
         return jsonify({
             'summary': summary,
@@ -81,11 +231,30 @@ def summarize():
             'success': False
         }), 500
 
-@app.route('/clear', methods=['POST'])
+@app.route('/journal')
+@login_required
+def journal_view():
+    journals = Journal.query.filter_by(user_id=current_user.id).order_by(Journal.timestamp.desc()).all()
+    return render_template('journal.html', journals=journals)
+
+@app.route('/clear_chat', methods=['POST'])
+@login_required
 def clear_chat():
     session['chat_history'] = []
     session.modified = True
     return jsonify({'success': True})
+
+@app.route('/toggle_reminder', methods=['POST'])
+@login_required
+def toggle_reminder():
+    if current_user.profile:
+        current_user.profile.reminder_enabled = not current_user.profile.reminder_enabled
+        db.session.commit()
+        return jsonify({
+            'success': True,
+            'enabled': current_user.profile.reminder_enabled
+        })
+    return jsonify({'success': False}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Onboarding - Vibe Journal AI{% endblock %}
+
+{% block content %}
+<div class="onboarding-container">
+    <div class="floating-shapes"></div>
+    
+    <div class="onboarding-card glass">
+        <h1 class="glow-text">✨ Tell us about you</h1>
+        <p class="subtitle">Help us personalize your journey</p>
+        
+        <form method="POST" class="onboarding-form">
+            <div class="form-group">
+                <label>Your Name</label>
+                <input type="text" name="name" placeholder="Enter your name" required class="glass-input">
+            </div>
+            
+            <div class="form-group">
+                <label>Your Age <span class="optional">(optional)</span></label>
+                <input type="number" name="age" placeholder="Age" class="glass-input" min="13" max="120">
+            </div>
+            
+            <div class="form-group">
+                <label>Your Biggest Personal Improvement Goal</label>
+                <textarea name="goal" placeholder="What do you want to improve in your life?" required class="glass-input" rows="4"></textarea>
+            </div>
+            
+            <button type="submit" class="btn-primary glow-btn">Start My Journey →</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.onboarding-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.onboarding-card {
+    max-width: 600px;
+    width: 100%;
+    padding: 50px;
+    border-radius: 30px;
+    backdrop-filter: blur(15px);
+    animation: slideUp 0.6s ease-out;
+}
+
+.onboarding-form {
+    margin-top: 40px;
+}
+
+.onboarding-form .form-group {
+    margin-bottom: 30px;
+}
+
+.onboarding-form label {
+    display: block;
+    margin-bottom: 10px;
+    color: #c084fc;
+    font-weight: 600;
+}
+
+.optional {
+    color: #9ca3af;
+    font-weight: normal;
+    font-size: 0.9rem;
+}
+
+textarea.glass-input {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+}
+</style>
+{% endblock %}

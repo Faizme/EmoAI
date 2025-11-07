@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Vibe Journal AI{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="particles"></div>
+    <div class="auth-card glass">
+        <h1 class="glow-text">Begin Your Journey</h1>
+        <p class="subtitle">Transform your thoughts into clarity</p>
+        
+        <form method="POST" class="auth-form">
+            <div class="form-group">
+                <input type="email" name="email" placeholder="Email" required class="glass-input">
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Password" required class="glass-input">
+            </div>
+            <button type="submit" class="btn-primary glow-btn">Sign Up</button>
+        </form>
+        
+        <p class="auth-switch">
+            Already have an account? <a href="{{ url_for('login') }}" class="link-glow">Login</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

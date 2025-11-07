@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Chat - Vibe Journal AI{% endblock %}
+
+{% block content %}
+<div class="chatbot-container">
+    <div class="animated-bg"></div>
+    
+    <div class="chat-header glass">
+        <h2 class="glow-text">💜 VILUN</h2>
+        <div class="header-buttons">
+            <button onclick="viewJournal()" class="icon-btn">📚 Journal</button>
+            <button onclick="logout()" class="icon-btn">🚪 Logout</button>
+        </div>
+    </div>
+    
+    <div class="chat-box" id="chatBox">
+        <div class="ai-message fade-in">
+            <div class="message-bubble">
+                <strong>VILUN:</strong> Hi {{ user_name }}! 👋 How are you feeling today?
+            </div>
+        </div>
+    </div>
+    
+    <div class="chat-input-area glass">
+        <input type="text" id="userInput" placeholder="Share your thoughts..." class="chat-input" autocomplete="off">
+        <button onclick="sendMessage()" id="sendBtn" class="send-btn">Send</button>
+    </div>
+    
+    <div class="action-buttons">
+        <button onclick="getSummary()" class="action-btn glow-btn">📝 Get Journal Summary</button>
+        <button onclick="clearChat()" class="action-btn-secondary">🔄 New Conversation</button>
+    </div>
+    
+    <div id="summaryModal" class="modal">
+        <div class="modal-content glass">
+            <span class="close-modal" onclick="closeSummary()">&times;</span>
+            <h2 class="glow-text">Your Journal Entry</h2>
+            <div id="summaryText" class="summary-text"></div>
+            
+            <div class="save-journal-form">
+                <label>How are you feeling? <span class="mood-emoji" id="moodEmoji">😊</span></label>
+                <select id="moodSelect" class="glass-input" onchange="updateMoodEmoji()">
+                    <option value="😊 Happy">😊 Happy</option>
+                    <option value="😌 Calm">😌 Calm</option>
+                    <option value="😔 Sad">😔 Sad</option>
+                    <option value="😰 Anxious">😰 Anxious</option>
+                    <option value="😤 Frustrated">😤 Frustrated</option>
+                    <option value="🤔 Thoughtful">🤔 Thoughtful</option>
+                    <option value="😴 Tired">😴 Tired</option>
+                    <option value="🔥 Motivated">🔥 Motivated</option>
+                </select>
+                
+                <label>Goal Progress (optional)</label>
+                <textarea id="goalProgress" class="glass-input" rows="3" placeholder="Any progress toward your goal today?"></textarea>
+                
+                <button onclick="saveJournal()" class="btn-primary glow-btn">Save to Journal ✅</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+{% endblock %}

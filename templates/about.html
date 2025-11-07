@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}About - Vibe Journal AI{% endblock %}
+
+{% block content %}
+<div class="about-container">
+    <div class="floating-shapes"></div>
+    
+    <section class="hero-section parallax">
+        <h1 class="glow-text fade-in">Vibe Journal AI</h1>
+        <p class="hero-subtitle fade-in-delay">Your Companion for Emotional Clarity</p>
+    </section>
+    
+    <section class="info-section glass slide-up">
+        <h2>What is Vibe Journal?</h2>
+        <p>Vibe Journal AI is more than just a diary - it's a conversational companion that helps you process your emotions, track your progress, and achieve your personal goals through daily reflection.</p>
+    </section>
+    
+    <section class="info-section glass slide-up-delay">
+        <h2>Why Journaling Helps</h2>
+        <ul class="benefits-list">
+            <li>✨ Process complex emotions safely</li>
+            <li>🎯 Track progress toward your goals</li>
+            <li>🧠 Gain deeper self-awareness</li>
+            <li>💪 Build consistent self-improvement habits</li>
+        </ul>
+    </section>
+    
+    <div class="continue-btn-container">
+        <a href="{{ url_for('onboarding') }}" class="btn-primary glow-btn">Continue →</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.about-container {
+    min-height: 100vh;
+    padding: 60px 20px;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.hero-section {
+    text-align: center;
+    margin-bottom: 80px;
+    padding: 100px 0;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    color: #a78bfa;
+    margin-top: 20px;
+}
+
+.info-section {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 40px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.info-section h2 {
+    color: #c084fc;
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+.benefits-list {
+    list-style: none;
+    padding: 0;
+}
+
+.benefits-list li {
+    padding: 15px;
+    margin: 10px 0;
+    font-size: 1.2rem;
+    color: #e9d5ff;
+}
+
+.continue-btn-container {
+    text-align: center;
+    margin-top: 60px;
+}
+
+.fade-in {
+    animation: fadeIn 1s ease-in;
+}
+
+.fade-in-delay {
+    animation: fadeIn 1s ease-in 0.3s both;
+}
+
+.slide-up {
+    animation: slideUp 0.8s ease-out;
+}
+
+.slide-up-delay {
+    animation: slideUp 0.8s ease-out 0.2s both;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.parallax {
+    transform: translateZ(0);
+    will-change: transform;
+}
+</style>
+{% endblock %}

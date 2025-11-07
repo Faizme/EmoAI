@@ -1,0 +1,172 @@
+✅ Vibe Journal AI — Full Project Description (Copy-Paste Ready)
+
+Build a full-stack web app called “Vibe Journal AI”.
+The app helps users reflect on their emotions daily through a conversational AI, stores a journal entry automatically, and gently improves their life with reminders and goal tracking.
+
+🔐 Authentication + Personalization (Required)
+
+Add Signup and Login using Flask-Login
+
+Store hashed passwords (no plain text)
+
+After signup, redirect user to onboarding page
+
+Onboarding collects:
+
+Name (required)
+
+Age (optional)
+
+Main goal for self-improvement (mandatory)
+
+Save onboarding data in UserProfile table linked to user_id
+
+If user profile exists → skip onboarding and go to chatbot page
+
+🎨 UI/UX Style
+
+The design theme must be:
+
+✅ Dark Mode
+✅ Premium + Elegant
+✅ Neo-Noir style
+✅ Subtle gradients: Deep Purple → Teal
+✅ Smooth animations between pages
+✅ Floating 3D shapes & parallax depth
+
+MUST USE
+
+Parallax scrolling on info pages
+
+3D floating elements (Three.js or CSS 3D)
+
+Glassmorphism cards for input boxes
+
+Soft glows & hover animations
+
+Page transitions: slide /fade /blur
+
+No childish bright UI.
+Should feel emotional + futuristic + safe.
+
+📄 Pages & Flow (In Order)
+✅ Page 1: Signup / Login Page
+
+Dark hero UI
+
+Email + password forms
+
+Tiny smooth lights / particles behind
+
+✅ Page 2: “About the App”
+
+Clean storytelling:
+
+What the app does
+
+Why journaling helps emotions
+
+Scroll reveals + depth movement
+Arrow button to move to next page
+
+✅ Page 3: Onboarding Page
+
+(Form only for first-time users)
+Prompt:
+✨ “Tell us a little about you”
+Fields:
+
+Name
+
+Age
+
+Your biggest personal improvement goal
+
+Click next → store in DB → Go to chatbot
+
+✅ Page 4: Main Chatbot Interface
+
+Full-screen chat interface
+
+Subtle animated background
+
+Typing animation for AI responses
+
+Speech-style bubble UI
+
+AI greets user by name
+
+Flow example:
+
+“How are you feeling today?”
+
+AI asks 2–4 follow-ups based on emotion
+
+Also asks about daily tasks + progress toward user’s goal
+
+AI generates a Short Summary + Suggestion
+
+Button: “Save to Journal ✅”
+→ Store summary + mood + date + goal_progress into DB
+
+Also: “View Journal” button leads to history page
+
+🧠 AI Experience Specs
+
+Personality: Calm Mentor / Supportive Coach
+
+The AI must:
+
+Respond warmly
+
+Encourage reflection
+
+Remember user goals
+
+Recommend small improvements daily
+
+Use ANY free LLM API available in Replit
+(e.g., Groq, DeepSeek, HuggingFace)
+
+Prompt AI with user history to improve advice over time.
+
+🧱 Database Models (Minimum)
+Table: Users
+
+| id | email | password_hash |
+
+Table: UserProfile
+
+| id | user_id FK | name | age | goal |
+
+Table: Journal
+
+| id | user_id FK | mood | summary | goal_progress | timestamp |
+
+SQLite + SQLAlchemy ORM 💯
+
+📝 Journal Viewing Page (Optional but Recommended)
+
+List past entries in beautiful card layout
+
+Show:
+
+Date
+
+Mood emoji
+
+AI summary
+
+Add animated page transition
+
+⏰ Habit Reminder System (Simple MVP)
+
+Daily motivational reminder based on user’s goal
+
+Can be shown:
+
+On login
+
+Or as a floating toast popup
+
+Toggle ON/OFF stored in UserProfile
