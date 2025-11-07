@@ -1,16 +1,53 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>replit</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VILUN - Your AI Companion</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
-
 <body>
-  Hello world
+  <div class="container">
+    <header>
+      <h1>💜 VILUN</h1>
+      <p class="subtitle">Your friendly AI companion & journal</p>
+    </header>
+
+    <div class="chat-container">
+      <div id="chatBox" class="chat-box">
+        <div class="welcome-message">
+          <p>👋 Hi! I'm VILUN, your friendly companion.</p>
+          <p>I'm here to listen and be supportive. How are you feeling today?</p>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <input 
+          type="text" 
+          id="userInput" 
+          placeholder="Type your message here..." 
+          autocomplete="off"
+        />
+        <button id="sendBtn" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="action-btn" onclick="generateSummary()">
+        📝 Get Journal Summary
+      </button>
+      <button class="action-btn secondary" onclick="clearChat()">
+        🔄 New Conversation
+      </button>
+    </div>
+
+    <div id="summaryBox" class="summary-box" style="display: none;">
+      <h3>Your Journal Entry</h3>
+      <div id="summaryContent"></div>
+      <button class="close-btn" onclick="closeSummary()">Close</button>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
-
 </html>
