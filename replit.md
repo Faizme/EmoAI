@@ -1,16 +1,19 @@
-# VILUN - AI Companion & Journal
+# VIBE JOURNAL AI - Full-Stack Emotional Wellness App
 
 ## Overview
 
-VILUN is a web-based conversational AI companion that provides emotional support and journaling capabilities. The application combines real-time chat functionality with the ability to summarize conversations into journal entries. Built with Flask for the backend and vanilla JavaScript for the frontend, it uses Google's Generative AI (Gemini) to power two distinct AI personalities: a friendly companion for conversations and a summarizer for journal generation.
+Vibe Journal AI is a comprehensive full-stack web application that helps users reflect on their emotions daily through conversational AI. The app stores journal entries automatically, tracks personal goals, and provides gentle reminders for self-improvement. Built with Flask for the backend, SQLite for data persistence, and vanilla JavaScript for the frontend, it uses Google's Generative AI (Gemini 2.0) to power an empathetic conversational companion.
 
 ## Recent Changes (November 2025)
 
-- Implemented complete Flask backend with REST API endpoints
-- Created responsive chat interface with purple gradient design
-- Added per-session storage for user privacy (Flask sessions)
-- Integrated Google Gemini AI for conversational responses and journal summarization
-- Configured workflow for automatic server restart on port 5000
+- **Complete rebuild** from simple chatbot to full-featured journaling app
+- Implemented authentication system with Flask-Login and bcrypt
+- Created database models for Users, UserProfiles, Journals, and ChatMessages
+- Built complete user journey: Signup → About → Onboarding → Chatbot → Journal
+- Applied premium dark mode neo-noir UI design with glassmorphism
+- Added personalized AI responses based on user goals
+- Implemented journal storage with mood tracking and goal progress
+- Fixed critical session storage issue by moving chat history to database
 
 ## User Preferences
 
@@ -22,73 +25,126 @@ Preferred communication style: Simple, everyday language.
 
 **Technology Stack**: Vanilla JavaScript, HTML5, CSS3
 
-The frontend implements a single-page application (SPA) pattern without a framework, keeping the codebase lightweight and simple. The chat interface is built with standard DOM manipulation and fetch API for asynchronous communication.
+The frontend implements a multi-page application with premium dark mode styling:
 
 **Key Design Decisions**:
-- **No Framework Approach**: Chosen for simplicity and minimal dependencies, suitable for a focused chat interface
-- **Session-based State**: Chat history is maintained server-side in Flask sessions rather than client-side storage, ensuring state persistence across page refreshes
-- **Real-time UI Feedback**: Implements thinking indicators and message streaming to improve perceived responsiveness
+- **Neo-Noir Dark Theme**: Deep purple to teal gradients with glassmorphism effects
+- **Page Transitions**: Smooth fade and slide animations between pages
+- **No Framework Approach**: Lightweight vanilla JS for focused functionality
+- **Responsive Design**: Mobile-first approach with fluid layouts
 
 ### Backend Architecture
 
-**Framework**: Flask 3.0.0+
+**Framework**: Flask 3.0+ with Flask-Login, Flask-SQLAlchemy, Flask-Bcrypt
 
-The backend follows a simple REST API pattern with session management for conversation state.
+The backend follows an MVC pattern with route-based organization:
 
 **Key Design Decisions**:
-- **Session-based Storage**: Chat history stored in Flask sessions (encrypted cookies) rather than a database
-  - **Rationale**: Simplifies deployment and eliminates database dependency for MVP
-  - **Trade-offs**: Limited scalability, no persistence across server restarts, storage limitations
-  - **Alternative Considered**: Database storage would provide better persistence and scalability but adds complexity
-- **Stateful Conversation Management**: Each user session maintains its own chat history array
-- **Modular AI Core**: AI functionality separated into `attached_assets/ai_core_1762554001118.py` for clean separation of concerns
+- **Database-backed Chat History**: Chat messages stored in SQLite to avoid session cookie limits
+- **Session-based Authentication**: Flask-Login for secure user session management
+- **Password Security**: Bcrypt hashing for all user passwords
+- **Per-user Data Isolation**: All data scoped to authenticated user
+
+### Database Architecture
+
+**Technology**: SQLite with SQLAlchemy ORM
+
+**Tables**:
+1. **Users**: Email, password hash, timestamps
+2. **UserProfile**: Name, age, goal, reminder preferences (1:1 with User)
+3. **Journal**: Mood, summary, goal progress, timestamps (many:1 with User)
+4. **ChatMessage**: Session ID, role, content, timestamps (many:1 with User)
+
+**Key Design Decisions**:
+- **Chat History in Database**: Prevents session cookie overflow for long conversations
+- **Session-based Chat Isolation**: Each chat session gets unique ID
+- **Cascading Deletes**: User deletion removes all associated data
+- **SQLite for Simplicity**: Perfect for MVP, easily upgradable to PostgreSQL
 
 ### AI/ML Architecture
 
-**Provider**: Google Generative AI (Gemini 1.5 Flash)
+**Provider**: Google Generative AI (Gemini 2.0 Flash)
 
 **Dual-Model Approach**:
-1. **Conversational Model (VILUN)**: Configured with empathetic, friend-like personality through system instructions
+1. **Conversational Model (VILUN)**: Warm, empathetic companion with context awareness
 2. **Summarization Model**: Transforms conversations into first-person journal entries
 
 **Key Design Decisions**:
-- **Two Separate Model Instances**: Uses distinct system instructions for different behavioral contexts
-  - **Rationale**: Separates conversational tone from summarization logic, allowing specialized prompts
-  - **Pros**: Clear separation of concerns, optimized prompts for each task
-  - **Cons**: Doubled API calls for summary feature
-- **Stateless AI Integration**: Each request provides full chat history to maintain context
-- **Environment-based Configuration**: API keys managed through environment variables for security
+- **User Context Integration**: AI receives user's name, age, and goals for personalization
+- **Database-backed History**: Full conversation context without size limits
+- **Stateless AI Calls**: Each request provides complete history for continuity
 
 ### Authentication & Security
 
-**Current Implementation**: No user authentication system
+**Implementation**: Flask-Login + Bcrypt
 
 **Security Measures**:
-- Secret key for session encryption (environment variable or auto-generated)
-- Session data stored in encrypted cookies
-- API key protected via environment variables
+- Bcrypt password hashing (cost factor 12+)
+- Session cookie encryption with secret key
+- CSRF protection via Flask defaults
+- XSS prevention through HTML escaping
+- User data isolation at database level
 
-**Note**: The current architecture assumes single-user or trusted environment usage. Multi-user deployment would require implementing user authentication and associating chat histories with user accounts.
+## User Journey
+
+### 1. Landing Page (Login/Signup)
+- Dark hero UI with glassmorphism card
+- Email + password authentication
+- Smooth animations and floating particle effects
+
+### 2. About Page
+- Storytelling about app benefits
+- Parallax scrolling effects
+- Smooth transitions to onboarding
+
+### 3. Onboarding (First-time users only)
+- Collects name, age (optional), and personal goal
+- Beautiful gradient forms with glassmorphism
+- Skipped for returning users
+
+### 4. Chatbot Interface
+- Full-screen chat with VILUN AI
+- Personalized greetings using user's name
+- Typing indicators and smooth animations
+- Mood tracking and goal progress questions
+
+### 5. Journal Summary
+- AI-generated summary of conversation
+- Mood selection with emoji indicators
+- Goal progress notes (optional)
+- Save to journal database
+
+### 6. Journal View
+- Historical entries in beautiful cards
+- Shows date, mood, summary, and goal progress
+- Sorted by most recent first
 
 ## External Dependencies
 
 ### Third-party Services
 
-**Google Generative AI (Gemini API)**
-- **Purpose**: Powers conversational AI and summarization features
+**Google Generative AI (Gemini 2.0 API)**
+- **Purpose**: Powers conversational AI and summarization
 - **Integration Point**: `attached_assets/ai_core_1762554001118.py`
 - **Configuration**: Requires `GOOGLE_API_KEY` environment variable
-- **Models Used**: `gemini-1.5-flash` for both chat and summarization
+- **Models Used**: `gemini-2.0-flash` for both chat and summarization
 
 ### Python Packages
 
 **Flask** (>=3.0.0)
-- Web framework for routing, templating, and session management
-- Provides the HTTP server and request handling
+- Web framework for routing, templating, and request handling
+
+**Flask-Login** (>=0.6.3)
+- User session management and authentication
+
+**Flask-SQLAlchemy** (>=3.1.1)
+- ORM for database operations
+
+**Flask-Bcrypt** (>=1.0.1)
+- Password hashing and verification
 
 **google-generativeai** (>=0.3.0)
 - Official Google SDK for Generative AI
-- Handles API communication with Gemini models
 
 ### Environment Variables
 
@@ -101,3 +157,65 @@ The backend follows a simple REST API pattern with session management for conver
 ### Frontend Dependencies
 
 No external frontend libraries or CDNs required - uses native browser APIs exclusively.
+
+## Project Structure
+
+```
+├── app.py                      # Main Flask application
+├── models.py                   # SQLAlchemy database models
+├── templates/                  # HTML templates
+│   ├── base.html              # Base template with CSS/JS includes
+│   ├── login.html             # Login page
+│   ├── signup.html            # Signup page
+│   ├── about.html             # About page
+│   ├── onboarding.html        # Onboarding form
+│   ├── chatbot.html           # Main chat interface
+│   └── journal.html           # Journal history view
+├── static/
+│   ├── css/
+│   │   ├── main.css           # Global dark theme styles
+│   │   └── chatbot.css        # Chat-specific styles
+│   └── js/
+│       ├── main.js            # Global JavaScript utilities
+│       └── chatbot.js         # Chat interface logic
+├── attached_assets/
+│   └── ai_core_1762554001118.py  # Gemini AI integration
+└── instance/
+    └── vibe_journal.db        # SQLite database (auto-created)
+```
+
+## Features Implemented
+
+✅ **User Authentication**: Secure signup/login with password hashing  
+✅ **User Onboarding**: Collect name, age, and personal improvement goals  
+✅ **AI Chat Companion**: Empathetic VILUN chatbot with user personalization  
+✅ **Database Chat Storage**: Unlimited conversation length  
+✅ **Journal Summarization**: AI-powered conversation summaries  
+✅ **Mood Tracking**: Emoji-based mood selection  
+✅ **Goal Progress Tracking**: Optional notes on daily progress  
+✅ **Journal History**: View all past entries with beautiful cards  
+✅ **Premium Dark UI**: Neo-noir theme with glassmorphism  
+✅ **Responsive Design**: Works on desktop and mobile  
+✅ **Session Management**: Isolated conversations per user  
+✅ **Habit Reminders**: Toggle for daily motivational reminders (backend ready)
+
+## Security Notes
+
+- All passwords are hashed with bcrypt
+- Session cookies are encrypted
+- User data is isolated per account
+- XSS protection via template escaping
+- No sensitive data in client-side storage
+- Chat history stored server-side only
+
+## Future Enhancements
+
+- Email verification for signup
+- Password reset functionality
+- Daily reminder notifications (UI implementation)
+- Export journal entries as PDF
+- Mood analytics dashboard
+- Goal progress visualization
+- Multi-language support
+- Dark/light theme toggle
+- Voice input for chat

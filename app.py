@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import Bcrypt
-from models import db, User, UserProfile, Journal
+from models import db, User, UserProfile, Journal, ChatMessage
 import os
 import sys
 import secrets
@@ -128,6 +128,26 @@ def chatbot():
         return redirect(url_for('onboarding'))
     return render_template('chatbot.html', user_name=current_user.profile.name)
 
+def get_session_id():
+    if 'chat_session_id' not in session:
+        session['chat_session_id'] = secrets.token_hex(16)
+    return session['chat_session_id']
+
+def get_chat_history_from_db():
+    session_id = get_session_id()
+    messages = ChatMessage.query.filter_by(
+        user_id=current_user.id,
+        session_id=session_id
+    ).order_by(ChatMessage.timestamp).all()
+    
+    history = []
+    for msg in messages:
+        history.append({
+            'role': msg.role,
+            'parts': [msg.content]
+        })
+    return history
+
 @app.route('/chat', methods=['POST'])
 @login_required
 def chat():
@@ -136,32 +156,39 @@ def chat():
     if not user_message:
         return jsonify({'error': 'No message provided'}), 400
     
-    chat_history = session.get('chat_history', [])
+    session_id = get_session_id()
     
-    chat_history.append({
-        'role': 'user',
-        'parts': [user_message]
-    })
+    user_chat = ChatMessage(
+        user_id=current_user.id,
+        session_id=session_id,
+        role='user',
+        content=user_message
+    )
+    db.session.add(user_chat)
+    db.session.commit()
     
     try:
+        chat_history = get_chat_history_from_db()
+        
         user_context = f"""
         User's name: {current_user.profile.name}
         User's goal: {current_user.profile.goal}
         User's age: {current_user.profile.age if current_user.profile.age else 'Not specified'}
         """
         
-        context_message = chat_history[0] if len(chat_history) == 1 else chat_history[-1]
-        context_message['parts'][0] = f"{user_context}\n\nUser says: {context_message['parts'][0]}"
+        if len(chat_history) == 1:
+            chat_history[0]['parts'][0] = f"{user_context}\n\nUser says: {chat_history[0]['parts'][0]}"
         
         ai_response = get_ai_chat_response(chat_history)
         
-        chat_history.append({
-            'role': 'model',
-            'parts': [ai_response]
-        })
-        
-        session['chat_history'] = chat_history
-        session.modified = True
+        ai_chat = ChatMessage(
+            user_id=current_user.id,
+            session_id=session_id,
+            role='model',
+            content=ai_response
+        )
+        db.session.add(ai_chat)
+        db.session.commit()
         
         return jsonify({
             'response': ai_response,
@@ -191,9 +218,16 @@ def save_journal():
         goal_progress=goal_progress
     )
     db.session.add(journal)
+    
+    session_id = get_session_id()
+    ChatMessage.query.filter_by(
+        user_id=current_user.id,
+        session_id=session_id
+    ).delete()
+    
     db.session.commit()
     
-    session['chat_history'] = []
+    session['chat_session_id'] = secrets.token_hex(16)
     session.modified = True
     
     return jsonify({'success': True, 'message': 'Journal entry saved!'})
@@ -201,7 +235,7 @@ def save_journal():
 @app.route('/get_summary', methods=['POST'])
 @login_required
 def get_summary():
-    chat_history = session.get('chat_history', [])
+    chat_history = get_chat_history_from_db()
     
     if not chat_history:
         return jsonify({'error': 'No chat history to summarize'}), 400
@@ -240,7 +274,14 @@ def journal_view():
 @app.route('/clear_chat', methods=['POST'])
 @login_required
 def clear_chat():
-    session['chat_history'] = []
+    session_id = get_session_id()
+    ChatMessage.query.filter_by(
+        user_id=current_user.id,
+        session_id=session_id
+    ).delete()
+    db.session.commit()
+    
+    session['chat_session_id'] = secrets.token_hex(16)
     session.modified = True
     return jsonify({'success': True})
 
