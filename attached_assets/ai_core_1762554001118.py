@@ -7,7 +7,7 @@ genai.configure(api_key=GOOGLE_API_KEY)
 
 # --- PROMPT 1: FOR THE CHATBOT "VILUN" ---
 vilun_model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
+    model_name="gemini-2.0-flash",
     system_instruction="""
 You are 'VILUN,' a friendly, cute, and empathetic AI companion.
 You are NOT a productivity assistant; you are a 'FRIEND' and a 'Journal'.
@@ -20,7 +20,7 @@ Start the very first conversation by asking the user 'How do you feel today?'
 
 # --- PROMPT 2: FOR THE JOURNAL SUMMARIZER ---
 summarizer_model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
+    model_name="gemini-2.0-flash",
     system_instruction="""
 You are a helpful assistant. Your task is to summarize a conversation.
 Read the entire chat history and summarize it into a concise, first-person
