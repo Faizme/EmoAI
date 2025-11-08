@@ -120,7 +120,6 @@ function updateMoodEmoji() {
 async function saveJournal() {
     const mood = document.getElementById('moodSelect').value;
     const summary = document.getElementById('summaryText').innerText;
-    const goalProgress = document.getElementById('goalProgress').value;
     
     try {
         const response = await fetch('/save_journal', {
@@ -128,7 +127,7 @@ async function saveJournal() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ mood, summary, goal_progress: goalProgress }),
+            body: JSON.stringify({ mood, summary }),
         });
         
         const data = await response.json();
@@ -347,22 +346,11 @@ async function loadRemindersList() {
                 remindersList.appendChild(reminderCard);
             });
         } else {
-            remindersList.innerHTML = '<p class="no-reminders">No reminders yet. Click + to add one!</p>';
+            remindersList.innerHTML = '<p class="no-reminders">No reminders yet. Create one above!</p>';
         }
     } catch (error) {
         console.error('Failed to load reminders list:', error);
     }
-}
-
-function showAddReminderForm() {
-    document.getElementById('addReminderForm').classList.remove('hidden');
-    document.getElementById('newReminderMessage').focus();
-}
-
-function hideAddReminderForm() {
-    document.getElementById('addReminderForm').classList.add('hidden');
-    document.getElementById('newReminderMessage').value = '';
-    document.getElementById('newReminderTime').value = '';
 }
 
 async function createReminder() {
@@ -386,7 +374,10 @@ async function createReminder() {
         const data = await response.json();
         
         if (data.success) {
-            hideAddReminderForm();
+            // Clear the form
+            document.getElementById('newReminderMessage').value = '';
+            document.getElementById('newReminderTime').value = '';
+            // Reload the list
             await loadRemindersList();
         } else {
             alert(data.error || 'Failed to create reminder');

@@ -207,7 +207,6 @@ def save_journal():
     data = request.json
     mood = data.get('mood')
     summary = data.get('summary')
-    goal_progress = data.get('goal_progress', '')
     
     if not mood or not summary:
         return jsonify({'error': 'Mood and summary are required'}), 400
@@ -216,7 +215,7 @@ def save_journal():
         user_id=current_user.id,
         mood=mood,
         summary=summary,
-        goal_progress=goal_progress
+        goal_progress=''
     )
     db.session.add(journal)
     

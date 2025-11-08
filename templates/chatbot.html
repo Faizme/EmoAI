@@ -47,21 +47,17 @@
             
             <div class="reminder-header">
                 <h2 class="glow-text">My Reminders 🔔</h2>
-                <button onclick="showAddReminderForm()" class="add-reminder-btn glow-btn" title="Add New Reminder">
-                    ➕ Add
-                </button>
             </div>
             
-            <!-- Add Reminder Form (hidden by default) -->
-            <div id="addReminderForm" class="add-reminder-form hidden">
-                <h3 style="color: #c4b5fd; margin-bottom: 1rem;">Create New Reminder</h3>
+            <!-- Inline Create New Reminder Card (always visible) -->
+            <div id="addReminderForm" class="add-reminder-form">
+                <h3 style="color: #c4b5fd; margin-bottom: 1rem;">➕ Create New Reminder</h3>
                 <textarea id="newReminderMessage" class="glass-input" rows="3" 
                           placeholder="What would you like to be reminded about?"></textarea>
                 <input type="time" id="newReminderTime" class="glass-input" 
                        placeholder="Time (optional)" style="margin-top: 0.5rem;">
                 <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                    <button onclick="createReminder()" class="btn-primary">Create</button>
-                    <button onclick="hideAddReminderForm()" class="btn-secondary">Cancel</button>
+                    <button onclick="createReminder()" class="btn-primary">Create Reminder</button>
                 </div>
             </div>
             
@@ -135,9 +131,6 @@
                     <option value="😴 Tired">😴 Tired</option>
                     <option value="🔥 Motivated">🔥 Motivated</option>
                 </select>
-                
-                <label>Goal Progress (optional)</label>
-                <textarea id="goalProgress" class="glass-input" rows="3" placeholder="Any progress toward your goal today?"></textarea>
                 
                 <button onclick="saveJournal()" class="btn-primary glow-btn">Save to Journal ✅</button>
             </div>
