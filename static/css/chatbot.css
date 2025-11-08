@@ -77,6 +77,15 @@
     border-color: rgb(173, 119, 72);
 }
 
+.elegant-btn.voice-off {
+    opacity: 0.6;
+    border-color: rgba(173, 119, 72, 0.2);
+}
+
+.elegant-btn.voice-off svg {
+    opacity: 0.5;
+}
+
 .btn-icon {
     font-size: 1rem;
 }

@@ -52,15 +52,51 @@ function toggleVoiceInput() {
 }
 
 // Text-to-Speech for AI responses
+let voiceEnabled = localStorage.getItem('voiceEnabled') !== 'false';
+
 function speakText(text) {
-    if ('speechSynthesis' in window) {
+    if (voiceEnabled && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.9;
-        utterance.pitch = 1;
-        utterance.volume = 0.8;
+        utterance.rate = 0.95;
+        utterance.pitch = 1.05;
+        utterance.volume = 0.9;
+        
+        const voices = window.speechSynthesis.getVoices();
+        const femaleVoice = voices.find(voice => 
+            voice.name.includes('Female') || 
+            voice.name.includes('Samantha') ||
+            voice.name.includes('Karen') ||
+            voice.name.includes('Victoria')
+        );
+        if (femaleVoice) {
+            utterance.voice = femaleVoice;
+        }
+        
         window.speechSynthesis.speak(utterance);
     }
 }
+
+function toggleVoiceResponse() {
+    voiceEnabled = !voiceEnabled;
+    localStorage.setItem('voiceEnabled', voiceEnabled);
+    
+    const toggleBtn = document.getElementById('voiceToggleBtn');
+    const toggleText = document.getElementById('voiceToggleText');
+    
+    if (voiceEnabled) {
+        toggleBtn.classList.remove('voice-off');
+        toggleText.textContent = 'Voice On';
+    } else {
+        toggleBtn.classList.add('voice-off');
+        toggleText.textContent = 'Voice Off';
+        window.speechSynthesis.cancel();
+    }
+}
+
+window.speechSynthesis.onvoiceschanged = () => {
+    window.speechSynthesis.getVoices();
+};
 
 // Enter key to send
 userInput.addEventListener('keypress', (e) => {
@@ -96,8 +132,7 @@ async function sendMessage() {
         
         if (data.success) {
             addMessageToChat('ai', data.response);
-            // Optionally speak AI response
-            // speakText(data.response);
+            speakText(data.response);
         } else {
             addMessageToChat('error', data.error || 'Something went wrong');
         }

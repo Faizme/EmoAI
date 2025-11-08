@@ -2,7 +2,7 @@
 
 ## Overview
 
-EmoAI is a comprehensive full-stack web application designed to support users in daily emotional reflection through conversational AI. It automatically stores journal entries, tracks personal goals, and provides personalized reminders for self-improvement. The application leverages Google's Generative AI (Gemini 2.0) to power an emotionally intelligent conversational companion, offering a premium user experience with a sophisticated, warm aesthetic.
+EmoAI is a comprehensive full-stack web application designed to help users improve their lives through AI-powered support. It helps users quit bad habits, build better ones, and achieve personal goals through emotionally intelligent conversations. The app provides daily check-ins, personalized advice, habit tracking with streaks, voice interactions, and automatic journaling. It leverages Google's Generative AI (Gemini 2.0) to power a feeling-first, goal-oriented companion that understands emotional subtext while offering practical guidance.
 
 ## User Preferences
 
@@ -30,7 +30,7 @@ The application features an elegant, sophisticated Wix Studio-inspired aesthetic
 ### Feature Specifications
 
 -   **User Management**: Secure signup/login, onboarding for collecting user goals.
--   **AI Chat**: Personalized, empathetic conversational AI companion with context awareness.
+-   **AI Chat**: Personalized, empathetic conversational AI companion for habit-quitting, life improvement, and emotional support. Includes voice-to-text input and text-to-speech responses using Web Speech API.
 -   **Journaling**: AI-generated conversation summaries, mood tracking, goal progress notes, and historical journal entry viewing.
 -   **Reminders & Habits**: Daily personalized reminder popups, custom reminder creation and management, habit progress tracking, and a 7-day streak visualization.
 -   **Data Management**: Chat history and habit progress are stored in the database, with automatic cleanup of habit progress older than 30 days.
