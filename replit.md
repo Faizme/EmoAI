@@ -24,7 +24,14 @@ The application features an elegant, sophisticated Wix Studio-inspired aesthetic
 -   **Frontend**: Built with Vanilla JavaScript, HTML5, and CSS3, focusing on a lightweight, no-framework approach for focused functionality and accessibility.
 -   **Backend**: Flask 3.0+ framework utilizing Flask-Login for secure authentication, Flask-SQLAlchemy for ORM, and Flask-Bcrypt for password hashing. It follows an MVC pattern with route-based organization.
 -   **Database**: SQLite with SQLAlchemy ORM for data persistence.
--   **AI/ML**: Google Generative AI (Gemini 2.0 Flash) is used as a dual-model approach for conversational AI and summarization. The AI is designed to be deeply emotionally intelligent, understanding subtext and responding with nuanced, feeling-first interactions.
+-   **Timezone**: Entire application operates on IST (Indian Standard Time, GMT+5:30) for all datetime operations, timestamps, and scheduling.
+-   **AI/ML**: Google Generative AI (Gemini 2.0 Flash) is used for multiple purposes:
+    - Conversational AI with emotional intelligence
+    - Event extraction from natural language
+    - Calendar query detection and date parsing
+    - Sentiment analysis for adaptive responses
+    - Sleep pattern analysis
+    - Journal summarization
 -   **Authentication & Security**: Implemented using Flask-Login and Bcrypt for password hashing, session cookie encryption, CSRF protection, XSS prevention, and user data isolation.
 
 ### Feature Specifications
@@ -79,6 +86,12 @@ The application features an elegant, sophisticated Wix Studio-inspired aesthetic
     - Automatic Google Calendar OAuth2 sync for confirmed events
     - Automatic reminder creation at exact event times
     - Event cards display creation context (original message that triggered detection)
+-   **Calendar Query Feature**: Natural language calendar queries with AI-powered date parsing:
+    - Ask questions like "What's my schedule tomorrow?" or "Show me events this week"
+    - AI detects calendar queries and parses date ranges from natural language
+    - Fetches confirmed events from database within requested timeframe
+    - Presents events in warm, conversational format through the AI chat
+    - Supports queries for specific days, weeks, or custom date ranges
 -   **Wellness Score Dashboard**: Comprehensive 0-100 health scoring system combining multiple wellness metrics:
     - Overall wellness score calculated from 4 equally-weighted categories (25% each)
     - Mood Trends: Based on recent journal entry sentiments
