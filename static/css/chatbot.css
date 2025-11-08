@@ -12,8 +12,8 @@
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(circle at 30% 40%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 70% 60%, rgba(20, 184, 166, 0.08) 0%, transparent 50%);
+        radial-gradient(circle at 30% 40%, rgba(107, 169, 159, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 70% 60%, rgba(232, 181, 166, 0.1) 0%, transparent 50%);
     animation: bgPulse 15s ease-in-out infinite;
     pointer-events: none;
 }
@@ -46,17 +46,18 @@
 
 .icon-btn {
     padding: 10px 20px;
-    background: rgba(168, 85, 247, 0.2);
-    border: 1px solid rgba(168, 85, 247, 0.3);
+    background: rgba(107, 169, 159, 0.15);
+    border: 1px solid var(--border-sage);
     border-radius: 12px;
-    color: var(--light-purple);
+    color: var(--text-sage);
     cursor: pointer;
     transition: all 0.3s;
 }
 
 .icon-btn:hover {
-    background: rgba(168, 85, 247, 0.3);
+    background: rgba(107, 169, 159, 0.25);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .chat-box {
@@ -95,8 +96,8 @@
 }
 
 .ai-message .message-bubble {
-    background: rgba(168, 85, 247, 0.2);
-    border: 1px solid rgba(168, 85, 247, 0.3);
+    background: rgba(107, 169, 159, 0.15);
+    border: 1px solid var(--border-sage);
     color: var(--text-primary);
 }
 
@@ -105,7 +106,7 @@
 }
 
 .user-message .message-bubble {
-    background: linear-gradient(135deg, var(--accent-purple), var(--teal));
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
     color: white;
     text-align: left;
 }
@@ -114,14 +115,14 @@
     display: inline-flex;
     gap: 5px;
     padding: 15px 20px;
-    background: rgba(168, 85, 247, 0.1);
+    background: rgba(107, 169, 159, 0.1);
     border-radius: 20px;
 }
 
 .typing-dot {
     width: 8px;
     height: 8px;
-    background: var(--accent-purple);
+    background: var(--accent-color);
     border-radius: 50%;
     animation: typingBounce 1.4s ease-in-out infinite;
 }
@@ -153,7 +154,7 @@
     flex: 1;
     padding: 15px 20px;
     background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    border: 2px solid rgba(107, 169, 159, 0.3);
     border-radius: 15px;
     color: var(--text-primary);
     font-size: 1rem;
@@ -162,13 +163,13 @@
 }
 
 .chat-input:focus {
-    border-color: var(--accent-purple);
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 20px rgba(107, 169, 159, 0.3);
 }
 
 .send-btn {
     padding: 15px 30px;
-    background: linear-gradient(135deg, var(--accent-purple), var(--teal));
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-peach));
     border: none;
     border-radius: 15px;
     color: white;
@@ -179,7 +180,7 @@
 
 .send-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(168, 85, 247, 0.4);
+    box-shadow: 0 5px 20px rgba(107, 169, 159, 0.4);
 }
 
 .action-buttons {
@@ -204,9 +205,9 @@
 .action-btn-secondary {
     padding: 12px 30px;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(168, 85, 247, 0.3);
+    border: 1px solid rgba(107, 169, 159, 0.3);
     border-radius: 15px;
-    color: var(--light-purple);
+    color: var(--accent-light);
     cursor: pointer;
     transition: all 0.3s;
 }
@@ -246,12 +247,12 @@
     top: 20px;
     font-size: 2rem;
     cursor: pointer;
-    color: var(--light-purple);
+    color: var(--accent-light);
     transition: all 0.3s;
 }
 
 .close-modal:hover {
-    color: var(--accent-purple);
+    color: var(--accent-color);
     transform: rotate(90deg);
 }
 
@@ -260,7 +261,7 @@
     padding: 25px;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 15px;
-    border-left: 3px solid var(--accent-purple);
+    border-left: 3px solid var(--accent-color);
     color: var(--text-primary);
     line-height: 1.8;
 }
@@ -272,7 +273,7 @@
 .save-journal-form label {
     display: block;
     margin-bottom: 10px;
-    color: var(--light-purple);
+    color: var(--accent-light);
     font-weight: 600;
 }
 
@@ -326,8 +327,8 @@ select.glass-input {
     padding: 30px;
     border-radius: 20px;
     max-width: 400px;
-    box-shadow: 0 10px 40px rgba(168, 85, 247, 0.4);
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    box-shadow: 0 10px 40px rgba(107, 169, 159, 0.4);
+    border: 2px solid rgba(107, 169, 159, 0.3);
 }
 
 .reminder-icon {
@@ -344,7 +345,7 @@ select.glass-input {
 
 .reminder-content h3 {
     text-align: center;
-    color: var(--accent-purple);
+    color: var(--accent-color);
     margin-bottom: 10px;
     font-size: 1.5rem;
 }
@@ -367,7 +368,7 @@ select.glass-input {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    color: var(--light-purple);
+    color: var(--accent-light);
     cursor: pointer;
     transition: all 0.3s;
     font-weight: 600;
@@ -385,7 +386,7 @@ select.glass-input {
 
 .setting-row label {
     display: block;
-    color: var(--light-purple);
+    color: var(--accent-light);
     margin-bottom: 10px;
     font-weight: 600;
 }
@@ -414,7 +415,7 @@ select.glass-input {
     right: 0;
     bottom: 0;
     background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    border: 2px solid rgba(107, 169, 159, 0.3);
     border-radius: 30px;
     transition: 0.4s;
 }
@@ -426,14 +427,14 @@ select.glass-input {
     width: 20px;
     left: 3px;
     bottom: 3px;
-    background: var(--light-purple);
+    background: var(--accent-light);
     border-radius: 50%;
     transition: 0.4s;
 }
 
 .toggle-switch input:checked + .slider {
-    background: linear-gradient(135deg, var(--accent-purple), var(--teal));
-    border-color: var(--teal);
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-peach));
+    border-color: var(--accent-peach);
 }
 
 .toggle-switch input:checked + .slider:before {
@@ -444,7 +445,7 @@ select.glass-input {
 input[type="time"].glass-input {
     padding: 12px 20px;
     background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    border: 2px solid rgba(107, 169, 159, 0.3);
     border-radius: 12px;
     color: var(--text-primary);
     font-size: 1rem;
@@ -454,8 +455,8 @@ input[type="time"].glass-input {
 }
 
 input[type="time"].glass-input:focus {
-    border-color: var(--accent-purple);
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 20px rgba(107, 169, 159, 0.3);
 }
 
 /* Reminder Management UI Styles */
@@ -478,7 +479,7 @@ input[type="time"].glass-input:focus {
 
 .add-reminder-btn {
     padding: 10px 20px;
-    background: linear-gradient(135deg, var(--accent-purple), var(--teal));
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-peach));
     border: none;
     border-radius: 12px;
     color: white;
@@ -490,12 +491,12 @@ input[type="time"].glass-input:focus {
 
 .add-reminder-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
+    box-shadow: 0 8px 25px rgba(107, 169, 159, 0.4);
 }
 
 .add-reminder-form {
-    background: rgba(168, 85, 247, 0.1);
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    background: rgba(107, 169, 159, 0.1);
+    border: 2px solid rgba(107, 169, 159, 0.3);
     border-radius: 15px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
@@ -533,13 +534,13 @@ input[type="time"].glass-input:focus {
 }
 
 .reminders-list::-webkit-scrollbar-thumb {
-    background: rgba(168, 85, 247, 0.3);
+    background: rgba(107, 169, 159, 0.3);
     border-radius: 10px;
 }
 
 .reminder-card {
     background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    border: 2px solid rgba(107, 169, 159, 0.3);
     border-radius: 12px;
     padding: 1rem;
     display: flex;
@@ -551,7 +552,7 @@ input[type="time"].glass-input:focus {
 }
 
 .reminder-card:hover {
-    border-color: rgba(168, 85, 247, 0.5);
+    border-color: rgba(107, 169, 159, 0.5);
     background: rgba(255, 255, 255, 0.08);
 }
 
@@ -567,9 +568,9 @@ input[type="time"].glass-input:focus {
 }
 
 .reminder-time {
-    color: var(--light-purple);
+    color: var(--accent-light);
     font-size: 0.85rem;
-    background: rgba(168, 85, 247, 0.2);
+    background: rgba(107, 169, 159, 0.2);
     padding: 4px 10px;
     border-radius: 8px;
     display: inline-block;
@@ -584,7 +585,7 @@ input[type="time"].glass-input:focus {
     width: 36px;
     height: 36px;
     border-radius: 8px;
-    border: 2px solid rgba(168, 85, 247, 0.3);
+    border: 2px solid rgba(107, 169, 159, 0.3);
     background: rgba(255, 255, 255, 0.05);
     color: var(--text-primary);
     cursor: pointer;
@@ -612,7 +613,7 @@ input[type="time"].glass-input:focus {
 
 .reminder-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+    box-shadow: 0 4px 15px rgba(107, 169, 159, 0.3);
 }
 
 .reminder-btn.delete:hover {
@@ -622,7 +623,7 @@ input[type="time"].glass-input:focus {
 
 .no-reminders {
     text-align: center;
-    color: var(--light-purple);
+    color: var(--accent-light);
     font-style: italic;
     padding: 2rem;
 }

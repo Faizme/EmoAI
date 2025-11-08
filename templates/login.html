@@ -3,27 +3,42 @@
 {% block title %}Login - Vibe Journal AI{% endblock %}
 
 {% block content %}
-<div class="clean-bg">
-    <div class="auth-container">
-        <div class="auth-card">
-            <h1>Welcome Back</h1>
-            <p class="subtitle">Continue your journey of self-discovery</p>
+<div class="auth-split-container">
+    <div class="auth-visual-side">
+        <div class="visual-content">
+            <img src="{{ url_for('static', filename='../attached_assets/stock_images/3d_pastel_workspace__16e72de1.jpg') }}" alt="Elegant workspace" class="auth-hero-image">
+            <div class="floating-shape shape-1"></div>
+            <div class="floating-shape shape-2"></div>
+        </div>
+    </div>
+    
+    <div class="auth-form-side">
+        <div class="auth-form-container">
+            <div class="brand-header">
+                <h1 class="brand-title">VILUN</h1>
+                <p class="brand-tagline">Your AI Companion</p>
+            </div>
             
-            <form method="POST" class="auth-form">
-                <div class="form-group">
-                    <label for="email" class="form-label">Email Address</label>
-                    <input type="email" id="email" name="email" placeholder="Enter your email" required class="form-input" autocomplete="email">
-                </div>
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required class="form-input" autocomplete="current-password">
-                </div>
-                <button type="submit" class="btn btn-primary">Login</button>
-            </form>
-            
-            <p class="auth-switch">
-                Don't have an account? <a href="{{ url_for('signup') }}" class="auth-link">Sign Up</a>
-            </p>
+            <div class="auth-content">
+                <h2 class="auth-title">Welcome Back</h2>
+                <p class="auth-description">Continue your journey of self-discovery and growth</p>
+                
+                <form method="POST" class="elegant-form">
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email" required class="form-input" autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required class="form-input" autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-elegant">Login</button>
+                </form>
+                
+                <p class="auth-switch">
+                    Don't have an account? <a href="{{ url_for('signup') }}" class="auth-link">Sign Up</a>
+                </p>
+            </div>
         </div>
     </div>
 </div>

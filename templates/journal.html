@@ -61,17 +61,19 @@
 }
 
 .btn-back {
-    background: rgba(168, 85, 247, 0.2);
+    background: rgba(107, 169, 159, 0.15);
     padding: 12px 24px;
     border-radius: 12px;
-    color: #c084fc;
+    color: var(--accent-color);
     text-decoration: none;
     transition: all 0.3s;
+    border: 1px solid var(--border-sage);
 }
 
 .btn-back:hover {
-    background: rgba(168, 85, 247, 0.3);
+    background: rgba(107, 169, 159, 0.25);
     transform: translateX(-5px);
+    box-shadow: var(--shadow-md);
 }
 
 .journal-entries {
@@ -93,14 +95,15 @@
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+    border-bottom: 1px solid var(--border-sage);
 }
 
 .mood-badge {
     font-size: 1.5rem;
     padding: 8px 16px;
-    background: rgba(168, 85, 247, 0.2);
+    background: rgba(107, 169, 159, 0.15);
     border-radius: 12px;
+    border: 1px solid var(--border-sage);
 }
 
 .journal-date {
@@ -109,7 +112,7 @@
 }
 
 .journal-content p {
-    color: #e9d5ff;
+    color: var(--text-secondary);
     line-height: 1.8;
     font-size: 1.1rem;
 }
@@ -117,13 +120,13 @@
 .goal-progress-section {
     margin-top: 20px;
     padding: 15px;
-    background: rgba(168, 85, 247, 0.1);
+    background: rgba(107, 169, 159, 0.08);
     border-radius: 12px;
-    border-left: 3px solid #a855f7;
+    border-left: 3px solid var(--accent-color);
 }
 
 .goal-progress-section strong {
-    color: #c084fc;
+    color: var(--accent-color);
 }
 
 .goal-progress-section p {
@@ -139,7 +142,7 @@
 }
 
 .empty-state h2 {
-    color: #c084fc;
+    color: var(--text-sage);
     margin-bottom: 15px;
 }
 
