@@ -815,6 +815,11 @@ def generate_motivation_message(activity_type):
     
     return random.choice(category_messages)
 
+@app.route('/my_calendar')
+@login_required
+def my_calendar():
+    return render_template('my_calendar.html')
+
 @app.route('/get_events', methods=['GET'])
 @login_required
 def get_events():
