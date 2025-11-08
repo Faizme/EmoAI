@@ -14,6 +14,7 @@ class User(UserMixin, db.Model):
     
     profile = db.relationship('UserProfile', backref='user', uselist=False, cascade='all, delete-orphan')
     journals = db.relationship('Journal', backref='user', lazy=True, cascade='all, delete-orphan')
+    reminders = db.relationship('Reminder', backref='user', lazy=True, cascade='all, delete-orphan')
 
 class UserProfile(db.Model):
     __tablename__ = 'user_profiles'
@@ -65,3 +66,16 @@ class HabitProgress(db.Model):
     
     def __repr__(self):
         return f'<HabitProgress {self.id} - {self.date}>'
+
+class Reminder(db.Model):
+    __tablename__ = 'reminders'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    time = db.Column(db.String(10), nullable=True)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Reminder {self.id} - {self.message[:20]}...>'

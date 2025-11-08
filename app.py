@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import Bcrypt
-from models import db, User, UserProfile, Journal, ChatMessage, HabitProgress
+from models import db, User, UserProfile, Journal, ChatMessage, HabitProgress, Reminder
 import os
 import sys
 import secrets
+import random
 from datetime import datetime, date, timedelta
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'attached_assets'))
@@ -362,10 +363,23 @@ def get_reminder_status():
         date=today
     ).first()
     
+    # Get a random active reminder if available
+    active_reminders = Reminder.query.filter_by(
+        user_id=current_user.id,
+        is_active=True
+    ).all()
+    
+    if active_reminders:
+        random_reminder = random.choice(active_reminders)
+        reminder_message = random_reminder.message
+    else:
+        # Fallback to goal if no custom reminders
+        reminder_message = f"How's your progress on: {current_user.profile.goal}?"
+    
     return jsonify({
         'show_reminder': not existing,
         'user_name': current_user.profile.name,
-        'habit_goal': current_user.profile.goal,
+        'reminder_message': reminder_message,
         'reminder_time': current_user.profile.reminder_time
     })
 
@@ -448,6 +462,102 @@ def toggle_reminder():
             'enabled': current_user.profile.reminder_enabled
         })
     return jsonify({'success': False}), 400
+
+# ========== CUSTOM REMINDER MANAGEMENT ROUTES ==========
+
+@app.route('/get_reminders', methods=['GET'])
+@login_required
+def get_reminders():
+    """Get all reminders for the current user"""
+    reminders = Reminder.query.filter_by(user_id=current_user.id).order_by(Reminder.created_at.desc()).all()
+    return jsonify({
+        'success': True,
+        'reminders': [{
+            'id': r.id,
+            'message': r.message,
+            'time': r.time,
+            'is_active': r.is_active,
+            'created_at': r.created_at.strftime('%Y-%m-%d %H:%M')
+        } for r in reminders]
+    })
+
+@app.route('/create_reminder', methods=['POST'])
+@login_required
+def create_reminder():
+    """Create a new custom reminder"""
+    data = request.json
+    message = data.get('message', '').strip()
+    time = data.get('time')
+    
+    if not message:
+        return jsonify({'success': False, 'error': 'Message is required'}), 400
+    
+    reminder = Reminder(
+        user_id=current_user.id,
+        message=message,
+        time=time,
+        is_active=True
+    )
+    db.session.add(reminder)
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'reminder': {
+            'id': reminder.id,
+            'message': reminder.message,
+            'time': reminder.time,
+            'is_active': reminder.is_active,
+            'created_at': reminder.created_at.strftime('%Y-%m-%d %H:%M')
+        }
+    })
+
+@app.route('/update_reminder/<int:reminder_id>', methods=['PUT'])
+@login_required
+def update_reminder(reminder_id):
+    """Update an existing reminder"""
+    reminder = Reminder.query.filter_by(id=reminder_id, user_id=current_user.id).first()
+    
+    if not reminder:
+        return jsonify({'success': False, 'error': 'Reminder not found'}), 404
+    
+    data = request.json
+    if 'message' in data:
+        message = data['message'].strip()
+        if not message:
+            return jsonify({'success': False, 'error': 'Message cannot be empty'}), 400
+        reminder.message = message
+    if 'time' in data:
+        reminder.time = data['time']
+    if 'is_active' in data:
+        reminder.is_active = data['is_active']
+    
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'reminder': {
+            'id': reminder.id,
+            'message': reminder.message,
+            'time': reminder.time,
+            'is_active': reminder.is_active,
+            'created_at': reminder.created_at.strftime('%Y-%m-%d %H:%M')
+        }
+    })
+
+@app.route('/delete_reminder/<int:reminder_id>', methods=['DELETE'])
+@login_required
+def delete_reminder(reminder_id):
+    """Delete a reminder"""
+    reminder = Reminder.query.filter_by(id=reminder_id, user_id=current_user.id).first()
+    
+    if not reminder:
+        return jsonify({'success': False, 'error': 'Reminder not found'}), 404
+    
+    db.session.delete(reminder)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'message': 'Reminder deleted'})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

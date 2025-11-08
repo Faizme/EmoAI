@@ -42,29 +42,60 @@
     
     <!-- Reminder Settings Modal -->
     <div id="reminderSettingsModal" class="modal hidden">
-        <div class="modal-content glass">
+        <div class="modal-content glass reminder-modal-large">
             <span class="close-modal" onclick="closeReminderSettings()">&times;</span>
-            <h2 class="glow-text">Reminder Settings 🔔</h2>
             
-            <div class="setting-row">
-                <label class="toggle-label">
-                    <span>Daily Reminders</span>
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="reminderToggle" onchange="updateReminderToggle()">
-                        <span class="slider"></span>
-                    </div>
-                </label>
+            <div class="reminder-header">
+                <h2 class="glow-text">My Reminders 🔔</h2>
+                <button onclick="showAddReminderForm()" class="add-reminder-btn glow-btn" title="Add New Reminder">
+                    ➕ Add
+                </button>
             </div>
             
-            <div class="setting-row" id="timePickerRow">
-                <label>Reminder Time (optional)</label>
-                <input type="time" id="reminderTime" class="glass-input" onchange="updateReminderTime()">
-                <p style="color: #b4a5d9; font-size: 0.9rem; margin-top: 0.5rem;">
-                    Leave blank for reminders on page load
-                </p>
+            <!-- Add Reminder Form (hidden by default) -->
+            <div id="addReminderForm" class="add-reminder-form hidden">
+                <h3 style="color: #c4b5fd; margin-bottom: 1rem;">Create New Reminder</h3>
+                <textarea id="newReminderMessage" class="glass-input" rows="3" 
+                          placeholder="What would you like to be reminded about?"></textarea>
+                <input type="time" id="newReminderTime" class="glass-input" 
+                       placeholder="Time (optional)" style="margin-top: 0.5rem;">
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <button onclick="createReminder()" class="btn-primary">Create</button>
+                    <button onclick="hideAddReminderForm()" class="btn-secondary">Cancel</button>
+                </div>
             </div>
             
-            <button onclick="closeReminderSettings()" class="btn-primary">Done</button>
+            <!-- Reminders List -->
+            <div id="remindersList" class="reminders-list">
+                <p class="no-reminders">Loading reminders...</p>
+            </div>
+            
+            <hr style="border-color: rgba(196, 181, 253, 0.2); margin: 1.5rem 0;">
+            
+            <!-- Global Settings -->
+            <div class="reminder-settings-section">
+                <h3 style="color: #c4b5fd; margin-bottom: 1rem;">Settings</h3>
+                
+                <div class="setting-row">
+                    <label class="toggle-label">
+                        <span>Enable Daily Reminders</span>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="reminderToggle" onchange="updateReminderToggle()">
+                            <span class="slider"></span>
+                        </div>
+                    </label>
+                </div>
+                
+                <div class="setting-row" id="timePickerRow">
+                    <label>Default Reminder Time (optional)</label>
+                    <input type="time" id="reminderTime" class="glass-input" onchange="updateReminderTime()">
+                    <p style="color: #b4a5d9; font-size: 0.9rem; margin-top: 0.5rem;">
+                        Leave blank for reminders on page load
+                    </p>
+                </div>
+            </div>
+            
+            <button onclick="closeReminderSettings()" class="btn-primary" style="margin-top: 1rem;">Done</button>
         </div>
     </div>
     

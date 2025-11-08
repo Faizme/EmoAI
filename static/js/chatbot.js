@@ -215,10 +215,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         const data = await response.json();
         
         if (data.show_reminder) {
-            // Update reminder popup with personalized message
+            // Update reminder popup with custom message
             document.getElementById('reminderGreeting').textContent = `Hey ${data.user_name}! 👋`;
-            document.getElementById('reminderMessage').textContent = 
-                `Did you take one small step for your goal: "${data.habit_goal}" today?`;
+            document.getElementById('reminderMessage').textContent = data.reminder_message || "How are you doing today?";
             
             // Show reminder popup after a short delay
             setTimeout(() => {
@@ -281,6 +280,7 @@ async function saveProgress() {
 
 // Reminder Settings Modal Functions
 async function openReminderSettings() {
+    await loadRemindersList();
     await loadReminderSettings();
     document.getElementById('reminderSettingsModal').classList.remove('hidden');
     document.getElementById('reminderSettingsModal').style.display = 'block';
@@ -309,6 +309,134 @@ async function loadReminderSettings() {
         }
     } catch (error) {
         console.error('Failed to load reminder settings:', error);
+    }
+}
+
+async function loadRemindersList() {
+    try {
+        const response = await fetch('/get_reminders');
+        const data = await response.json();
+        
+        const remindersList = document.getElementById('remindersList');
+        if (!remindersList) return;
+        
+        remindersList.innerHTML = '';
+        
+        if (data.reminders && data.reminders.length > 0) {
+            data.reminders.forEach(reminder => {
+                const reminderCard = document.createElement('div');
+                reminderCard.className = 'reminder-card';
+                reminderCard.innerHTML = `
+                    <div class="reminder-content">
+                        <p class="reminder-text">${escapeHtml(reminder.message)}</p>
+                        ${reminder.time ? `<span class="reminder-time">⏰ ${reminder.time}</span>` : ''}
+                    </div>
+                    <div class="reminder-actions">
+                        <button onclick="toggleReminderActive(${reminder.id}, ${!reminder.is_active})" 
+                                class="reminder-btn ${reminder.is_active ? 'active' : 'inactive'}" 
+                                title="${reminder.is_active ? 'Deactivate' : 'Activate'}">
+                            ${reminder.is_active ? '✓' : '○'}
+                        </button>
+                        <button onclick="deleteReminderItem(${reminder.id})" 
+                                class="reminder-btn delete" 
+                                title="Delete">
+                            🗑️
+                        </button>
+                    </div>
+                `;
+                remindersList.appendChild(reminderCard);
+            });
+        } else {
+            remindersList.innerHTML = '<p class="no-reminders">No reminders yet. Click + to add one!</p>';
+        }
+    } catch (error) {
+        console.error('Failed to load reminders list:', error);
+    }
+}
+
+function showAddReminderForm() {
+    document.getElementById('addReminderForm').classList.remove('hidden');
+    document.getElementById('newReminderMessage').focus();
+}
+
+function hideAddReminderForm() {
+    document.getElementById('addReminderForm').classList.add('hidden');
+    document.getElementById('newReminderMessage').value = '';
+    document.getElementById('newReminderTime').value = '';
+}
+
+async function createReminder() {
+    const message = document.getElementById('newReminderMessage').value.trim();
+    const time = document.getElementById('newReminderTime').value;
+    
+    if (!message) {
+        alert('Please enter a reminder message!');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/create_reminder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message, time }),
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            hideAddReminderForm();
+            await loadRemindersList();
+        } else {
+            alert(data.error || 'Failed to create reminder');
+        }
+    } catch (error) {
+        alert('Failed to create reminder. Please try again.');
+    }
+}
+
+async function toggleReminderActive(reminderId, newState) {
+    try {
+        const response = await fetch(`/update_reminder/${reminderId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ is_active: newState }),
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            await loadRemindersList();
+        } else {
+            alert(data.error || 'Failed to update reminder');
+        }
+    } catch (error) {
+        alert('Failed to update reminder. Please try again.');
+    }
+}
+
+async function deleteReminderItem(reminderId) {
+    if (!confirm('Are you sure you want to delete this reminder?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/delete_reminder/${reminderId}`, {
+            method: 'DELETE',
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            await loadRemindersList();
+        } else {
+            alert(data.error || 'Failed to delete reminder');
+        }
+    } catch (error) {
+        alert('Failed to delete reminder. Please try again.');
     }
 }
 
