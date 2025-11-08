@@ -255,12 +255,11 @@ def chat():
             
             events = Event.query.filter(
                 Event.user_id == current_user.id,
-                Event.is_confirmed == True,
                 Event.event_date >= start_date,
                 Event.event_date <= end_date
             ).order_by(Event.event_date, Event.event_time).all()
             
-            print(f"[CALENDAR QUERY DEBUG] Confirmed events: {len(events)}")
+            print(f"[CALENDAR QUERY DEBUG] All events: {len(events)}")
             
             if events:
                 events_list = []
@@ -270,12 +269,14 @@ def chat():
                         event_info += f" at {evt.event_time}"
                     if evt.location:
                         event_info += f" (Location: {evt.location})"
+                    if not evt.is_confirmed:
+                        event_info += " (pending confirmation)"
                     events_list.append(event_info)
                 
-                calendar_events_context = f"\n\n[CALENDAR EVENTS for your response]\nThe user has these confirmed events in their calendar:\n" + "\n".join(events_list) + "\n\nPlease present these events in a warm, conversational way."
+                calendar_events_context = f"\n\n[CALENDAR EVENTS for your response]\nThe user has these events in their calendar:\n" + "\n".join(events_list) + "\n\nPlease present these events in a warm, conversational way. If any event is pending confirmation, gently remind them they can confirm it."
                 print(f"[CALENDAR QUERY DEBUG] Calendar events context added to AI")
             else:
-                calendar_events_context = f"\n\n[CALENDAR EVENTS for your response]\nThe user has no confirmed events in this time period. Let them know gently that their calendar is clear for this time."
+                calendar_events_context = f"\n\n[CALENDAR EVENTS for your response]\nThe user has no events in this time period. Let them know gently that their calendar is clear for this time."
                 print(f"[CALENDAR QUERY DEBUG] No events found, telling AI calendar is clear")
         
         chat_history = get_chat_history_from_db()
