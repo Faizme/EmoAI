@@ -179,16 +179,24 @@ def chat():
         )
         db.session.add(sentiment_record)
         
-        today_date = date.today().isoformat()
-        detected_event = extract_event_from_message(user_message, today_date)
+        current_datetime = datetime.now()
+        detected_event = extract_event_from_message(user_message, current_datetime)
         
         event_data = None
         if detected_event:
             try:
                 event_date = datetime.strptime(detected_event['date'], '%Y-%m-%d').date()
+                event_time_str = detected_event.get('time')
                 
-                if event_date <= date.today():
-                    print(f"Rejected past/today event: {event_date}")
+                is_future_event = False
+                if event_date > date.today():
+                    is_future_event = True
+                elif event_date == date.today() and event_time_str:
+                    event_datetime = datetime.strptime(f"{detected_event['date']} {event_time_str}", '%Y-%m-%d %H:%M')
+                    is_future_event = event_datetime > current_datetime
+                
+                if not is_future_event:
+                    print(f"Rejected past event: {event_date} {event_time_str}")
                 elif not detected_event.get('title'):
                     print(f"Rejected event without title")
                 else:
@@ -831,6 +839,10 @@ def get_events():
 @login_required
 def confirm_event(event_id):
     """Confirm and optionally edit an event"""
+    from google.oauth2.credentials import Credentials
+    from googleapiclient.discovery import build
+    import json
+    
     event = Event.query.filter_by(id=event_id, user_id=current_user.id).first()
     if not event:
         return jsonify({'success': False, 'error': 'Event not found'}), 404
@@ -847,14 +859,76 @@ def confirm_event(event_id):
         event.location = data['location']
     
     event.is_confirmed = True
+    
+    existing_reminder = Reminder.query.filter_by(
+        user_id=current_user.id,
+        message=f"Event: {event.title}"
+    ).first()
+    
+    if existing_reminder:
+        existing_reminder.time = event.event_time
+        existing_reminder.is_active = True
+    elif event.event_time:
+        reminder = Reminder(
+            user_id=current_user.id,
+            message=f"Event: {event.title}",
+            time=event.event_time,
+            is_active=True
+        )
+        db.session.add(reminder)
+    
     db.session.commit()
+    
+    token_record = GoogleCalendarToken.query.filter_by(user_id=current_user.id).first()
+    if token_record and not event.is_in_google_calendar:
+        try:
+            creds = Credentials(
+                token=token_record.access_token,
+                refresh_token=token_record.refresh_token,
+                token_uri=token_record.token_uri,
+                client_id=token_record.client_id,
+                client_secret=token_record.client_secret,
+                scopes=json.loads(token_record.scopes) if token_record.scopes else []
+            )
+            
+            service = build('calendar', 'v3', credentials=creds)
+            
+            event_body = {
+                'summary': event.title,
+                'description': event.description or '',
+                'start': {
+                    'date': event.event_date.isoformat(),
+                    'timeZone': 'UTC',
+                },
+                'end': {
+                    'date': event.event_date.isoformat(),
+                    'timeZone': 'UTC',
+                }
+            }
+            
+            if event.event_time:
+                start_datetime = f"{event.event_date.isoformat()}T{event.event_time}:00"
+                event_body['start'] = {'dateTime': start_datetime, 'timeZone': 'UTC'}
+                event_body['end'] = {'dateTime': start_datetime, 'timeZone': 'UTC'}
+            
+            if event.location:
+                event_body['location'] = event.location
+            
+            calendar_event = service.events().insert(calendarId='primary', body=event_body).execute()
+            
+            event.is_in_google_calendar = True
+            event.google_calendar_id = calendar_event['id']
+            db.session.commit()
+        except Exception as e:
+            print(f"Error auto-syncing to Google Calendar: {e}")
     
     return jsonify({'success': True, 'event': {
         'id': event.id,
         'title': event.title,
         'date': event.event_date.isoformat(),
         'time': event.event_time,
-        'location': event.location
+        'location': event.location,
+        'synced_to_google': event.is_in_google_calendar
     }})
 
 @app.route('/delete_event/<int:event_id>', methods=['DELETE'])

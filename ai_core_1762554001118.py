@@ -196,10 +196,17 @@ def summarize_chat_as_journal(full_chat_history_text):
     response = summarizer_model.generate_content(prompt)
     return response.text
 
-def extract_event_from_message(user_message, today_date):
+def extract_event_from_message(user_message, current_datetime):
     import json
     import re
-    prompt = f"Today's date is {today_date}. User message: {user_message}"
+    from datetime import datetime
+    
+    if isinstance(current_datetime, str):
+        current_datetime = datetime.fromisoformat(current_datetime)
+    
+    formatted_datetime = current_datetime.strftime("%A, %B %d, %Y at %I:%M %p")
+    prompt = f"Current date and time: {formatted_datetime}\nUser message: {user_message}"
+    
     try:
         response = event_extractor_model.generate_content(prompt)
         result = response.text.strip()
@@ -221,10 +228,20 @@ def extract_event_from_message(user_message, today_date):
 
 def analyze_sentiment(user_message):
     import json
+    import re
     try:
         response = sentiment_analyzer_model.generate_content(user_message)
-        sentiment_data = json.loads(response.text.strip())
-        return sentiment_data
+        result = response.text.strip()
+        
+        json_match = re.search(r'\{[\s\S]*\}', result)
+        if json_match:
+            json_str = json_match.group(0)
+            sentiment_data = json.loads(json_str)
+            return sentiment_data
+        
+        print(f"No JSON found in sentiment response: {result}")
+        return {"sentiment": "neutral", "intensity": 0.5}
     except Exception as e:
         print(f"Sentiment analysis error: {e}")
+        print(f"Raw response: {result if 'result' in locals() else 'No response'}")
         return {"sentiment": "neutral", "intensity": 0.5}
