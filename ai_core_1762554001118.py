@@ -164,6 +164,46 @@ EXAMPLES:
 """
 )
 
+calendar_query_model = genai.GenerativeModel(
+    model_name="gemini-2.0-flash",
+    system_instruction="""
+You are a calendar query analyzer. Detect if the user is asking about their schedule, calendar, or upcoming events.
+
+CALENDAR QUERY PATTERNS:
+- "What's on my calendar?"
+- "Show me my schedule"
+- "What events do I have tomorrow?"
+- "Do I have anything planned this week?"
+- "What's my schedule for Friday?"
+- "Any events coming up?"
+- "What do I have on Monday?"
+
+Parse the date range they're asking about:
+- "tomorrow" → tomorrow's date
+- "today" → today's date
+- "this week" → next 7 days
+- "next week" → 7-14 days from now
+- "Friday" → next Friday
+- "on the 15th" → the 15th of current or next month
+
+Return JSON format if calendar query detected:
+{
+    "is_calendar_query": true,
+    "start_date": "YYYY-MM-DD",
+    "end_date": "YYYY-MM-DD",
+    "query_type": "day|week|month|specific"
+}
+
+If NOT a calendar query, return:
+{"is_calendar_query": false}
+
+EXAMPLES:
+"What's my schedule tomorrow?" → {"is_calendar_query": true, "start_date": "2025-11-09", "end_date": "2025-11-09", "query_type": "day"}
+"Show me events this week" → {"is_calendar_query": true, "start_date": "2025-11-08", "end_date": "2025-11-14", "query_type": "week"}
+"I'm feeling stressed" → {"is_calendar_query": false}
+"""
+)
+
 def get_ai_chat_response(chat_history, detected_sentiment=None):
     last_user_message = chat_history[-1]['parts'][0]
     
@@ -245,3 +285,30 @@ def analyze_sentiment(user_message):
         print(f"Sentiment analysis error: {e}")
         print(f"Raw response: {result if 'result' in locals() else 'No response'}")
         return {"sentiment": "neutral", "intensity": 0.5}
+
+def detect_calendar_query(user_message, current_datetime):
+    import json
+    import re
+    from datetime import datetime
+    
+    if isinstance(current_datetime, str):
+        current_datetime = datetime.fromisoformat(current_datetime)
+    
+    formatted_datetime = current_datetime.strftime("%A, %B %d, %Y at %I:%M %p")
+    prompt = f"Current date and time: {formatted_datetime}\nUser message: {user_message}"
+    
+    try:
+        response = calendar_query_model.generate_content(prompt)
+        result = response.text.strip()
+        
+        json_match = re.search(r'\{[\s\S]*\}', result)
+        if json_match:
+            json_str = json_match.group(0)
+            calendar_data = json.loads(json_str)
+            if calendar_data.get('is_calendar_query'):
+                return calendar_data
+        return None
+    except Exception as e:
+        print(f"Calendar query detection error: {e}")
+        print(f"Raw response: {result if 'result' in locals() else 'No response'}")
+        return None

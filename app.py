@@ -7,9 +7,18 @@ import sys
 import secrets
 import random
 from datetime import datetime, date, timedelta
+import pytz
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'attached_assets'))
-from ai_core_1762554001118 import get_ai_chat_response, summarize_chat_as_journal, extract_event_from_message, analyze_sentiment
+from ai_core_1762554001118 import get_ai_chat_response, summarize_chat_as_journal, extract_event_from_message, analyze_sentiment, detect_calendar_query
+
+IST = pytz.timezone('Asia/Kolkata')
+
+def get_ist_now():
+    return datetime.now(IST)
+
+def get_ist_date():
+    return get_ist_now().date()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', secrets.token_hex(32))
@@ -179,7 +188,7 @@ def chat():
         )
         db.session.add(sentiment_record)
         
-        current_datetime = datetime.now()
+        current_datetime = get_ist_now()
         detected_event = extract_event_from_message(user_message, current_datetime)
         
         event_data = None
@@ -189,10 +198,10 @@ def chat():
                 event_time_str = detected_event.get('time')
                 
                 is_future_event = False
-                if event_date > date.today():
+                if event_date > get_ist_date():
                     is_future_event = True
-                elif event_date == date.today() and event_time_str:
-                    event_datetime = datetime.strptime(f"{detected_event['date']} {event_time_str}", '%Y-%m-%d %H:%M')
+                elif event_date == get_ist_date() and event_time_str:
+                    event_datetime = IST.localize(datetime.strptime(f"{detected_event['date']} {event_time_str}", '%Y-%m-%d %H:%M'))
                     is_future_event = event_datetime > current_datetime
                 
                 if not is_future_event:
@@ -222,6 +231,34 @@ def chat():
             except Exception as event_error:
                 print(f"Error creating event: {event_error}")
         
+        calendar_query_data = detect_calendar_query(user_message, current_datetime)
+        calendar_events_context = ""
+        
+        if calendar_query_data:
+            start_date = datetime.strptime(calendar_query_data['start_date'], '%Y-%m-%d').date()
+            end_date = datetime.strptime(calendar_query_data['end_date'], '%Y-%m-%d').date()
+            
+            events = Event.query.filter(
+                Event.user_id == current_user.id,
+                Event.is_confirmed == True,
+                Event.event_date >= start_date,
+                Event.event_date <= end_date
+            ).order_by(Event.event_date, Event.event_time).all()
+            
+            if events:
+                events_list = []
+                for evt in events:
+                    event_info = f"- {evt.title} on {evt.event_date.strftime('%A, %B %d, %Y')}"
+                    if evt.event_time:
+                        event_info += f" at {evt.event_time}"
+                    if evt.location:
+                        event_info += f" (Location: {evt.location})"
+                    events_list.append(event_info)
+                
+                calendar_events_context = f"\n\n[CALENDAR EVENTS for your response]\nThe user has these confirmed events in their calendar:\n" + "\n".join(events_list) + "\n\nPlease present these events in a warm, conversational way."
+            else:
+                calendar_events_context = f"\n\n[CALENDAR EVENTS for your response]\nThe user has no confirmed events in this time period. Let them know gently that their calendar is clear for this time."
+        
         chat_history = get_chat_history_from_db()
         
         user_context = f"""
@@ -232,6 +269,9 @@ def chat():
         
         if len(chat_history) == 1:
             chat_history[0]['parts'][0] = f"{user_context}\n\nUser says: {chat_history[0]['parts'][0]}"
+        
+        if calendar_events_context:
+            chat_history[-1]['parts'][0] += calendar_events_context
         
         ai_response = get_ai_chat_response(chat_history, detected_sentiment)
         
@@ -387,7 +427,7 @@ def save_habit_progress():
     data = request.json
     progress_note = data.get('progress_note', '')
     
-    today = date.today()
+    today = get_ist_date()
     
     # Check if progress already recorded today
     existing = HabitProgress.query.filter_by(
@@ -398,7 +438,7 @@ def save_habit_progress():
     if existing:
         # Update existing entry
         existing.progress_note = progress_note
-        existing.timestamp = datetime.utcnow()
+        existing.timestamp = get_ist_now()
     else:
         # Get latest mood from journal if available
         latest_journal = Journal.query.filter_by(
@@ -426,7 +466,7 @@ def get_reminder_status():
     if not current_user.profile or not current_user.profile.reminder_enabled:
         return jsonify({'show_reminder': False})
     
-    today = date.today()
+    today = get_ist_date()
     
     # Check if progress already recorded today
     existing = HabitProgress.query.filter_by(
@@ -462,7 +502,7 @@ def dashboard():
         return redirect(url_for('onboarding'))
     
     # Get last 7 days of progress
-    today = date.today()
+    today = get_ist_date()
     seven_days_ago = today - timedelta(days=6)
     
     progress_records = HabitProgress.query.filter(
@@ -695,7 +735,7 @@ def log_activity():
     activity = Activity(
         goal_id=goal_id,
         user_id=current_user.id,
-        date=date.today(),
+        date=get_ist_date(),
         activity_type=activity_type,
         description=description,
         completed=True
@@ -728,7 +768,7 @@ def log_sleep():
     import ai_core_1762554001118 as ai_core
     
     data = request.json
-    sleep_date = datetime.strptime(data.get('date', str(date.today())), '%Y-%m-%d').date()
+    sleep_date = datetime.strptime(data.get('date', str(get_ist_date())), '%Y-%m-%d').date()
     
     existing_log = SleepLog.query.filter_by(user_id=current_user.id, date=sleep_date).first()
     
@@ -1021,7 +1061,7 @@ def wellness_score():
     """Calculate overall wellness score (0-100)"""
     from datetime import timedelta
     
-    today = date.today()
+    today = get_ist_date()
     week_ago = today - timedelta(days=7)
     month_ago = today - timedelta(days=30)
     
@@ -1136,7 +1176,7 @@ def calendar_view():
 @login_required
 def check_event_followups():
     """Check if there are any events from yesterday to follow up on"""
-    yesterday = date.today() - timedelta(days=1)
+    yesterday = get_ist_date() - timedelta(days=1)
     
     past_events = Event.query.filter(
         Event.user_id == current_user.id,
@@ -1165,8 +1205,7 @@ def check_time_reminders():
     if not current_user.profile or not current_user.profile.reminder_enabled:
         return jsonify({'show_reminder': False})
     
-    from datetime import datetime as dt
-    current_time = dt.now().strftime('%H:%M')
+    current_time = get_ist_now().strftime('%H:%M')
     
     active_reminders = Reminder.query.filter_by(
         user_id=current_user.id,
@@ -1261,7 +1300,7 @@ def google_callback():
         existing_token.client_secret = credentials.client_secret
         existing_token.scopes = json.dumps(credentials.scopes)
         existing_token.expiry = credentials.expiry
-        existing_token.updated_at = datetime.utcnow()
+        existing_token.updated_at = get_ist_now()
     else:
         token = GoogleCalendarToken(
             user_id=current_user.id,
