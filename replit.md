@@ -14,6 +14,13 @@ Vibe Journal AI is a comprehensive full-stack web application that helps users r
 - Added personalized AI responses based on user goals
 - Implemented journal storage with mood tracking and goal progress
 - Fixed critical session storage issue by moving chat history to database
+- **Added Daily Reminders & Habit Progress feature** (November 8, 2025):
+  - Daily reminder popup with personalized messages
+  - Habit progress tracking with notes
+  - 7-day streak visualization on dashboard
+  - Reminder settings modal with toggle and time picker
+  - Auto-cleanup of progress older than 30 days
+  - Bell icon with animated notification
 
 ## User Preferences
 
@@ -51,9 +58,10 @@ The backend follows an MVC pattern with route-based organization:
 
 **Tables**:
 1. **Users**: Email, password hash, timestamps
-2. **UserProfile**: Name, age, goal, reminder preferences (1:1 with User)
+2. **UserProfile**: Name, age, goal, reminder_enabled, reminder_time (1:1 with User)
 3. **Journal**: Mood, summary, goal progress, timestamps (many:1 with User)
 4. **ChatMessage**: Session ID, role, content, timestamps (many:1 with User)
+5. **HabitProgress**: Date, progress note, mood, timestamps (many:1 with User)
 
 **Key Design Decisions**:
 - **Chat History in Database**: Prevents session cookie overflow for long conversations
@@ -169,7 +177,8 @@ No external frontend libraries or CDNs required - uses native browser APIs exclu
 │   ├── signup.html            # Signup page
 │   ├── about.html             # About page
 │   ├── onboarding.html        # Onboarding form
-│   ├── chatbot.html           # Main chat interface
+│   ├── chatbot.html           # Main chat interface with reminders
+│   ├── dashboard.html         # Habit streak & progress dashboard
 │   └── journal.html           # Journal history view
 ├── static/
 │   ├── css/
@@ -194,10 +203,14 @@ No external frontend libraries or CDNs required - uses native browser APIs exclu
 ✅ **Mood Tracking**: Emoji-based mood selection  
 ✅ **Goal Progress Tracking**: Optional notes on daily progress  
 ✅ **Journal History**: View all past entries with beautiful cards  
+✅ **Daily Habit Reminders**: Personalized popup on login with Yes/Not today buttons  
+✅ **Habit Progress Tracking**: Save daily progress notes with timestamps  
+✅ **7-Day Streak Dashboard**: Visual tracker with supportive messages  
+✅ **Reminder Settings**: Toggle and time picker with bell icon in navbar  
+✅ **Auto Data Cleanup**: Automatically deletes progress older than 30 days  
 ✅ **Premium Dark UI**: Neo-noir theme with glassmorphism  
 ✅ **Responsive Design**: Works on desktop and mobile  
-✅ **Session Management**: Isolated conversations per user  
-✅ **Habit Reminders**: Toggle for daily motivational reminders (backend ready)
+✅ **Session Management**: Isolated conversations per user
 
 ## Security Notes
 
@@ -207,6 +220,15 @@ No external frontend libraries or CDNs required - uses native browser APIs exclu
 - XSS protection via template escaping
 - No sensitive data in client-side storage
 - Chat history stored server-side only
+- Habit progress data auto-deleted after 30 days
+
+## Database Migration Notes
+
+**Important**: When updating to the version with Daily Reminders & Habit Progress:
+- The database schema has been updated with new fields and tables
+- For development: Delete `instance/vibe_journal.db` and restart the app to recreate with new schema
+- For production: Use proper database migration tools (Alembic/Flask-Migrate) to preserve existing data
+- New schema adds: `reminder_time` column to UserProfile and `HabitProgress` table
 
 ## Future Enhancements
 
