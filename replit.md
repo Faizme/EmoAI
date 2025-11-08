@@ -37,7 +37,7 @@ The application features an elegant, sophisticated Wix Studio-inspired aesthetic
 ### Feature Specifications
 
 -   **User Management**: Secure signup/login, onboarding for collecting user goals.
--   **AI Chat**: Personalized, empathetic conversational AI companion for habit-quitting, life improvement, and emotional support. Includes voice-to-text input and text-to-speech responses using Web Speech API.
+-   **AI Chat**: Personalized, empathetic conversational AI companion for habit-quitting, life improvement, and emotional support. Responses are kept very short (1-2 sentences) yet meaningful and actionable. Includes voice-to-text input and text-to-speech responses using Web Speech API.
 -   **Goals & Activities**: 
     - Separate interfaces for "Quit Bad Habits" vs "Build New Skills"
     - Different activity types for each goal category
