@@ -271,6 +271,19 @@ def journal_view():
     journals = Journal.query.filter_by(user_id=current_user.id).order_by(Journal.timestamp.desc()).all()
     return render_template('journal.html', journals=journals)
 
+@app.route('/journal/analytics')
+@login_required
+def journal_analytics():
+    """Journal analytics with graphs and AI insights"""
+    journals = Journal.query.filter_by(user_id=current_user.id).order_by(Journal.timestamp.asc()).all()
+    journals_data = [{
+        'timestamp': j.timestamp.isoformat(),
+        'mood': j.mood,
+        'summary': j.summary,
+        'goal_progress': j.goal_progress or ''
+    } for j in journals]
+    return render_template('journal_analytics.html', journals=journals, journals_data=journals_data)
+
 @app.route('/clear_chat', methods=['POST'])
 @login_required
 def clear_chat():

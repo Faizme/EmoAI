@@ -5,99 +5,174 @@
 {% block content %}
 <div class="sleep-page">
     <div class="sleep-header">
-        <h1>Sleep Tracker</h1>
-        <p class="subtitle">Monitor and improve your sleep quality</p>
+        <h1>Sleep Intelligence</h1>
+        <p class="subtitle">Advanced sleep tracking and optimization</p>
         <button onclick="window.location.href='/chatbot'" class="btn-outline">Back to Chat</button>
+    </div>
+    
+    <div class="sleep-score-banner" id="sleepScoreBanner" style="display: none;">
+        <div class="score-container">
+            <div class="score-circle">
+                <svg class="score-ring" viewBox="0 0 120 120">
+                    <circle class="score-ring-bg" cx="60" cy="60" r="54"></circle>
+                    <circle class="score-ring-fill" cx="60" cy="60" r="54" id="scoreRingFill"></circle>
+                </svg>
+                <div class="score-text">
+                    <div class="score-value" id="sleepScoreValue">0</div>
+                    <div class="score-label">Sleep Score</div>
+                </div>
+            </div>
+            <div class="score-info">
+                <h3 id="scoreTitle">Sleep Quality Assessment</h3>
+                <p id="scoreDescription">Log your sleep to get personalized insights</p>
+                <div class="score-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Duration Quality</span>
+                        <span class="metric-value" id="durationQuality">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Consistency</span>
+                        <span class="metric-value" id="consistencyScore">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Sleep Efficiency</span>
+                        <span class="metric-value" id="efficiencyScore">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class="sleep-container">
         <div class="sleep-log-card">
-            <h2>Log Today's Sleep</h2>
+            <h2>Log Sleep Session</h2>
             <form id="sleepForm" class="sleep-form">
                 <div class="form-row">
                     <div class="form-group">
                         <label>Bedtime</label>
                         <input type="time" id="bedtime" class="form-input" required>
+                        <span class="input-hint">When did you go to bed?</span>
                     </div>
                     <div class="form-group">
                         <label>Wake Time</label>
                         <input type="time" id="wake-time" class="form-input" required>
+                        <span class="input-hint">When did you wake up?</span>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label>Hours Slept</label>
-                    <input type="number" id="hours-slept" class="form-input" step="0.5" min="0" max="24" placeholder="8.5">
+                    <label>Total Sleep Duration</label>
+                    <input type="number" id="hours-slept" class="form-input" step="0.5" min="0" max="24" placeholder="Automatically calculated" readonly>
+                    <span class="input-hint">Hours will be calculated automatically</span>
                 </div>
                 
                 <div class="form-group">
-                    <label>Sleep Quality (1-5)</label>
-                    <div class="quality-rating">
-                        <button type="button" class="star-btn" data-value="1">⭐</button>
-                        <button type="button" class="star-btn" data-value="2">⭐</button>
-                        <button type="button" class="star-btn" data-value="3">⭐</button>
-                        <button type="button" class="star-btn" data-value="4">⭐</button>
-                        <button type="button" class="star-btn" data-value="5">⭐</button>
+                    <label>How did you sleep?</label>
+                    <div class="quality-slider-container">
+                        <input type="range" id="quality-slider" min="1" max="5" value="3" class="quality-slider">
+                        <div class="quality-labels">
+                            <span>Poor</span>
+                            <span>Fair</span>
+                            <span>Good</span>
+                            <span>Very Good</span>
+                            <span>Excellent</span>
+                        </div>
+                        <div class="quality-selected" id="qualitySelected">Good</div>
                     </div>
                     <input type="hidden" id="quality-rating" value="3">
                 </div>
                 
                 <div class="form-group">
-                    <label>Notes (Optional)</label>
-                    <textarea id="notes" class="form-input" rows="3" placeholder="How did you feel? Any dreams?"></textarea>
+                    <label>Additional Notes</label>
+                    <textarea id="notes" class="form-input" rows="3" placeholder="Any factors affecting your sleep? Dreams, interruptions, etc."></textarea>
                 </div>
                 
-                <button type="submit" class="btn-primary full-width">Log Sleep</button>
+                <button type="submit" class="btn-primary full-width">Analyze & Save Sleep Data</button>
             </form>
         </div>
         
-        <div class="sleep-stats-card">
-            <h2>Your Sleep Insights</h2>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-icon">😴</div>
-                    <div class="stat-value">7.5h</div>
-                    <div class="stat-label">Avg Hours</div>
+        <div class="sleep-insights-card">
+            <h2>Personalized Sleep Tips</h2>
+            <div id="personalizedTips" class="tips-container">
+                <div class="tip-item">
+                    <div class="tip-number">1</div>
+                    <p>Maintain a consistent sleep schedule, even on weekends</p>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-icon">⭐</div>
-                    <div class="stat-value">4.2/5</div>
-                    <div class="stat-label">Avg Quality</div>
+                <div class="tip-item">
+                    <div class="tip-number">2</div>
+                    <p>Create a relaxing bedtime routine 30-60 minutes before sleep</p>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-icon">📊</div>
-                    <div class="stat-value">85%</div>
-                    <div class="stat-label">Consistency</div>
+                <div class="tip-item">
+                    <div class="tip-number">3</div>
+                    <p>Keep your bedroom cool (15-19°C / 60-67°F) for optimal sleep</p>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">4</div>
+                    <p>Avoid screens and blue light 1-2 hours before bedtime</p>
+                </div>
+                <div class="tip-item">
+                    <div class="tip-number">5</div>
+                    <p>Limit caffeine intake after 2 PM for better sleep quality</p>
                 </div>
             </div>
             
-            <div class="sleep-tips">
-                <h3>Tips for Better Sleep</h3>
-                <ul>
-                    <li>Aim for 7-9 hours per night</li>
-                    <li>Keep a consistent sleep schedule</li>
-                    <li>Avoid screens 1 hour before bed</li>
-                    <li>Keep your room cool and dark</li>
-                </ul>
+            <div class="stats-summary">
+                <h3>Your Sleep Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="avgHours">{{ "%.1f"|format(sleep_logs|map(attribute='hours_slept')|sum / sleep_logs|length if sleep_logs|length > 0 else 0) }}</div>
+                        <div class="stat-label">Average Hours</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="avgQuality">{{ "%.1f"|format(sleep_logs|map(attribute='quality_rating')|sum / sleep_logs|length if sleep_logs|length > 0 else 0) }}</div>
+                        <div class="stat-label">Average Rating</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ sleep_logs|length }}</div>
+                        <div class="stat-label">Total Logs</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
     <div class="sleep-history-section">
-        <h2>Sleep History</h2>
+        <h2>Sleep History & Patterns</h2>
+        {% if sleep_logs|length > 0 %}
         <div class="history-grid">
             {% for log in sleep_logs %}
             <div class="history-card">
                 <div class="history-date">{{ log.date.strftime('%b %d, %Y') }}</div>
                 <div class="history-details">
                     <div class="detail-row">
-                        <span class="label">Hours:</span>
-                        <span class="value">{{ log.hours_slept }}h</span>
+                        <span class="label">Duration</span>
+                        <span class="value strong">{{ log.hours_slept }}h</span>
                     </div>
                     <div class="detail-row">
-                        <span class="label">Quality:</span>
-                        <span class="value">
-                            {% for i in range(log.quality_rating or 0) %}⭐{% endfor %}
+                        <span class="label">Quality</span>
+                        <span class="value quality-badge quality-{{ log.quality_rating }}">
+                            {{ ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][log.quality_rating - 1] if log.quality_rating else 'N/A' }}
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Score</span>
+                        <span class="value strong">
+                            {% set hours = log.hours_slept %}
+                            {% set quality = log.quality_rating or 3 %}
+                            {% if hours >= 7 and hours <= 9 %}
+                                {% set duration_score = 50 %}
+                            {% elif hours >= 6 and hours < 7 %}
+                                {% set duration_score = 40 %}
+                            {% elif hours >= 9 and hours < 10 %}
+                                {% set duration_score = 45 %}
+                            {% elif hours >= 5 and hours < 6 %}
+                                {% set duration_score = 30 %}
+                            {% elif hours >= 4 and hours < 5 %}
+                                {% set duration_score = 20 %}
+                            {% else %}
+                                {% set duration_score = 10 %}
+                            {% endif %}
+                            {{ (duration_score + quality * 10)|int }}/100
                         </span>
                     </div>
                     {% if log.notes %}
@@ -107,77 +182,26 @@
             </div>
             {% endfor %}
         </div>
+        {% else %}
+        <div class="empty-state">
+            <p>No sleep data yet. Start tracking your sleep to unlock personalized insights and recommendations.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 
 <script>
-const starBtns = document.querySelectorAll('.star-btn');
+const qualityLabels = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+const qualitySlider = document.getElementById('quality-slider');
+const qualitySelected = document.getElementById('qualitySelected');
 const qualityInput = document.getElementById('quality-rating');
 
-starBtns.forEach((btn, index) => {
-    btn.addEventListener('click', () => {
-        const value = btn.getAttribute('data-value');
-        qualityInput.value = value;
-        
-        starBtns.forEach((star, i) => {
-            if (i < value) {
-                star.classList.add('active');
-            } else {
-                star.classList.remove('active');
-            }
-        });
-    });
+qualitySlider.addEventListener('input', (e) => {
+    const value = parseInt(e.target.value);
+    qualityInput.value = value;
+    qualitySelected.textContent = qualityLabels[value - 1];
+    e.target.style.setProperty('--value', value);
 });
-
-starBtns.forEach((star, i) => {
-    if (i < 3) star.classList.add('active');
-});
-
-document.getElementById('sleepForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const bedtime = document.getElementById('bedtime').value;
-    const wakeTime = document.getElementById('wake-time').value;
-    const hoursSlept = parseFloat(document.getElementById('hours-slept').value);
-    const qualityRating = parseInt(document.getElementById('quality-rating').value);
-    const notes = document.getElementById('notes').value.trim();
-    
-    try {
-        const response = await fetch('/log_sleep', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                bedtime,
-                wake_time: wakeTime,
-                hours_slept: hoursSlept,
-                quality_rating: qualityRating,
-                notes,
-                date: new Date().toISOString().split('T')[0]
-            })
-        });
-        
-        const data = await response.json();
-        if (data.success) {
-            showToast('Sleep logged successfully!');
-            setTimeout(() => location.reload(), 1500);
-        }
-    } catch (error) {
-        showToast('Failed to log sleep');
-    }
-});
-
-function showToast(message) {
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => toast.classList.add('show'), 100);
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 2000);
-}
 
 function calculateHours() {
     const bedtime = document.getElementById('bedtime').value;
@@ -198,6 +222,174 @@ function calculateHours() {
 
 document.getElementById('bedtime').addEventListener('change', calculateHours);
 document.getElementById('wake-time').addEventListener('change', calculateHours);
+
+document.getElementById('sleepForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const bedtime = document.getElementById('bedtime').value;
+    const wakeTime = document.getElementById('wake-time').value;
+    const hoursSlept = parseFloat(document.getElementById('hours-slept').value);
+    const qualityRating = parseInt(document.getElementById('quality-rating').value);
+    const notes = document.getElementById('notes').value.trim();
+    
+    if (!hoursSlept || hoursSlept === 0) {
+        showToast('Please enter valid sleep times');
+        return;
+    }
+    
+    const sleepScore = calculateSleepScore(hoursSlept, qualityRating);
+    displaySleepScore(sleepScore, hoursSlept, qualityRating);
+    
+    try {
+        const response = await fetch('/log_sleep', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                bedtime,
+                wake_time: wakeTime,
+                hours_slept: hoursSlept,
+                quality_rating: qualityRating,
+                notes,
+                date: new Date().toISOString().split('T')[0]
+            })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            showToast('Sleep data analyzed and saved successfully');
+            setTimeout(() => location.reload(), 2000);
+        }
+    } catch (error) {
+        showToast('Failed to save sleep data');
+    }
+});
+
+function calculateSleepScore(hours, quality) {
+    let durationScore = 0;
+    
+    if (hours >= 7 && hours <= 9) {
+        durationScore = 50;
+    } else if (hours >= 6 && hours < 7) {
+        durationScore = 40;
+    } else if (hours >= 9 && hours < 10) {
+        durationScore = 45;
+    } else if (hours >= 5 && hours < 6) {
+        durationScore = 30;
+    } else if (hours >= 4 && hours < 5) {
+        durationScore = 20;
+    } else {
+        durationScore = 10;
+    }
+    
+    const qualityScore = quality * 10;
+    
+    return Math.min(100, durationScore + qualityScore);
+}
+
+function displaySleepScore(score, hours, quality) {
+    const banner = document.getElementById('sleepScoreBanner');
+    const scoreValue = document.getElementById('sleepScoreValue');
+    const scoreTitle = document.getElementById('scoreTitle');
+    const scoreDescription = document.getElementById('scoreDescription');
+    const scoreRingFill = document.getElementById('scoreRingFill');
+    
+    banner.style.display = 'block';
+    scoreValue.textContent = score;
+    
+    const circumference = 2 * Math.PI * 54;
+    const offset = circumference - (score / 100) * circumference;
+    scoreRingFill.style.strokeDashoffset = offset;
+    
+    let title, description, tips;
+    if (score >= 80) {
+        title = 'Excellent Sleep Quality';
+        description = 'Your sleep is optimal! You\'re getting the right amount of quality rest. Keep up these healthy habits.';
+        tips = [
+            'Continue maintaining your consistent sleep schedule',
+            'Your current routine is working excellently',
+            'Consider tracking what you do before bed to maintain this quality'
+        ];
+        scoreRingFill.style.stroke = 'rgb(107, 169, 159)';
+    } else if (score >= 60) {
+        title = 'Good Sleep Quality';
+        description = 'You\'re getting decent sleep, but there\'s room for improvement to reach optimal rest levels.';
+        tips = hours < 7 ? [
+            'Try going to bed 30 minutes earlier to increase sleep duration',
+            'Establish a consistent pre-sleep routine',
+            'Avoid caffeine and screens 2 hours before bedtime',
+            'Keep your bedroom dark, quiet, and cool'
+        ] : [
+            'Focus on improving sleep quality through better sleep hygiene',
+            'Create a relaxing bedtime routine',
+            'Ensure your bedroom is optimized for sleep (dark, quiet, cool)',
+            'Consider meditation or breathing exercises before bed'
+        ];
+        scoreRingFill.style.stroke = 'rgb(232, 181, 166)';
+    } else if (score >= 40) {
+        title = 'Fair Sleep Quality';
+        description = 'Your sleep needs attention. Both duration and quality could be improved for better health and energy.';
+        tips = [
+            'Prioritize getting 7-9 hours of sleep consistently',
+            'Establish a strict bedtime and wake time, even on weekends',
+            'Eliminate all screens 1 hour before bed',
+            'Avoid heavy meals, caffeine, and alcohol before sleep',
+            'Create a dark, quiet sleep environment'
+        ];
+        scoreRingFill.style.stroke = 'rgb(173, 119, 72)';
+    } else {
+        title = 'Poor Sleep Quality';
+        description = 'Your sleep requires immediate improvement. Poor sleep significantly impacts your health, mood, and performance.';
+        tips = [
+            'URGENT: Aim for at least 6-7 hours tonight',
+            'Set a firm bedtime alarm 8 hours before you need to wake up',
+            'Remove all electronics from your bedroom',
+            'Consult a healthcare provider if sleep issues persist',
+            'Consider cognitive behavioral therapy for insomnia (CBT-I)',
+            'Avoid all caffeine after noon'
+        ];
+        scoreRingFill.style.stroke = 'rgb(200, 100, 100)';
+    }
+    
+    scoreTitle.textContent = title;
+    scoreDescription.textContent = description;
+    
+    updatePersonalizedTips(tips);
+    updateMetrics(hours, quality, score);
+}
+
+function updatePersonalizedTips(tips) {
+    const container = document.getElementById('personalizedTips');
+    container.innerHTML = tips.map((tip, index) => `
+        <div class="tip-item">
+            <div class="tip-number">${index + 1}</div>
+            <p>${tip}</p>
+        </div>
+    `).join('');
+}
+
+function updateMetrics(hours, quality, score) {
+    let durationQuality = 'Poor';
+    if (hours >= 7 && hours <= 9) durationQuality = 'Optimal';
+    else if (hours >= 6 && hours < 7 || hours > 9 && hours <= 10) durationQuality = 'Good';
+    else if (hours >= 5 && hours < 6) durationQuality = 'Fair';
+    
+    document.getElementById('durationQuality').textContent = durationQuality;
+    document.getElementById('consistencyScore').textContent = quality >= 4 ? 'High' : quality >= 3 ? 'Medium' : 'Low';
+    document.getElementById('efficiencyScore').textContent = `${Math.round((quality / 5) * 100)}%`;
+}
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add('show'), 100);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
 </script>
 
 <style>
@@ -208,7 +400,7 @@ document.getElementById('wake-time').addEventListener('change', calculateHours);
 }
 
 .sleep-header {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto 2rem;
     text-align: center;
 }
@@ -226,37 +418,139 @@ document.getElementById('wake-time').addEventListener('change', calculateHours);
     margin-bottom: 1.5rem;
 }
 
+.sleep-score-banner {
+    max-width: 1400px;
+    margin: 0 auto 2rem;
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.score-container {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 3rem;
+    align-items: center;
+}
+
+.score-circle {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.score-ring {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.score-ring-bg {
+    fill: none;
+    stroke: rgb(230, 230, 230);
+    stroke-width: 8;
+}
+
+.score-ring-fill {
+    fill: none;
+    stroke: rgb(107, 169, 159);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 339.292;
+    stroke-dashoffset: 339.292;
+    transition: stroke-dashoffset 1s ease, stroke 0.3s ease;
+}
+
+.score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.score-value {
+    font-size: 3rem;
+    font-weight: 700;
+    color: rgb(173, 119, 72);
+    line-height: 1;
+}
+
+.score-label {
+    font-size: 0.875rem;
+    color: rgb(107, 107, 107);
+    margin-top: 0.5rem;
+}
+
+.score-info h3 {
+    font-family: 'Playfair Display', serif;
+    color: rgb(47, 100, 87);
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+}
+
+.score-info p {
+    color: rgb(107, 107, 107);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.score-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    color: rgb(107, 107, 107);
+}
+
+.metric-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: rgb(173, 119, 72);
+}
+
 .sleep-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto 3rem;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
 }
 
-.sleep-log-card, .sleep-stats-card {
+.sleep-log-card, .sleep-insights-card {
     background: white;
-    padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
 
-.sleep-log-card h2, .sleep-stats-card h2 {
+.sleep-log-card h2, .sleep-insights-card h2 {
     font-family: 'Playfair Display', serif;
     color: rgb(173, 119, 72);
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    font-size: 1.75rem;
 }
 
 .sleep-form {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.75rem;
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .form-group {
@@ -267,14 +561,23 @@ document.getElementById('wake-time').addEventListener('change', calculateHours);
 .form-group label {
     font-weight: 600;
     color: rgb(47, 100, 87);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.input-hint {
+    font-size: 0.75rem;
+    color: rgb(150, 150, 150);
+    margin-top: 0.5rem;
 }
 
 .form-input {
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
     border: 2px solid rgb(220, 215, 205);
-    border-radius: 8px;
+    border-radius: 10px;
     font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.2s;
 }
 
 .form-input:focus {
@@ -282,144 +585,248 @@ document.getElementById('wake-time').addEventListener('change', calculateHours);
     border-color: rgb(173, 119, 72);
 }
 
-.quality-rating {
-    display: flex;
-    gap: 0.5rem;
+.quality-slider-container {
+    padding: 1rem 0;
 }
 
-.star-btn {
-    background: none;
-    border: none;
-    font-size: 2rem;
+.quality-slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: linear-gradient(to right, 
+        rgb(200, 100, 100) 0%, 
+        rgb(232, 181, 166) 25%, 
+        rgb(173, 119, 72) 50%, 
+        rgb(107, 169, 159) 75%, 
+        rgb(107, 169, 159) 100%);
+    outline: none;
+    -webkit-appearance: none;
+    --value: 3;
+}
+
+.quality-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
     cursor: pointer;
-    opacity: 0.3;
-    transition: all 0.2s;
+    border: 3px solid rgb(173, 119, 72);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
-.star-btn.active {
-    opacity: 1;
-    transform: scale(1.1);
+.quality-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+    border: 3px solid rgb(173, 119, 72);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.quality-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    font-size: 0.75rem;
+    color: rgb(107, 107, 107);
+}
+
+.quality-selected {
+    text-align: center;
+    font-weight: 700;
+    color: rgb(173, 119, 72);
+    margin-top: 1rem;
+    font-size: 1.125rem;
+}
+
+.tips-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tip-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem;
+    background: rgb(249, 244, 233);
+    border-radius: 10px;
+}
+
+.tip-number {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgb(173, 119, 72), rgb(193, 139, 92));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.tip-item p {
+    margin: 0;
+    line-height: 1.6;
+    color: rgb(60, 60, 60);
+}
+
+.stats-summary {
+    border-top: 2px solid rgb(220, 215, 205);
+    padding-top: 2rem;
+}
+
+.stats-summary h3 {
+    color: rgb(47, 100, 87);
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
 }
 
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
-    margin-bottom: 2rem;
 }
 
 .stat-item {
     text-align: center;
-}
-
-.stat-icon {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+    padding: 1rem;
+    background: rgb(249, 244, 233);
+    border-radius: 10px;
 }
 
 .stat-value {
-    font-size: 1.75rem;
+    font-size: 2rem;
     font-weight: 700;
     color: rgb(173, 119, 72);
+    line-height: 1;
 }
 
 .stat-label {
     font-size: 0.875rem;
     color: rgb(107, 107, 107);
-}
-
-.sleep-tips {
-    background: rgb(249, 244, 233);
-    padding: 1.5rem;
-    border-radius: 12px;
-}
-
-.sleep-tips h3 {
-    color: rgb(47, 100, 87);
-    margin-bottom: 1rem;
-}
-
-.sleep-tips ul {
-    list-style: none;
-    padding: 0;
-}
-
-.sleep-tips li {
-    padding: 0.5rem 0;
-    padding-left: 1.5rem;
-    position: relative;
-}
-
-.sleep-tips li:before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: rgb(107, 169, 159);
-    font-weight: bold;
+    margin-top: 0.5rem;
 }
 
 .sleep-history-section {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
 .sleep-history-section h2 {
     font-family: 'Playfair Display', serif;
     color: rgb(173, 119, 72);
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    font-size: 1.75rem;
 }
 
 .history-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
 }
 
 .history-card {
     background: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 1.75rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.history-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
 
 .history-date {
-    font-weight: 600;
+    font-weight: 700;
     color: rgb(173, 119, 72);
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
+    font-size: 1.125rem;
 }
 
 .detail-row {
     display: flex;
     justify-content: space-between;
-    padding: 0.5rem 0;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgb(240, 240, 240);
 }
 
-.history-notes {
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid rgb(220, 215, 205);
+.detail-row:last-of-type {
+    border-bottom: none;
+}
+
+.label {
     color: rgb(107, 107, 107);
     font-size: 0.875rem;
 }
 
+.value {
+    font-weight: 600;
+    color: rgb(60, 60, 60);
+}
+
+.value.strong {
+    color: rgb(173, 119, 72);
+    font-size: 1.125rem;
+}
+
+.quality-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.quality-1 { background: rgb(255, 200, 200); color: rgb(150, 50, 50); }
+.quality-2 { background: rgb(255, 220, 200); color: rgb(180, 100, 50); }
+.quality-3 { background: rgb(255, 240, 200); color: rgb(150, 120, 50); }
+.quality-4 { background: rgb(220, 240, 220); color: rgb(50, 120, 80); }
+.quality-5 { background: rgb(200, 240, 230); color: rgb(40, 100, 80); }
+
+.history-notes {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgb(220, 215, 205);
+    color: rgb(107, 107, 107);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 16px;
+    color: rgb(107, 107, 107);
+}
+
 .btn-primary {
-    padding: 1rem 2rem;
+    padding: 1.25rem 2rem;
     background: linear-gradient(135deg, rgb(173, 119, 72), rgb(193, 139, 92));
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 600;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(173, 119, 72, 0.3);
+    box-shadow: 0 6px 16px rgba(173, 119, 72, 0.3);
 }
 
 .btn-outline {
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.5rem;
     background: white;
     color: rgb(173, 119, 72);
     border: 2px solid rgb(173, 119, 72);
@@ -444,13 +851,14 @@ document.getElementById('wake-time').addEventListener('change', calculateHours);
     right: 2rem;
     background: rgb(107, 169, 159);
     color: white;
-    padding: 1rem 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
     opacity: 0;
     transform: translateX(100px);
     transition: all 0.3s;
     z-index: 9999;
+    font-weight: 600;
 }
 
 .toast.show {
@@ -458,17 +866,33 @@ document.getElementById('wake-time').addEventListener('change', calculateHours);
     transform: translateX(0);
 }
 
-@media (max-width: 968px) {
+@media (max-width: 1200px) {
+    .score-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+        justify-items: center;
+    }
+    
     .sleep-container {
         grid-template-columns: 1fr;
     }
     
+    .score-metrics {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
     .form-row {
         grid-template-columns: 1fr;
     }
     
     .stats-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .quality-labels {
+        font-size: 0.625rem;
     }
 }
 </style>

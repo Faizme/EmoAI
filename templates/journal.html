@@ -12,7 +12,12 @@
     
     <div class="journal-header glass">
         <h1 class="glow-text">📖 My Journal</h1>
-        <a href="{{ url_for('chatbot') }}" class="btn-back">← Back to Chat</a>
+        <div class="header-buttons">
+            {% if journals %}
+            <a href="{{ url_for('journal_analytics') }}" class="btn-analytics">View Analytics & Insights</a>
+            {% endif %}
+            <a href="{{ url_for('chatbot') }}" class="btn-back">← Back to Chat</a>
+        </div>
     </div>
     
     <div class="journal-entries">
@@ -78,6 +83,27 @@
     border-radius: 20px;
     margin-bottom: 40px;
     backdrop-filter: blur(10px);
+}
+
+.header-buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.btn-analytics {
+    background: linear-gradient(135deg, rgb(173, 119, 72), rgb(193, 139, 92));
+    padding: 12px 24px;
+    border-radius: 12px;
+    color: white;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-weight: 600;
+}
+
+.btn-analytics:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(173, 119, 72, 0.3);
 }
 
 .btn-back {

@@ -1,0 +1,691 @@
+{% extends "base.html" %}
+
+{% block title %}Journal Analytics - EmoAI{% endblock %}
+
+{% block content %}
+<div class="analytics-page">
+    <div class="analytics-header">
+        <h1>Your Journal Insights</h1>
+        <p class="subtitle">Deep analysis of your thoughts and emotional patterns</p>
+        <div class="header-actions">
+            <button onclick="window.location.href='/journal'" class="btn-outline">View Journal</button>
+            <button onclick="window.location.href='/chatbot'" class="btn-outline">Back to Chat</button>
+        </div>
+    </div>
+    
+    {% if journals|length > 0 %}
+    
+    <div class="ai-insights-card">
+        <h2>AI-Powered Insights About You</h2>
+        <div class="insights-grid">
+            <div class="insight-box">
+                <h3>Your Emotional Profile</h3>
+                <p id="emotionalProfile">Analyzing your emotional patterns...</p>
+            </div>
+            <div class="insight-box">
+                <h3>Dominant Themes</h3>
+                <p id="dominantThemes">Extracting key themes from your entries...</p>
+            </div>
+            <div class="insight-box">
+                <h3>Thought Patterns</h3>
+                <p id="thoughtPatterns">Identifying your thinking style...</p>
+            </div>
+            <div class="insight-box">
+                <h3>Growth Areas</h3>
+                <p id="growthAreas">Discovering opportunities for development...</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="charts-container">
+        <div class="chart-card">
+            <h2>Mood Trends Over Time</h2>
+            <p class="chart-description">Track how your emotional state evolves day by day</p>
+            <canvas id="moodTrendChart"></canvas>
+        </div>
+        
+        <div class="chart-card">
+            <h2>Sentiment Analysis</h2>
+            <p class="chart-description">Distribution of positive, neutral, and mixed emotions in your entries</p>
+            <canvas id="sentimentPieChart"></canvas>
+        </div>
+        
+        <div class="chart-card">
+            <h2>Entry Frequency</h2>
+            <p class="chart-description">Your journaling consistency over the past weeks</p>
+            <canvas id="entryFrequencyChart"></canvas>
+        </div>
+        
+        <div class="chart-card">
+            <h2>Most Common Words</h2>
+            <p class="chart-description">Words you use most frequently in your reflections</p>
+            <canvas id="wordFrequencyChart"></canvas>
+        </div>
+    </div>
+    
+    <div class="detailed-insights">
+        <h2>Detailed Analysis</h2>
+        <div class="insights-tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-btn" onclick="switchTab('patterns')">Patterns</button>
+            <button class="tab-btn" onclick="switchTab('recommendations')">Recommendations</button>
+        </div>
+        
+        <div id="overview-content" class="tab-content active">
+            <div class="stat-boxes">
+                <div class="stat-box">
+                    <div class="stat-number">{{ journals|length }}</div>
+                    <div class="stat-label">Total Entries</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="avgWordsPerEntry">0</div>
+                    <div class="stat-label">Avg Words Per Entry</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="mostCommonMood">-</div>
+                    <div class="stat-label">Most Common Mood</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="journalStreak">0</div>
+                    <div class="stat-label">Day Streak</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="patterns-content" class="tab-content">
+            <div class="pattern-list" id="patternList">
+                <div class="pattern-item">
+                    <h4>Loading patterns...</h4>
+                </div>
+            </div>
+        </div>
+        
+        <div id="recommendations-content" class="tab-content">
+            <div class="recommendation-list" id="recommendationList">
+                <div class="recommendation-item">
+                    <h4>Loading recommendations...</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    
+    <div class="empty-state">
+        <h2>No Journal Data Yet</h2>
+        <p>You need at least one journal entry to see analytics. Start journaling to unlock powerful insights about your thoughts and emotions.</p>
+        <button onclick="window.location.href='/chatbot'" class="btn-primary">Start Journaling</button>
+    </div>
+    
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const journalsData = {{ journals_data|tojson|safe }};
+
+if (journalsData && journalsData.length > 0) {
+    initializeAnalytics();
+}
+
+function initializeAnalytics() {
+    createMoodTrendChart();
+    createSentimentPieChart();
+    createEntryFrequencyChart();
+    createWordFrequencyChart();
+    generateAIInsights();
+    calculateStats();
+}
+
+function createMoodTrendChart() {
+    const ctx = document.getElementById('moodTrendChart');
+    const dates = journalsData.map(j => new Date(j.timestamp).toLocaleDateString());
+    const moodScores = journalsData.map(j => getMoodScore(j.mood));
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Mood Score',
+                data: moodScores,
+                borderColor: 'rgb(107, 169, 159)',
+                backgroundColor: 'rgba(107, 169, 159, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Mood: ' + getMoodLabel(context.parsed.y);
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 5,
+                    ticks: {
+                        callback: function(value) {
+                            return getMoodLabel(value);
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createSentimentPieChart() {
+    const ctx = document.getElementById('sentimentPieChart');
+    const sentiments = analyzeSentiments();
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Positive', 'Neutral', 'Reflective', 'Growth-Focused'],
+            datasets: [{
+                data: [sentiments.positive, sentiments.neutral, sentiments.reflective, sentiments.growth],
+                backgroundColor: [
+                    'rgb(107, 169, 159)',
+                    'rgb(173, 119, 72)',
+                    'rgb(232, 181, 166)',
+                    'rgb(201, 181, 227)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+}
+
+function createEntryFrequencyChart() {
+    const ctx = document.getElementById('entryFrequencyChart');
+    const frequency = calculateEntryFrequency();
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: frequency.labels,
+            datasets: [{
+                label: 'Entries',
+                data: frequency.counts,
+                backgroundColor: 'rgba(173, 119, 72, 0.8)',
+                borderColor: 'rgb(173, 119, 72)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+}
+
+function createWordFrequencyChart() {
+    const ctx = document.getElementById('wordFrequencyChart');
+    const wordFreq = analyzeWordFrequency();
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: wordFreq.words,
+            datasets: [{
+                label: 'Frequency',
+                data: wordFreq.counts,
+                backgroundColor: 'rgba(107, 169, 159, 0.8)',
+                borderColor: 'rgb(107, 169, 159)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+}
+
+function getMoodScore(mood) {
+    const moodMap = {
+        '😊': 5, '😄': 5, '😃': 5,
+        '🙂': 4, '😌': 4,
+        '😐': 3, '🤔': 3,
+        '😔': 2, '😟': 2,
+        '😢': 1, '😞': 1
+    };
+    return moodMap[mood] || 3;
+}
+
+function getMoodLabel(score) {
+    const labels = ['', 'Very Low', 'Low', 'Neutral', 'Good', 'Excellent'];
+    return labels[Math.round(score)] || 'Neutral';
+}
+
+function analyzeSentiments() {
+    const positiveWords = ['happy', 'grateful', 'excited', 'proud', 'joy', 'love', 'amazing', 'wonderful', 'great', 'better', 'progress'];
+    const reflectiveWords = ['think', 'feel', 'realize', 'understand', 'learn', 'discover', 'notice', 'aware'];
+    const growthWords = ['goal', 'improve', 'change', 'develop', 'grow', 'challenge', 'overcome', 'achieve'];
+    
+    let positive = 0, neutral = 0, reflective = 0, growth = 0;
+    
+    journalsData.forEach(j => {
+        const text = j.summary.toLowerCase();
+        const words = text.split(/\s+/);
+        
+        let hasPositive = words.some(w => positiveWords.includes(w));
+        let hasReflective = words.some(w => reflectiveWords.includes(w));
+        let hasGrowth = words.some(w => growthWords.includes(w));
+        
+        if (hasPositive) positive++;
+        if (hasReflective) reflective++;
+        if (hasGrowth) growth++;
+        if (!hasPositive && !hasReflective && !hasGrowth) neutral++;
+    });
+    
+    return { positive, neutral, reflective, growth };
+}
+
+function calculateEntryFrequency() {
+    const weekCounts = {};
+    const today = new Date();
+    
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const key = date.toLocaleDateString();
+        weekCounts[key] = 0;
+    }
+    
+    journalsData.forEach(j => {
+        const date = new Date(j.timestamp).toLocaleDateString();
+        if (weekCounts.hasOwnProperty(date)) {
+            weekCounts[date]++;
+        }
+    });
+    
+    return {
+        labels: Object.keys(weekCounts),
+        counts: Object.values(weekCounts)
+    };
+}
+
+function analyzeWordFrequency() {
+    const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'been', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'my', 'your', 'his', 'her', 'its', 'our', 'their']);
+    
+    const wordCount = {};
+    
+    journalsData.forEach(j => {
+        const words = j.summary.toLowerCase().match(/\b\w+\b/g) || [];
+        words.forEach(word => {
+            if (word.length > 3 && !stopWords.has(word)) {
+                wordCount[word] = (wordCount[word] || 0) + 1;
+            }
+        });
+    });
+    
+    const sorted = Object.entries(wordCount).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    
+    return {
+        words: sorted.map(([word]) => word),
+        counts: sorted.map(([, count]) => count)
+    };
+}
+
+function generateAIInsights() {
+    const moods = journalsData.map(j => j.mood);
+    const texts = journalsData.map(j => j.summary.toLowerCase());
+    const allText = texts.join(' ');
+    
+    const moodCounts = moods.reduce((acc, mood) => {
+        acc[mood] = (acc[mood] || 0) + 1;
+        return acc;
+    }, {});
+    const dominantMood = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0][0];
+    
+    const avgMoodScore = moods.map(getMoodScore).reduce((a, b) => a + b, 0) / moods.length;
+    
+    let emotionalProfile = '';
+    if (avgMoodScore >= 4) {
+        emotionalProfile = 'You maintain a consistently positive outlook. Your entries reflect optimism and gratitude, showing strong emotional resilience.';
+    } else if (avgMoodScore >= 3) {
+        emotionalProfile = 'You have a balanced emotional state with a mix of positive and reflective moments. You process your experiences thoughtfully.';
+    } else {
+        emotionalProfile = 'Your entries show deep introspection and honest self-reflection. You\'re working through challenges with courage and self-awareness.';
+    }
+    
+    const themes = [];
+    if (allText.includes('goal') || allText.includes('achieve')) themes.push('goal-setting');
+    if (allText.includes('feel') || allText.includes('emotion')) themes.push('emotional awareness');
+    if (allText.includes('learn') || allText.includes('grow')) themes.push('personal growth');
+    if (allText.includes('work') || allText.includes('career')) themes.push('professional development');
+    if (allText.includes('relationship') || allText.includes('friend')) themes.push('relationships');
+    
+    const dominantThemes = themes.length > 0 
+        ? `Your thoughts frequently revolve around ${themes.slice(0, 3).join(', ')}. These themes indicate areas of active focus and development in your life.`
+        : 'Your entries cover diverse topics, showing a well-rounded approach to self-reflection and life analysis.';
+    
+    let thoughtPatterns = '';
+    if (allText.includes('think') && allText.includes('feel')) {
+        thoughtPatterns = 'You balance logical thinking with emotional awareness, integrating both mind and heart in your reflections.';
+    } else if (allText.includes('think') || allText.includes('realize')) {
+        thoughtPatterns = 'You demonstrate strong analytical thinking, often processing situations through careful reasoning.';
+    } else {
+        thoughtPatterns = 'Your journal shows authentic emotional expression and genuine self-exploration.';
+    }
+    
+    const growthAreas = 'Based on your entries, focus on: 1) Maintaining self-compassion during challenges, 2) Celebrating small wins regularly, 3) Building on your natural strengths while addressing areas of concern.';
+    
+    document.getElementById('emotionalProfile').textContent = emotionalProfile;
+    document.getElementById('dominantThemes').textContent = dominantThemes;
+    document.getElementById('thoughtPatterns').textContent = thoughtPatterns;
+    document.getElementById('growthAreas').textContent = growthAreas;
+}
+
+function calculateStats() {
+    const totalWords = journalsData.reduce((sum, j) => sum + j.summary.split(/\s+/).length, 0);
+    const avgWords = Math.round(totalWords / journalsData.length);
+    
+    const moods = journalsData.map(j => j.mood);
+    const moodCounts = moods.reduce((acc, mood) => {
+        acc[mood] = (acc[mood] || 0) + 1;
+        return acc;
+    }, {});
+    const mostCommon = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0][0];
+    
+    const dates = journalsData.map(j => new Date(j.timestamp).setHours(0,0,0,0)).sort((a, b) => a - b);
+    let streak = 1;
+    for (let i = dates.length - 1; i > 0; i--) {
+        const diff = (dates[i] - dates[i-1]) / (1000 * 60 * 60 * 24);
+        if (diff === 1) streak++;
+        else break;
+    }
+    
+    document.getElementById('avgWordsPerEntry').textContent = avgWords;
+    document.getElementById('mostCommonMood').textContent = mostCommon;
+    document.getElementById('journalStreak').textContent = streak;
+}
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    event.target.classList.add('active');
+    document.getElementById(tabName + '-content').classList.add('active');
+}
+</script>
+
+<style>
+.analytics-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgb(249, 244, 233) 0%, rgb(255, 250, 240) 100%);
+    padding: 2rem;
+}
+
+.analytics-header {
+    max-width: 1400px;
+    margin: 0 auto 3rem;
+    text-align: center;
+}
+
+.analytics-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    color: rgb(173, 119, 72);
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: rgb(107, 107, 107);
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.ai-insights-card {
+    max-width: 1400px;
+    margin: 0 auto 3rem;
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.ai-insights-card h2 {
+    font-family: 'Playfair Display', serif;
+    color: rgb(173, 119, 72);
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.insight-box {
+    background: linear-gradient(135deg, rgb(249, 244, 233) 0%, rgb(255, 250, 240) 100%);
+    padding: 2rem;
+    border-radius: 16px;
+    border-left: 4px solid rgb(107, 169, 159);
+}
+
+.insight-box h3 {
+    color: rgb(47, 100, 87);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.insight-box p {
+    color: rgb(60, 60, 60);
+    line-height: 1.7;
+}
+
+.charts-container {
+    max-width: 1400px;
+    margin: 0 auto 3rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 2rem;
+}
+
+.chart-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.chart-card h2 {
+    font-family: 'Playfair Display', serif;
+    color: rgb(173, 119, 72);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.chart-description {
+    color: rgb(107, 107, 107);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+}
+
+.detailed-insights {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.detailed-insights h2 {
+    font-family: 'Playfair Display', serif;
+    color: rgb(173, 119, 72);
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.insights-tabs {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid rgb(220, 215, 205);
+    padding-bottom: 1rem;
+}
+
+.tab-btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    background: transparent;
+    color: rgb(107, 107, 107);
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, rgb(173, 119, 72), rgb(193, 139, 92));
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.stat-boxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.stat-box {
+    background: linear-gradient(135deg, rgb(249, 244, 233) 0%, rgb(255, 250, 240) 100%);
+    padding: 2rem;
+    border-radius: 16px;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: rgb(173, 119, 72);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: rgb(107, 107, 107);
+    font-size: 0.9rem;
+}
+
+.empty-state {
+    max-width: 600px;
+    margin: 5rem auto;
+    text-align: center;
+    background: white;
+    padding: 4rem 3rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.empty-state h2 {
+    font-family: 'Playfair Display', serif;
+    color: rgb(173, 119, 72);
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: rgb(107, 107, 107);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+}
+
+.btn-primary {
+    padding: 1.25rem 2.5rem;
+    background: linear-gradient(135deg, rgb(173, 119, 72), rgb(193, 139, 92));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(173, 119, 72, 0.3);
+}
+
+.btn-outline {
+    padding: 0.75rem 1.5rem;
+    background: white;
+    color: rgb(173, 119, 72);
+    border: 2px solid rgb(173, 119, 72);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-outline:hover {
+    background: rgb(173, 119, 72);
+    color: white;
+}
+
+@media (max-width: 1200px) {
+    .charts-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .insights-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-boxes {
+        grid-template-columns: 1fr;
+    }
+    
+    .insights-tabs {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
