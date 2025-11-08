@@ -38,14 +38,15 @@ The application features an elegant, sophisticated Wix Studio-inspired aesthetic
     - Habits activities: Deep Breathing, Take a Walk, Journal Entry
     - Achievement activities: Practice Session, Complete Lesson, Do Exercise
 -   **Positive Reinforcement**: Swiggy-style motivational toast notifications that appear after completing activities, with context-aware encouraging messages
--   **Sleep Tracker**: Advanced sleep intelligence system with:
+-   **Sleep Tracker**: Advanced sleep intelligence system with AI-powered analysis:
     - Automatic sleep quality scoring (0-100 scale) based on duration and quality
     - Premium circular score visualization with animated SVG rings
-    - Intelligent, score-based sleep recommendations
+    - AI-powered sleep analysis using Gemini 2.0 that analyzes weekly sleep patterns
+    - Personalized AI insights after each sleep log with actionable recommendations
     - Quality slider interface for rating sleep experience
     - Automatic hour calculation from bedtime/wake time
     - Color-coded sleep scores (Excellent/Good/Fair/Poor)
-    - Personalized tips that adapt to individual sleep patterns
+    - AI generates feeling-first, supportive sleep improvement suggestions
     - Sleep metrics: Duration Quality, Consistency, Sleep Efficiency
     - 14-day sleep history with quality badges
 -   **Journaling**: AI-generated conversation summaries, mood tracking, goal progress notes, and historical journal entry viewing.
@@ -58,7 +59,12 @@ The application features an elegant, sophisticated Wix Studio-inspired aesthetic
     - Word frequency analysis showing most meaningful terms (filters stop words)
     - Requires minimum 1 journal entry to unlock analytics
 -   **Reminders & Habits**: Daily personalized reminder popups, custom reminder creation and management, habit progress tracking, and a 7-day streak visualization.
--   **Time-based Reminder System**: Browser-based popup notifications that check for due reminders every minute and display them at the scheduled time.
+-   **Time-based Reminder System**: Browser-based popup notifications with alarm sounds:
+    - Automatic check every 60 seconds for due reminders
+    - Popup notifications at exact scheduled times
+    - Web Audio API alarm sound (dual-tone notification) when reminders trigger
+    - Delete functionality for managing reminder list
+    - Auto-dismisses after 30 seconds if not interacted with
 -   **Calendar Event Extraction & Visual Calendar**: Comprehensive calendar system with AI-powered event detection and visual interface:
     - AI extracts event details (title, date, time, location) from natural conversations
     - Server-side validation ensures only future dates are accepted
@@ -68,6 +74,8 @@ The application features an elegant, sophisticated Wix Studio-inspired aesthetic
     - Color-coded dates: today highlighting, event indicators, other-month styling
     - Click any date to view all events in a modal popup
     - Event preview bubbles on calendar dates (max 2 shown, "+N more" indicator)
+    - Edit and delete functionality for all calendar events
+    - Full event editing: modify title, date, time, location, and description
     - Automatic Google Calendar OAuth2 sync for confirmed events
     - Automatic reminder creation at exact event times
     - Event cards display creation context (original message that triggered detection)
