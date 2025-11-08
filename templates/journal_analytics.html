@@ -184,6 +184,7 @@ if (journalsData && journalsData.length > 0) {
 }
 
 function initializeAnalytics() {
+    loadWellnessScore();
     createMoodTrendChart();
     createSentimentPieChart();
     createEntryFrequencyChart();
@@ -487,6 +488,47 @@ function switchTab(tabName) {
     
     event.target.classList.add('active');
     document.getElementById(tabName + '-content').classList.add('active');
+}
+
+async function loadWellnessScore() {
+    try {
+        const response = await fetch('/wellness_score');
+        const data = await response.json();
+        
+        if (data.overall_score !== undefined) {
+            const score = data.overall_score;
+            const circumference = 565.48;
+            const offset = circumference - (score / 100) * circumference;
+            
+            setTimeout(() => {
+                document.getElementById('wellnessProgressRing').style.strokeDashoffset = offset;
+                document.getElementById('wellnessScoreText').textContent = score;
+                
+                let category = 'Excellent';
+                if (score < 40) category = 'Needs Attention';
+                else if (score < 60) category = 'Fair';
+                else if (score < 80) category = 'Good';
+                document.getElementById('wellnessCategoryLabel').textContent = category;
+            }, 200);
+            
+            setTimeout(() => {
+                document.getElementById('moodScore').textContent = data.breakdown.mood;
+                document.getElementById('moodBar').style.width = data.breakdown.mood + '%';
+                
+                document.getElementById('sleepScore').textContent = data.breakdown.sleep;
+                document.getElementById('sleepBar').style.width = data.breakdown.sleep + '%';
+                
+                document.getElementById('habitsScore').textContent = data.breakdown.habits;
+                document.getElementById('habitsBar').style.width = data.breakdown.habits + '%';
+                
+                document.getElementById('journalScore').textContent = data.breakdown.journal;
+                document.getElementById('journalBar').style.width = data.breakdown.journal + '%';
+            }, 500);
+        }
+    } catch (error) {
+        console.error('Error loading wellness score:', error);
+        document.getElementById('wellnessCategoryLabel').textContent = 'Unable to load score';
+    }
 }
 </script>
 

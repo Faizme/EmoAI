@@ -58,6 +58,31 @@ The application features an elegant, sophisticated Wix Studio-inspired aesthetic
     - Word frequency analysis showing most meaningful terms (filters stop words)
     - Requires minimum 1 journal entry to unlock analytics
 -   **Reminders & Habits**: Daily personalized reminder popups, custom reminder creation and management, habit progress tracking, and a 7-day streak visualization.
+-   **Time-based Reminder System**: Browser-based popup notifications that check for due reminders every minute and display them at the scheduled time.
+-   **Calendar Event Extraction**: AI-powered system that automatically detects upcoming events mentioned in chat conversations:
+    - Gemini extracts event title, date, time, and location from natural language
+    - Server-side validation ensures only future dates are accepted
+    - User confirmation workflow with edit capability before adding to calendar
+    - Dedicated calendar dashboard showing all upcoming events with confirmation status
+    - Event cards display creation context (original message that triggered detection)
+-   **Wellness Score Dashboard**: Comprehensive 0-100 health scoring system combining multiple wellness metrics:
+    - Overall wellness score calculated from 4 equally-weighted categories (25% each)
+    - Mood Trends: Based on recent journal entry sentiments
+    - Sleep Quality: Average of recent sleep scores
+    - Habit Streaks: Consistency of goal activities
+    - Journal Consistency: Frequency of journaling
+    - Animated circular progress ring visualization with category breakdown
+    - Score categorization (Excellent 80+, Good 60-79, Fair 40-59, Needs Attention <40)
+-   **Dynamic AI Personality**: Real-time sentiment analysis that adapts bot responses to user's emotional state:
+    - Analyzes user message sentiment (positive, negative, neutral, anxious)
+    - Adapts conversation tone: cheerful/uplifting when user is sad, celebratory when happy, calming when anxious
+    - Works from first message with no conversation history needed
+    - Maintains emotional intelligence core while adjusting delivery style
+-   **Event Memory & Follow-up System**: Intelligent event tracking and automatic follow-up questions:
+    - AI remembers events mentioned in conversations
+    - Automatically detects when events have passed (checks yesterday's events)
+    - Generates context-aware follow-up questions the day after events occur
+    - Helps maintain continuity and shows the AI "cares" about user's life
 -   **Data Management**: Chat history and habit progress are stored in the database, with automatic cleanup of habit progress older than 30 days.
 
 ### System Design Choices
