@@ -1,76 +1,11 @@
 .premium-chat-container {
     display: flex;
     height: 100vh;
-    background: linear-gradient(135deg, #F4EEE3 0%, #EDE5D8 100%);
+    background: rgb(249, 244, 233);
     position: relative;
     overflow: hidden;
 }
 
-/* Chat History Sidebar - Right Side */
-.chat-sidebar-right {
-    width: 280px;
-    background: white;
-    border-left: 1px solid rgba(107, 169, 159, 0.2);
-    display: flex;
-    flex-direction: column;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.05);
-}
-
-.sidebar-header {
-    padding: 24px 20px;
-    border-bottom: 1px solid rgba(107, 169, 159, 0.15);
-}
-
-.sidebar-header h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    color: #5A5A5A;
-    margin: 0;
-}
-
-.history-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 12px;
-}
-
-.history-item {
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 1px solid transparent;
-}
-
-.history-item:hover {
-    background: rgba(107, 169, 159, 0.08);
-    border-color: rgba(107, 169, 159, 0.2);
-}
-
-.history-item.active {
-    background: rgba(107, 169, 159, 0.12);
-    border-color: var(--accent-color);
-}
-
-.history-date {
-    font-size: 0.75rem;
-    color: var(--accent-color);
-    font-weight: 600;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.history-preview {
-    font-size: 0.9rem;
-    color: #666;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* Main Chat Area */
 .main-chat-area {
     flex: 1;
     display: flex;
@@ -78,11 +13,10 @@
     position: relative;
 }
 
-/* Elegant Header */
 .elegant-chat-header {
     background: white;
     padding: 24px 32px;
-    border-bottom: 1px solid rgba(107, 169, 159, 0.15);
+    border-bottom: 1px solid rgba(173, 119, 72, 0.15);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -99,7 +33,7 @@
 
 .header-left .app-tagline {
     font-size: 0.9rem;
-    color: var(--accent-color);
+    color: rgb(173, 119, 72);
     margin: 4px 0 0 0;
 }
 
@@ -122,32 +56,31 @@
 }
 
 .elegant-btn.btn-primary {
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+    background: rgb(173, 119, 72);
     color: white;
-    box-shadow: 0 4px 12px rgba(107, 169, 159, 0.3);
+    box-shadow: 0 4px 12px rgba(173, 119, 72, 0.3);
 }
 
 .elegant-btn.btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(107, 169, 159, 0.4);
+    box-shadow: 0 6px 16px rgba(173, 119, 72, 0.4);
 }
 
 .elegant-btn.btn-outline {
     background: white;
-    border: 1.5px solid rgba(107, 169, 159, 0.3);
-    color: var(--accent-color);
+    border: 1.5px solid rgba(173, 119, 72, 0.3);
+    color: rgb(173, 119, 72);
 }
 
 .elegant-btn.btn-outline:hover {
-    background: rgba(107, 169, 159, 0.08);
-    border-color: var(--accent-color);
+    background: rgba(173, 119, 72, 0.08);
+    border-color: rgb(173, 119, 72);
 }
 
 .btn-icon {
     font-size: 1rem;
 }
 
-/* Conversation Area */
 .conversation-area {
     flex: 1;
     overflow-y: auto;
@@ -180,17 +113,17 @@
     border-radius: 16px;
     background: white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(107, 169, 159, 0.1);
+    border: 1px solid rgba(173, 119, 72, 0.1);
 }
 
 .ai-message-elegant .message-content {
     margin-right: auto;
-    border-left: 3px solid var(--accent-color);
+    border-left: 3px solid rgb(173, 119, 72);
 }
 
 .user-message-elegant .message-content {
     margin-left: auto;
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+    background: rgb(47, 100, 87);
     border: none;
     color: white;
 }
@@ -201,7 +134,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 8px;
-    color: var(--accent-color);
+    color: rgb(173, 119, 72);
 }
 
 .user-message-elegant .message-sender {
@@ -230,7 +163,7 @@
 .typing-dot-elegant {
     width: 8px;
     height: 8px;
-    background: var(--accent-color);
+    background: rgb(173, 119, 72);
     border-radius: 50%;
     animation: typingBounce 1.4s infinite;
 }
@@ -252,11 +185,10 @@
     }
 }
 
-/* Input Section */
 .input-section {
     background: white;
     padding: 20px 32px 24px;
-    border-top: 1px solid rgba(107, 169, 159, 0.15);
+    border-top: 1px solid rgba(173, 119, 72, 0.15);
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
 }
 
@@ -271,9 +203,9 @@
 .voice-btn {
     padding: 12px;
     background: white;
-    border: 1.5px solid rgba(107, 169, 159, 0.3);
+    border: 1.5px solid rgba(173, 119, 72, 0.3);
     border-radius: 12px;
-    color: var(--accent-color);
+    color: rgb(173, 119, 72);
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
@@ -282,30 +214,30 @@
 }
 
 .voice-btn:hover {
-    background: rgba(107, 169, 159, 0.08);
-    border-color: var(--accent-color);
+    background: rgba(173, 119, 72, 0.08);
+    border-color: rgb(173, 119, 72);
 }
 
 .voice-btn.listening {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
+    background: rgb(173, 119, 72);
+    border-color: rgb(173, 119, 72);
     color: white;
     animation: pulse 1.5s infinite;
 }
 
 @keyframes pulse {
     0%, 100% {
-        box-shadow: 0 0 0 0 rgba(107, 169, 159, 0.4);
+        box-shadow: 0 0 0 0 rgba(173, 119, 72, 0.4);
     }
     50% {
-        box-shadow: 0 0 0 10px rgba(107, 169, 159, 0);
+        box-shadow: 0 0 0 10px rgba(173, 119, 72, 0);
     }
 }
 
 .premium-input {
     flex: 1;
     padding: 14px 20px;
-    border: 1.5px solid rgba(107, 169, 159, 0.2);
+    border: 1.5px solid rgba(173, 119, 72, 0.2);
     border-radius: 12px;
     font-size: 1rem;
     background: #F9F9F9;
@@ -315,14 +247,14 @@
 
 .premium-input:focus {
     outline: none;
-    border-color: var(--accent-color);
+    border-color: rgb(173, 119, 72);
     background: white;
-    box-shadow: 0 0 0 3px rgba(107, 169, 159, 0.1);
+    box-shadow: 0 0 0 3px rgba(173, 119, 72, 0.1);
 }
 
 .send-btn-elegant {
     padding: 12px 16px;
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+    background: rgb(173, 119, 72);
     color: white;
     border: none;
     border-radius: 12px;
@@ -331,12 +263,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(107, 169, 159, 0.3);
+    box-shadow: 0 4px 12px rgba(173, 119, 72, 0.3);
 }
 
 .send-btn-elegant:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(107, 169, 159, 0.4);
+    box-shadow: 0 6px 16px rgba(173, 119, 72, 0.4);
 }
 
 .input-actions {
@@ -349,7 +281,7 @@
 .action-link {
     background: none;
     border: none;
-    color: var(--accent-color);
+    color: rgb(173, 119, 72);
     font-size: 0.9rem;
     cursor: pointer;
     padding: 8px 12px;
@@ -358,15 +290,14 @@
 }
 
 .action-link:hover {
-    color: var(--accent-light);
+    color: rgb(47, 100, 87);
     text-decoration: underline;
 }
 
-/* User Info Badge - Bottom Left */
 .user-info-badge {
-    position: absolute;
-    bottom: 140px;
-    left: 32px;
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -374,7 +305,7 @@
     padding: 12px 16px;
     border-radius: 50px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(107, 169, 159, 0.2);
+    border: 1px solid rgba(173, 119, 72, 0.2);
     z-index: 100;
 }
 
@@ -382,7 +313,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
+    background: linear-gradient(135deg, rgb(173, 119, 72), rgb(47, 100, 87));
     color: white;
     display: flex;
     align-items: center;
@@ -404,10 +335,9 @@
 
 .user-status {
     font-size: 0.75rem;
-    color: var(--accent-color);
+    color: rgb(173, 119, 72);
 }
 
-/* Elegant Modals */
 .elegant-modal {
     position: fixed;
     top: 0;
@@ -498,7 +428,7 @@
 .premium-textarea {
     width: 100%;
     padding: 14px 20px;
-    border: 1.5px solid rgba(107, 169, 159, 0.2);
+    border: 1.5px solid rgba(173, 119, 72, 0.2);
     border-radius: 12px;
     font-size: 1rem;
     background: #F9F9F9;
@@ -509,9 +439,9 @@
 
 .premium-textarea:focus {
     outline: none;
-    border-color: var(--accent-color);
+    border-color: rgb(173, 119, 72);
     background: white;
-    box-shadow: 0 0 0 3px rgba(107, 169, 159, 0.1);
+    box-shadow: 0 0 0 3px rgba(173, 119, 72, 0.1);
 }
 
 .full-width {
@@ -519,11 +449,10 @@
     justify-content: center;
 }
 
-/* Settings Sections */
 .settings-section {
     margin-bottom: 32px;
     padding-bottom: 24px;
-    border-bottom: 1px solid rgba(107, 169, 159, 0.15);
+    border-bottom: 1px solid rgba(173, 119, 72, 0.15);
 }
 
 .settings-section:last-child {
@@ -575,14 +504,13 @@
 }
 
 .toggle-switch-elegant input:checked + .toggle-slider {
-    background-color: var(--accent-color);
+    background-color: rgb(173, 119, 72);
 }
 
 .toggle-switch-elegant input:checked + .toggle-slider:before {
     transform: translateX(24px);
 }
 
-/* Reminders List */
 .reminders-list-elegant {
     display: flex;
     flex-direction: column;
@@ -592,7 +520,7 @@
 .reminder-card {
     padding: 16px;
     background: #F9F9F9;
-    border: 1px solid rgba(107, 169, 159, 0.15);
+    border: 1px solid rgba(173, 119, 72, 0.15);
     border-radius: 12px;
     display: flex;
     justify-content: space-between;
@@ -625,7 +553,6 @@
     font-style: italic;
 }
 
-/* Mood Selection */
 .mood-selection {
     margin: 24px 0;
 }
@@ -641,18 +568,13 @@
     padding: 20px;
     background: #F9F9F9;
     border-radius: 12px;
-    border-left: 3px solid var(--accent-color);
+    border-left: 3px solid rgb(173, 119, 72);
     margin: 20px 0;
     line-height: 1.7;
     color: #333;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
-    .chat-sidebar-right {
-        display: none;
-    }
-    
     .elegant-chat-header {
         flex-direction: column;
         gap: 16px;
@@ -664,7 +586,7 @@
     }
     
     .user-info-badge {
-        bottom: 120px;
+        bottom: 16px;
         left: 16px;
     }
     
