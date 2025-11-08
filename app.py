@@ -1050,5 +1050,161 @@ def check_time_reminders():
     
     return jsonify({'show_reminder': False})
 
+@app.route('/google_auth')
+@login_required
+def google_auth():
+    from google_auth_oauthlib.flow import Flow
+    
+    client_config = {
+        "web": {
+            "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
+            "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "redirect_uris": [f"https://{os.environ.get('REPLIT_DEV_DOMAIN')}/google_callback"]
+        }
+    }
+    
+    flow = Flow.from_client_config(
+        client_config,
+        scopes=['https://www.googleapis.com/auth/calendar'],
+        redirect_uri=f"https://{os.environ.get('REPLIT_DEV_DOMAIN')}/google_callback"
+    )
+    
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true',
+        prompt='consent'
+    )
+    
+    session['oauth_state'] = state
+    return redirect(authorization_url)
+
+@app.route('/google_callback')
+@login_required
+def google_callback():
+    from google_auth_oauthlib.flow import Flow
+    import json
+    
+    client_config = {
+        "web": {
+            "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
+            "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "redirect_uris": [f"https://{os.environ.get('REPLIT_DEV_DOMAIN')}/google_callback"]
+        }
+    }
+    
+    flow = Flow.from_client_config(
+        client_config,
+        scopes=['https://www.googleapis.com/auth/calendar'],
+        state=session['oauth_state'],
+        redirect_uri=f"https://{os.environ.get('REPLIT_DEV_DOMAIN')}/google_callback"
+    )
+    
+    flow.fetch_token(authorization_response=request.url)
+    credentials = flow.credentials
+    
+    existing_token = GoogleCalendarToken.query.filter_by(user_id=current_user.id).first()
+    if existing_token:
+        existing_token.access_token = credentials.token
+        existing_token.refresh_token = credentials.refresh_token
+        existing_token.token_uri = credentials.token_uri
+        existing_token.client_id = credentials.client_id
+        existing_token.client_secret = credentials.client_secret
+        existing_token.scopes = json.dumps(credentials.scopes)
+        existing_token.expiry = credentials.expiry
+        existing_token.updated_at = datetime.utcnow()
+    else:
+        token = GoogleCalendarToken(
+            user_id=current_user.id,
+            access_token=credentials.token,
+            refresh_token=credentials.refresh_token,
+            token_uri=credentials.token_uri,
+            client_id=credentials.client_id,
+            client_secret=credentials.client_secret,
+            scopes=json.dumps(credentials.scopes),
+            expiry=credentials.expiry
+        )
+        db.session.add(token)
+    
+    db.session.commit()
+    flash('Successfully connected to Google Calendar!', 'success')
+    return redirect(url_for('calendar'))
+
+@app.route('/google_calendar_status')
+@login_required
+def google_calendar_status():
+    token = GoogleCalendarToken.query.filter_by(user_id=current_user.id).first()
+    return jsonify({
+        'connected': token is not None,
+        'expiry': token.expiry.isoformat() if token and token.expiry else None
+    })
+
+@app.route('/sync_event_to_google/<int:event_id>', methods=['POST'])
+@login_required
+def sync_event_to_google(event_id):
+    from google.oauth2.credentials import Credentials
+    from googleapiclient.discovery import build
+    import json
+    
+    event = Event.query.filter_by(id=event_id, user_id=current_user.id).first()
+    if not event:
+        return jsonify({'error': 'Event not found'}), 404
+    
+    token_record = GoogleCalendarToken.query.filter_by(user_id=current_user.id).first()
+    if not token_record:
+        return jsonify({'error': 'Google Calendar not connected'}), 400
+    
+    creds = Credentials(
+        token=token_record.access_token,
+        refresh_token=token_record.refresh_token,
+        token_uri=token_record.token_uri,
+        client_id=token_record.client_id,
+        client_secret=token_record.client_secret,
+        scopes=json.loads(token_record.scopes) if token_record.scopes else []
+    )
+    
+    try:
+        service = build('calendar', 'v3', credentials=creds)
+        
+        event_body = {
+            'summary': event.title,
+            'description': event.description or '',
+            'start': {
+                'date': event.event_date.isoformat(),
+                'timeZone': 'UTC',
+            },
+            'end': {
+                'date': event.event_date.isoformat(),
+                'timeZone': 'UTC',
+            }
+        }
+        
+        if event.event_time:
+            start_datetime = f"{event.event_date.isoformat()}T{event.event_time}:00"
+            event_body['start'] = {'dateTime': start_datetime, 'timeZone': 'UTC'}
+            event_body['end'] = {'dateTime': start_datetime, 'timeZone': 'UTC'}
+        
+        if event.location:
+            event_body['location'] = event.location
+        
+        calendar_event = service.events().insert(calendarId='primary', body=event_body).execute()
+        
+        event.is_in_google_calendar = True
+        event.google_calendar_id = calendar_event['id']
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'google_event_id': calendar_event['id'],
+            'google_event_link': calendar_event.get('htmlLink')
+        })
+    
+    except Exception as e:
+        print(f"Error syncing to Google Calendar: {e}")
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

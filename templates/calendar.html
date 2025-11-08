@@ -181,6 +181,12 @@
     <div class="calendar-header">
         <h1>Your Calendar</h1>
         <p>Upcoming events detected from your conversations</p>
+        <div id="googleCalendarStatus" style="margin-top: 20px;">
+            <button id="connectGoogleBtn" class="back-link" style="display: none;">Connect Google Calendar</button>
+            <div id="connectedStatus" style="display: none; color: rgb(107, 169, 159); font-weight: 500;">
+                ✓ Google Calendar Connected
+            </div>
+        </div>
     </div>
 
     <div id="eventsContainer" class="events-grid">
@@ -197,6 +203,26 @@
 </div>
 
 <script>
+let googleConnected = false;
+
+async function checkGoogleCalendarStatus() {
+    try {
+        const response = await fetch('/google_calendar_status');
+        const data = await response.json();
+        googleConnected = data.connected;
+        
+        if (googleConnected) {
+            document.getElementById('connectedStatus').style.display = 'block';
+            document.getElementById('connectGoogleBtn').style.display = 'none';
+        } else {
+            document.getElementById('connectGoogleBtn').style.display = 'inline-block';
+            document.getElementById('connectedStatus').style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error checking Google Calendar status:', error);
+    }
+}
+
 async function loadEvents() {
     try {
         const response = await fetch('/get_events');
@@ -233,6 +259,15 @@ async function loadEvents() {
                     <span class="event-status ${event.is_confirmed ? 'confirmed' : 'pending'}">
                         ${event.is_confirmed ? 'Confirmed' : 'Pending Confirmation'}
                     </span>
+                    ${event.is_in_google_calendar ? `
+                    <div style="margin-top: 12px; color: rgb(107, 169, 159); font-size: 14px;">
+                        ✓ Synced to Google Calendar
+                    </div>
+                    ` : googleConnected && event.is_confirmed ? `
+                    <button class="event-btn confirm" style="margin-top: 12px;" onclick="syncToGoogle(${event.id})">
+                        Add to Google Calendar
+                    </button>
+                    ` : ''}
                     <div class="event-actions">
                         ${!event.is_confirmed ? `<button class="event-btn confirm" onclick="confirmEvent(${event.id})">Confirm</button>` : ''}
                         <button class="event-btn delete" onclick="deleteEvent(${event.id})">Delete</button>
@@ -244,6 +279,34 @@ async function loadEvents() {
         console.error('Error loading events:', error);
     }
 }
+
+async function syncToGoogle(eventId) {
+    try {
+        const response = await fetch(`/sync_event_to_google/${eventId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('Event successfully added to your Google Calendar!');
+            loadEvents();
+        } else {
+            alert('Error: ' + (data.error || 'Failed to sync event'));
+        }
+    } catch (error) {
+        console.error('Error syncing to Google Calendar:', error);
+        alert('Failed to sync event to Google Calendar');
+    }
+}
+
+document.getElementById('connectGoogleBtn').addEventListener('click', function() {
+    window.location.href = '/google_auth';
+});
+
+checkGoogleCalendarStatus();
+loadEvents();
 
 async function confirmEvent(eventId) {
     if (!confirm('Confirm this event?')) return;
