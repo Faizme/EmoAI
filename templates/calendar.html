@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block title %}Calendar - EmoAI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chatbot.css') }}">
+<style>
+    .calendar-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+        background: linear-gradient(135deg, #f9f4e9 0%, #fef9f3 100%);
+        min-height: 100vh;
+    }
+
+    .calendar-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .calendar-header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 42px;
+        color: rgb(173, 119, 72);
+        margin-bottom: 10px;
+    }
+
+    .calendar-header p {
+        font-family: 'Inter', sans-serif;
+        color: #666;
+        font-size: 16px;
+    }
+
+    .events-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .event-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .event-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+
+    .event-card.unconfirmed {
+        border-left: 4px solid rgb(232, 181, 166);
+    }
+
+    .event-card.confirmed {
+        border-left: 4px solid rgb(107, 169, 159);
+    }
+
+    .event-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 24px;
+        color: rgb(173, 119, 72);
+        margin-bottom: 12px;
+    }
+
+    .event-detail {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 8px 0;
+        font-family: 'Inter', sans-serif;
+        color: #555;
+    }
+
+    .event-detail-icon {
+        width: 20px;
+        text-align: center;
+    }
+
+    .event-status {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        margin-top: 12px;
+    }
+
+    .event-status.pending {
+        background: rgb(232, 181, 166, 0.2);
+        color: rgb(173, 119, 72);
+    }
+
+    .event-status.confirmed {
+        background: rgb(107, 169, 159, 0.2);
+        color: rgb(47, 100, 87);
+    }
+
+    .event-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .event-btn {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .event-btn.confirm {
+        background: rgb(107, 169, 159);
+        color: white;
+    }
+
+    .event-btn.confirm:hover {
+        background: rgb(47, 100, 87);
+    }
+
+    .event-btn.delete {
+        background: rgb(232, 181, 166);
+        color: white;
+    }
+
+    .event-btn.delete:hover {
+        background: rgb(173, 119, 72);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 12px;
+    }
+
+    .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 24px;
+        color: rgb(173, 119, 72);
+        margin-bottom: 10px;
+    }
+
+    .empty-state p {
+        font-family: 'Inter', sans-serif;
+        color: #666;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 24px;
+        background: rgb(107, 169, 159);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-family: 'Inter', sans-serif;
+        transition: background 0.2s;
+    }
+
+    .back-link:hover {
+        background: rgb(47, 100, 87);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="calendar-container">
+    <div class="calendar-header">
+        <h1>Your Calendar</h1>
+        <p>Upcoming events detected from your conversations</p>
+    </div>
+
+    <div id="eventsContainer" class="events-grid">
+        <div class="empty-state">
+            <div class="empty-state-icon">📅</div>
+            <h3>No events yet</h3>
+            <p>When you mention upcoming events in your conversations with EmoAI, they'll appear here automatically.</p>
+        </div>
+    </div>
+
+    <div style="text-align: center;">
+        <a href="/chatbot" class="back-link">← Back to Chat</a>
+    </div>
+</div>
+
+<script>
+async function loadEvents() {
+    try {
+        const response = await fetch('/get_events');
+        const data = await response.json();
+        
+        const container = document.getElementById('eventsContainer');
+        
+        if (data.events && data.events.length > 0) {
+            container.innerHTML = data.events.map(event => `
+                <div class="event-card ${event.is_confirmed ? 'confirmed' : 'unconfirmed'}">
+                    <div class="event-title">${escapeHtml(event.title)}</div>
+                    <div class="event-detail">
+                        <span class="event-detail-icon">📅</span>
+                        <span>${new Date(event.date).toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}</span>
+                    </div>
+                    ${event.time ? `
+                    <div class="event-detail">
+                        <span class="event-detail-icon">⏰</span>
+                        <span>${event.time}</span>
+                    </div>
+                    ` : ''}
+                    ${event.location ? `
+                    <div class="event-detail">
+                        <span class="event-detail-icon">📍</span>
+                        <span>${escapeHtml(event.location)}</span>
+                    </div>
+                    ` : ''}
+                    ${event.created_from_message ? `
+                    <div class="event-detail" style="font-style: italic; color: #888; margin-top: 12px;">
+                        <span class="event-detail-icon">💬</span>
+                        <span>"${escapeHtml(event.created_from_message)}"</span>
+                    </div>
+                    ` : ''}
+                    <span class="event-status ${event.is_confirmed ? 'confirmed' : 'pending'}">
+                        ${event.is_confirmed ? 'Confirmed' : 'Pending Confirmation'}
+                    </span>
+                    <div class="event-actions">
+                        ${!event.is_confirmed ? `<button class="event-btn confirm" onclick="confirmEvent(${event.id})">Confirm</button>` : ''}
+                        <button class="event-btn delete" onclick="deleteEvent(${event.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Error loading events:', error);
+    }
+}
+
+async function confirmEvent(eventId) {
+    if (!confirm('Confirm this event?')) return;
+    
+    try {
+        const response = await fetch(`/confirm_event/${eventId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({})
+        });
+        
+        if (response.ok) {
+            loadEvents();
+        }
+    } catch (error) {
+        console.error('Error confirming event:', error);
+    }
+}
+
+async function deleteEvent(eventId) {
+    if (!confirm('Delete this event?')) return;
+    
+    try {
+        const response = await fetch(`/delete_event/${eventId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            loadEvents();
+        }
+    } catch (error) {
+        console.error('Error deleting event:', error);
+    }
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+loadEvents();
+</script>
+{% endblock %}

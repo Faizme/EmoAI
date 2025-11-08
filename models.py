@@ -140,3 +140,53 @@ class SleepLog(db.Model):
     
     def __repr__(self):
         return f'<SleepLog {self.id} - {self.date}>'
+
+class Event(db.Model):
+    __tablename__ = 'events'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    event_date = db.Column(db.Date, nullable=False)
+    event_time = db.Column(db.String(10), nullable=True)
+    location = db.Column(db.String(200), nullable=True)
+    is_confirmed = db.Column(db.Boolean, default=False)
+    is_in_google_calendar = db.Column(db.Boolean, default=False)
+    google_calendar_id = db.Column(db.String(200), nullable=True)
+    created_from_message = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<Event {self.id} - {self.title}>'
+
+class UserSentiment(db.Model):
+    __tablename__ = 'user_sentiments'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    session_id = db.Column(db.String(100), nullable=False)
+    sentiment = db.Column(db.String(50), nullable=False)
+    intensity = db.Column(db.Float, default=0.5)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<UserSentiment {self.id} - {self.sentiment}>'
+
+class GoogleCalendarToken(db.Model):
+    __tablename__ = 'google_calendar_tokens'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
+    access_token = db.Column(db.Text, nullable=False)
+    refresh_token = db.Column(db.Text, nullable=True)
+    token_uri = db.Column(db.String(200), nullable=True)
+    client_id = db.Column(db.String(200), nullable=True)
+    client_secret = db.Column(db.String(200), nullable=True)
+    scopes = db.Column(db.Text, nullable=True)
+    expiry = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<GoogleCalendarToken {self.id} - User {self.user_id}>'

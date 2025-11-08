@@ -15,6 +15,61 @@
     
     {% if journals|length > 0 %}
     
+    <div class="wellness-score-section">
+        <h2 style="text-align: center; font-family: 'Playfair Display', serif; font-size: 32px; color: rgb(173, 119, 72); margin-bottom: 30px;">Your Overall Wellness Score</h2>
+        
+        <div class="wellness-main-card">
+            <div class="wellness-score-ring">
+                <svg width="200" height="200" viewBox="0 0 200 200">
+                    <circle cx="100" cy="100" r="90" fill="none" stroke="#e8e8e8" stroke-width="12"></circle>
+                    <circle id="wellnessProgressRing" cx="100" cy="100" r="90" fill="none" stroke="rgb(107, 169, 159)" stroke-width="12" stroke-linecap="round" stroke-dasharray="565.48" stroke-dashoffset="565.48" transform="rotate(-90 100 100)" style="transition: stroke-dashoffset 1s ease"></circle>
+                    <text id="wellnessScoreText" x="100" y="110" text-anchor="middle" font-size="48" font-weight="bold" fill="rgb(173, 119, 72)">0</text>
+                </svg>
+                <div id="wellnessCategoryLabel" style="text-align: center; margin-top: 10px; font-size: 18px; color: #555;">Loading...</div>
+            </div>
+            
+            <div class="wellness-breakdown">
+                <h3 style="margin-bottom: 20px;">Score Breakdown</h3>
+                <div class="wellness-category">
+                    <div class="category-header">
+                        <span>Mood Trends</span>
+                        <span id="moodScore" class="category-score">0</span>
+                    </div>
+                    <div class="category-bar">
+                        <div id="moodBar" class="category-bar-fill" style="width: 0%; background: rgb(107, 169, 159);"></div>
+                    </div>
+                </div>
+                <div class="wellness-category">
+                    <div class="category-header">
+                        <span>Sleep Quality</span>
+                        <span id="sleepScore" class="category-score">0</span>
+                    </div>
+                    <div class="category-bar">
+                        <div id="sleepBar" class="category-bar-fill" style="width: 0%; background: rgb(173, 119, 72);"></div>
+                    </div>
+                </div>
+                <div class="wellness-category">
+                    <div class="category-header">
+                        <span>Habit Streaks</span>
+                        <span id="habitsScore" class="category-score">0</span>
+                    </div>
+                    <div class="category-bar">
+                        <div id="habitsBar" class="category-bar-fill" style="width: 0%; background: rgb(232, 181, 166);"></div>
+                    </div>
+                </div>
+                <div class="wellness-category">
+                    <div class="category-header">
+                        <span>Journal Consistency</span>
+                        <span id="journalScore" class="category-score">0</span>
+                    </div>
+                    <div class="category-bar">
+                        <div id="journalBar" class="category-bar-fill" style="width: 0%; background: rgb(201, 181, 227);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="ai-insights-card">
         <h2>AI-Powered Insights About You</h2>
         <div class="insights-grid">
@@ -666,6 +721,68 @@ function switchTab(tabName) {
 .btn-outline:hover {
     background: rgb(173, 119, 72);
     color: white;
+}
+
+.wellness-score-section {
+    margin: 40px 0;
+}
+
+.wellness-main-card {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 40px;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    align-items: center;
+}
+
+.wellness-score-ring {
+    text-align: center;
+}
+
+.wellness-breakdown {
+    flex: 1;
+}
+
+.wellness-category {
+    margin-bottom: 20px;
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    color: #333;
+}
+
+.category-score {
+    font-weight: 700;
+    color: rgb(173, 119, 72);
+}
+
+.category-bar {
+    width: 100%;
+    height: 12px;
+    background: #f0f0f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.category-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 1s ease;
+}
+
+@media (max-width: 900px) {
+    .wellness-main-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
 }
 
 @media (max-width: 1200px) {

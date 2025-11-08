@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import Bcrypt
-from models import db, User, UserProfile, Journal, ChatMessage, HabitProgress, Reminder, Goal, Activity, MotivationMessage, SleepLog
+from models import db, User, UserProfile, Journal, ChatMessage, HabitProgress, Reminder, Goal, Activity, MotivationMessage, SleepLog, Event, UserSentiment, GoogleCalendarToken
 import os
 import sys
 import secrets
@@ -9,7 +9,7 @@ import random
 from datetime import datetime, date, timedelta
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'attached_assets'))
-from ai_core_1762554001118 import get_ai_chat_response, summarize_chat_as_journal
+from ai_core_1762554001118 import get_ai_chat_response, summarize_chat_as_journal, extract_event_from_message, analyze_sentiment
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', secrets.token_hex(32))
@@ -169,6 +169,51 @@ def chat():
     db.session.commit()
     
     try:
+        detected_sentiment = analyze_sentiment(user_message)
+        
+        sentiment_record = UserSentiment(
+            user_id=current_user.id,
+            session_id=session_id,
+            sentiment=detected_sentiment['sentiment'],
+            intensity=detected_sentiment['intensity']
+        )
+        db.session.add(sentiment_record)
+        
+        today_date = date.today().isoformat()
+        detected_event = extract_event_from_message(user_message, today_date)
+        
+        event_data = None
+        if detected_event:
+            try:
+                event_date = datetime.strptime(detected_event['date'], '%Y-%m-%d').date()
+                
+                if event_date <= date.today():
+                    print(f"Rejected past/today event: {event_date}")
+                elif not detected_event.get('title'):
+                    print(f"Rejected event without title")
+                else:
+                    new_event = Event(
+                        user_id=current_user.id,
+                        title=detected_event['title'],
+                        event_date=event_date,
+                        event_time=detected_event.get('time'),
+                        location=detected_event.get('location'),
+                        created_from_message=user_message,
+                        is_confirmed=False
+                    )
+                    db.session.add(new_event)
+                    db.session.flush()
+                    
+                    event_data = {
+                        'id': new_event.id,
+                        'title': new_event.title,
+                        'date': new_event.event_date.isoformat(),
+                        'time': new_event.event_time,
+                        'location': new_event.location
+                    }
+            except Exception as event_error:
+                print(f"Error creating event: {event_error}")
+        
         chat_history = get_chat_history_from_db()
         
         user_context = f"""
@@ -180,7 +225,7 @@ def chat():
         if len(chat_history) == 1:
             chat_history[0]['parts'][0] = f"{user_context}\n\nUser says: {chat_history[0]['parts'][0]}"
         
-        ai_response = get_ai_chat_response(chat_history)
+        ai_response = get_ai_chat_response(chat_history, detected_sentiment)
         
         ai_chat = ChatMessage(
             user_id=current_user.id,
@@ -191,10 +236,16 @@ def chat():
         db.session.add(ai_chat)
         db.session.commit()
         
-        return jsonify({
+        response_data = {
             'response': ai_response,
-            'success': True
-        })
+            'success': True,
+            'sentiment': detected_sentiment
+        }
+        
+        if event_data:
+            response_data['detected_event'] = event_data
+        
+        return jsonify(response_data)
     except Exception as e:
         return jsonify({
             'error': str(e),
@@ -755,6 +806,249 @@ def generate_motivation_message(activity_type):
     ])
     
     return random.choice(category_messages)
+
+@app.route('/get_events', methods=['GET'])
+@login_required
+def get_events():
+    """Get all events for the current user"""
+    events = Event.query.filter_by(user_id=current_user.id).order_by(Event.event_date).all()
+    return jsonify({
+        'success': True,
+        'events': [{
+            'id': e.id,
+            'title': e.title,
+            'description': e.description,
+            'date': e.event_date.isoformat(),
+            'time': e.event_time,
+            'location': e.location,
+            'is_confirmed': e.is_confirmed,
+            'is_in_google_calendar': e.is_in_google_calendar,
+            'created_from_message': e.created_from_message
+        } for e in events]
+    })
+
+@app.route('/confirm_event/<int:event_id>', methods=['POST'])
+@login_required
+def confirm_event(event_id):
+    """Confirm and optionally edit an event"""
+    event = Event.query.filter_by(id=event_id, user_id=current_user.id).first()
+    if not event:
+        return jsonify({'success': False, 'error': 'Event not found'}), 404
+    
+    data = request.json
+    event.title = data.get('title', event.title)
+    event.description = data.get('description', event.description)
+    
+    if data.get('date'):
+        event.event_date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+    if 'time' in data:
+        event.event_time = data['time']
+    if 'location' in data:
+        event.location = data['location']
+    
+    event.is_confirmed = True
+    db.session.commit()
+    
+    return jsonify({'success': True, 'event': {
+        'id': event.id,
+        'title': event.title,
+        'date': event.event_date.isoformat(),
+        'time': event.event_time,
+        'location': event.location
+    }})
+
+@app.route('/delete_event/<int:event_id>', methods=['DELETE'])
+@login_required
+def delete_event(event_id):
+    """Delete an event"""
+    event = Event.query.filter_by(id=event_id, user_id=current_user.id).first()
+    if not event:
+        return jsonify({'success': False, 'error': 'Event not found'}), 404
+    
+    db.session.delete(event)
+    db.session.commit()
+    return jsonify({'success': True})
+
+@app.route('/wellness_score', methods=['GET'])
+@login_required
+def wellness_score():
+    """Calculate overall wellness score (0-100)"""
+    from datetime import timedelta
+    
+    today = date.today()
+    week_ago = today - timedelta(days=7)
+    month_ago = today - timedelta(days=30)
+    
+    mood_score = 0
+    journal_entries = Journal.query.filter(
+        Journal.user_id == current_user.id,
+        Journal.timestamp >= datetime.combine(week_ago, datetime.min.time())
+    ).all()
+    
+    if journal_entries:
+        mood_values = {'happy': 100, 'grateful': 90, 'hopeful': 85, 'content': 80, 
+                       'neutral': 70, 'anxious': 50, 'stressed': 40, 'sad': 30, 'frustrated': 20}
+        avg_mood = sum(mood_values.get(j.mood.lower(), 70) for j in journal_entries) / len(journal_entries)
+        mood_score = avg_mood * 0.25
+    else:
+        mood_score = 50 * 0.25
+    
+    sleep_score = 0
+    sleep_logs = SleepLog.query.filter(
+        SleepLog.user_id == current_user.id,
+        SleepLog.date >= week_ago
+    ).all()
+    
+    if sleep_logs:
+        total_sleep_score = 0
+        for log in sleep_logs:
+            hours = log.hours_slept or 0
+            quality = log.quality_rating or 3
+            
+            if 7 <= hours <= 9:
+                duration_score = 50
+            elif 6 <= hours < 7:
+                duration_score = 40
+            elif 9 < hours <= 10:
+                duration_score = 45
+            elif 5 <= hours < 6:
+                duration_score = 30
+            elif 4 <= hours < 5:
+                duration_score = 20
+            else:
+                duration_score = 10
+            
+            quality_score = quality * 10
+            log_score = min(duration_score + quality_score, 100)
+            total_sleep_score += log_score
+        
+        avg_sleep = total_sleep_score / len(sleep_logs)
+        sleep_score = avg_sleep * 0.25
+    else:
+        sleep_score = 50 * 0.25
+    
+    habit_score = 0
+    goals = Goal.query.filter_by(user_id=current_user.id, is_active=True).all()
+    
+    if goals:
+        total_activities = 0
+        for goal in goals:
+            activities = Activity.query.filter(
+                Activity.user_id == current_user.id,
+                Activity.goal_id == goal.id,
+                Activity.date >= week_ago,
+                Activity.completed == True
+            ).count()
+            total_activities += activities
+        
+        habit_score = min((total_activities / 7) * 100, 100) * 0.25
+    else:
+        habit_score = 50 * 0.25
+    
+    journal_consistency_score = 0
+    total_days = (today - month_ago).days
+    if total_days > 0:
+        all_month_journals = Journal.query.filter(
+            Journal.user_id == current_user.id,
+            Journal.timestamp >= datetime.combine(month_ago, datetime.min.time())
+        ).count()
+        
+        consistency_pct = (all_month_journals / total_days) * 100
+        journal_consistency_score = min(consistency_pct, 100) * 0.25
+    else:
+        journal_consistency_score = 50 * 0.25
+    
+    overall_score = int(mood_score + sleep_score + habit_score + journal_consistency_score)
+    
+    category_label = 'Excellent'
+    if overall_score < 40:
+        category_label = 'Needs Attention'
+    elif overall_score < 60:
+        category_label = 'Fair'
+    elif overall_score < 80:
+        category_label = 'Good'
+    
+    return jsonify({
+        'success': True,
+        'overall_score': overall_score,
+        'category': category_label,
+        'breakdown': {
+            'mood': int(mood_score / 0.25),
+            'sleep': int(sleep_score / 0.25),
+            'habits': int(habit_score / 0.25),
+            'journal_consistency': int(journal_consistency_score / 0.25)
+        }
+    })
+
+@app.route('/calendar')
+@login_required
+def calendar_view():
+    """Calendar dashboard page"""
+    return render_template('calendar.html', user_name=current_user.profile.name if current_user.profile else 'User')
+
+@app.route('/check_event_followups', methods=['GET'])
+@login_required
+def check_event_followups():
+    """Check if there are any events from yesterday to follow up on"""
+    yesterday = date.today() - timedelta(days=1)
+    
+    past_events = Event.query.filter(
+        Event.user_id == current_user.id,
+        Event.event_date == yesterday,
+        Event.is_confirmed == True
+    ).all()
+    
+    if past_events:
+        event = past_events[0]
+        return jsonify({
+            'has_followup': True,
+            'event': {
+                'id': event.id,
+                'title': event.title,
+                'date': event.event_date.isoformat()
+            },
+            'followup_message': f"How did your {event.title} go yesterday?"
+        })
+    
+    return jsonify({'has_followup': False})
+
+@app.route('/check_time_reminders', methods=['GET'])
+@login_required
+def check_time_reminders():
+    """Check if any reminders should be shown based on current time"""
+    if not current_user.profile or not current_user.profile.reminder_enabled:
+        return jsonify({'show_reminder': False})
+    
+    from datetime import datetime as dt
+    current_time = dt.now().strftime('%H:%M')
+    
+    active_reminders = Reminder.query.filter_by(
+        user_id=current_user.id,
+        is_active=True
+    ).all()
+    
+    time_matched_reminders = [r for r in active_reminders if r.time and r.time == current_time[:5]]
+    
+    if time_matched_reminders:
+        reminder = random.choice(time_matched_reminders)
+        return jsonify({
+            'show_reminder': True,
+            'reminder': {
+                'id': reminder.id,
+                'message': reminder.message,
+                'time': reminder.time
+            }
+        })
+    
+    if current_user.profile.reminder_time and current_user.profile.reminder_time == current_time[:5]:
+        return jsonify({
+            'show_reminder': True,
+            'reminder': {
+                'message': f"Time to check in on your goal: {current_user.profile.goal}"
+            }
+        })
+    
+    return jsonify({'show_reminder': False})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

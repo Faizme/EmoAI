@@ -99,13 +99,127 @@ Start the journal entry with 'My Reflection Today:'
 """
 )
 
-def get_ai_chat_response(chat_history):
+event_extractor_model = genai.GenerativeModel(
+    model_name="gemini-2.0-flash",
+    system_instruction="""
+You are an event extraction assistant. Your task is to detect if a user message mentions any future events, appointments, meetings, or plans.
+
+EXTRACTION RULES:
+- Only extract events that are explicitly mentioned as future plans
+- Parse relative dates like "tomorrow", "next Tuesday", "on the 15th", "in 3 days"
+- Extract event title, date, time (if mentioned), and location (if mentioned)
+- Return JSON format ONLY if an event is detected, otherwise return "NO_EVENT"
+
+JSON FORMAT (return exactly this structure):
+{
+    "has_event": true,
+    "title": "event name",
+    "date": "YYYY-MM-DD",
+    "time": "HH:MM" or null,
+    "location": "location name" or null,
+    "original_message": "the user's message"
+}
+
+If NO event detected, return exactly: NO_EVENT
+
+EXAMPLES:
+"I have a dentist appointment tomorrow at 2pm" →
+{"has_event": true, "title": "Dentist appointment", "date": "2025-11-09", "time": "14:00", "location": null, "original_message": "I have a dentist appointment tomorrow at 2pm"}
+
+"Let's meet next Friday for coffee" →
+{"has_event": true, "title": "Coffee meeting", "date": "2025-11-15", "time": null, "location": null, "original_message": "Let's meet next Friday for coffee"}
+
+"I'm feeling stressed today" → NO_EVENT
+"""
+)
+
+sentiment_analyzer_model = genai.GenerativeModel(
+    model_name="gemini-2.0-flash",
+    system_instruction="""
+You are a sentiment analysis assistant. Analyze the emotional state of the user from their message.
+
+SENTIMENT CATEGORIES:
+- happy: User is joyful, excited, celebrating, or expressing positive emotions
+- sad: User is down, depressed, grieving, or expressing sadness
+- anxious: User is worried, stressed, overwhelmed, or expressing anxiety
+- frustrated: User is annoyed, angry, or expressing frustration
+- neutral: User is calm, matter-of-fact, or not expressing strong emotions
+- confused: User is uncertain, lost, or seeking clarity
+
+INTENSITY SCALE (0.0 to 1.0):
+- 0.0-0.3: Low intensity (mild emotion)
+- 0.4-0.7: Medium intensity (noticeable emotion)
+- 0.8-1.0: High intensity (strong emotion)
+
+Return ONLY in this JSON format:
+{
+    "sentiment": "category",
+    "intensity": 0.0-1.0
+}
+
+EXAMPLES:
+"I'm doing great! Just finished a workout" → {"sentiment": "happy", "intensity": 0.7}
+"I don't know what to do anymore..." → {"sentiment": "sad", "intensity": 0.8}
+"The weather is nice today" → {"sentiment": "neutral", "intensity": 0.2}
+"""
+)
+
+def get_ai_chat_response(chat_history, detected_sentiment=None):
     last_user_message = chat_history[-1]['parts'][0]
-    chat_session = emoai_model.start_chat(history=chat_history[:-1])
-    response = chat_session.send_message(last_user_message)
+    
+    personality_context = ""
+    if detected_sentiment:
+        if detected_sentiment['sentiment'] == 'sad' and detected_sentiment['intensity'] > 0.5:
+            personality_context = "\n\nIMPORTANT: User is feeling sad. Respond with extra warmth, gentle encouragement, and uplifting energy. Be cheerful but not dismissive of their feelings."
+        elif detected_sentiment['sentiment'] == 'happy' and detected_sentiment['intensity'] > 0.5:
+            personality_context = "\n\nIMPORTANT: User is feeling happy! Match their positive energy, celebrate with them, and share in their joy with enthusiasm."
+        elif detected_sentiment['sentiment'] == 'anxious' and detected_sentiment['intensity'] > 0.5:
+            personality_context = "\n\nIMPORTANT: User is feeling anxious. Respond with calm, reassuring tone. Offer grounding techniques and gentle support."
+        elif detected_sentiment['sentiment'] == 'frustrated' and detected_sentiment['intensity'] > 0.5:
+            personality_context = "\n\nIMPORTANT: User is feeling frustrated. Validate their feelings, be patient and understanding. Help them find solutions without being pushy."
+        elif detected_sentiment['sentiment'] == 'confused':
+            personality_context = "\n\nIMPORTANT: User is confused. Be clear, patient, and break things down simply. Ask clarifying questions."
+    
+    if personality_context:
+        modified_history = chat_history[:-1]
+        modified_message = personality_context + "\n\nUser says: " + last_user_message
+    else:
+        modified_history = chat_history[:-1]
+        modified_message = last_user_message
+    
+    chat_session = emoai_model.start_chat(history=modified_history)
+    response = chat_session.send_message(modified_message)
     return response.text
 
 def summarize_chat_as_journal(full_chat_history_text):
     prompt = f"Here is the chat conversation:\n\n{full_chat_history_text}\n\n"
     response = summarizer_model.generate_content(prompt)
     return response.text
+
+def extract_event_from_message(user_message, today_date):
+    import json
+    prompt = f"Today's date is {today_date}. User message: {user_message}"
+    try:
+        response = event_extractor_model.generate_content(prompt)
+        result = response.text.strip()
+        
+        if result == "NO_EVENT":
+            return None
+        
+        event_data = json.loads(result)
+        if event_data.get('has_event'):
+            return event_data
+        return None
+    except Exception as e:
+        print(f"Event extraction error: {e}")
+        return None
+
+def analyze_sentiment(user_message):
+    import json
+    try:
+        response = sentiment_analyzer_model.generate_content(user_message)
+        sentiment_data = json.loads(response.text.strip())
+        return sentiment_data
+    except Exception as e:
+        print(f"Sentiment analysis error: {e}")
+        return {"sentiment": "neutral", "intensity": 0.5}
