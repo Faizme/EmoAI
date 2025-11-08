@@ -59,11 +59,17 @@ The application features an elegant, sophisticated Wix Studio-inspired aesthetic
     - Requires minimum 1 journal entry to unlock analytics
 -   **Reminders & Habits**: Daily personalized reminder popups, custom reminder creation and management, habit progress tracking, and a 7-day streak visualization.
 -   **Time-based Reminder System**: Browser-based popup notifications that check for due reminders every minute and display them at the scheduled time.
--   **Calendar Event Extraction**: AI-powered system that automatically detects upcoming events mentioned in chat conversations:
-    - Gemini extracts event title, date, time, and location from natural language
+-   **Calendar Event Extraction & Visual Calendar**: Comprehensive calendar system with AI-powered event detection and visual interface:
+    - AI extracts event details (title, date, time, location) from natural conversations
     - Server-side validation ensures only future dates are accepted
     - User confirmation workflow with edit capability before adding to calendar
-    - Dedicated calendar dashboard showing all upcoming events with confirmation status
+    - Custom visual calendar interface accessible from top navigation
+    - Month grid view with day-by-day event display
+    - Color-coded dates: today highlighting, event indicators, other-month styling
+    - Click any date to view all events in a modal popup
+    - Event preview bubbles on calendar dates (max 2 shown, "+N more" indicator)
+    - Automatic Google Calendar OAuth2 sync for confirmed events
+    - Automatic reminder creation at exact event times
     - Event cards display creation context (original message that triggered detection)
 -   **Wellness Score Dashboard**: Comprehensive 0-100 health scoring system combining multiple wellness metrics:
     - Overall wellness score calculated from 4 equally-weighted categories (25% each)
