@@ -169,7 +169,7 @@ calendar_query_model = genai.GenerativeModel(
     system_instruction="""
 You are a calendar query analyzer. Detect if the user is asking about their schedule, calendar, or upcoming events.
 
-CALENDAR QUERY PATTERNS:
+CALENDAR QUERY PATTERNS (recognize ALL of these):
 - "What's on my calendar?"
 - "Show me my schedule"
 - "What events do I have tomorrow?"
@@ -177,14 +177,23 @@ CALENDAR QUERY PATTERNS:
 - "What's my schedule for Friday?"
 - "Any events coming up?"
 - "What do I have on Monday?"
+- "Is there anything I have to do on [date]?"
+- "Anything on [date]?"
+- "Do I have plans on [date]?"
+- "What's happening on [date]?"
+- "Am I free on [date]?"
+- "Tell me about my schedule"
+- "What do I have coming up?"
 
 Parse the date range they're asking about:
 - "tomorrow" → tomorrow's date
 - "today" → today's date
-- "this week" → next 7 days
-- "next week" → 7-14 days from now
-- "Friday" → next Friday
-- "on the 15th" → the 15th of current or next month
+- "this week" → next 7 days from today
+- "next week" → 7-14 days from today
+- "Friday" or "Monday" etc. → next occurrence of that day
+- "on the 15th" or "on November 9" or "on 9th November" → that specific date
+- "on Nov 9" or "on 9 Nov" → that specific date
+- Always use YYYY-MM-DD format for dates
 
 Return JSON format if calendar query detected:
 {
@@ -200,6 +209,9 @@ If NOT a calendar query, return:
 EXAMPLES:
 "What's my schedule tomorrow?" → {"is_calendar_query": true, "start_date": "2025-11-09", "end_date": "2025-11-09", "query_type": "day"}
 "Show me events this week" → {"is_calendar_query": true, "start_date": "2025-11-08", "end_date": "2025-11-14", "query_type": "week"}
+"Is there anything I have to do on November 9?" → {"is_calendar_query": true, "start_date": "2025-11-09", "end_date": "2025-11-09", "query_type": "day"}
+"Anything on Nov 9?" → {"is_calendar_query": true, "start_date": "2025-11-09", "end_date": "2025-11-09", "query_type": "day"}
+"Do I have plans on 9th November?" → {"is_calendar_query": true, "start_date": "2025-11-09", "end_date": "2025-11-09", "query_type": "day"}
 "I'm feeling stressed" → {"is_calendar_query": false}
 """
 )

@@ -234,9 +234,24 @@ def chat():
         calendar_query_data = detect_calendar_query(user_message, current_datetime)
         calendar_events_context = ""
         
+        print(f"[CALENDAR QUERY DEBUG] User message: {user_message}")
+        print(f"[CALENDAR QUERY DEBUG] Calendar query data: {calendar_query_data}")
+        
         if calendar_query_data:
             start_date = datetime.strptime(calendar_query_data['start_date'], '%Y-%m-%d').date()
             end_date = datetime.strptime(calendar_query_data['end_date'], '%Y-%m-%d').date()
+            
+            print(f"[CALENDAR QUERY DEBUG] Searching for events between {start_date} and {end_date}")
+            
+            all_events_in_range = Event.query.filter(
+                Event.user_id == current_user.id,
+                Event.event_date >= start_date,
+                Event.event_date <= end_date
+            ).order_by(Event.event_date, Event.event_time).all()
+            
+            print(f"[CALENDAR QUERY DEBUG] Total events in range: {len(all_events_in_range)}")
+            for evt in all_events_in_range:
+                print(f"  - {evt.title} on {evt.event_date} (confirmed: {evt.is_confirmed})")
             
             events = Event.query.filter(
                 Event.user_id == current_user.id,
@@ -244,6 +259,8 @@ def chat():
                 Event.event_date >= start_date,
                 Event.event_date <= end_date
             ).order_by(Event.event_date, Event.event_time).all()
+            
+            print(f"[CALENDAR QUERY DEBUG] Confirmed events: {len(events)}")
             
             if events:
                 events_list = []
@@ -256,8 +273,10 @@ def chat():
                     events_list.append(event_info)
                 
                 calendar_events_context = f"\n\n[CALENDAR EVENTS for your response]\nThe user has these confirmed events in their calendar:\n" + "\n".join(events_list) + "\n\nPlease present these events in a warm, conversational way."
+                print(f"[CALENDAR QUERY DEBUG] Calendar events context added to AI")
             else:
                 calendar_events_context = f"\n\n[CALENDAR EVENTS for your response]\nThe user has no confirmed events in this time period. Let them know gently that their calendar is clear for this time."
+                print(f"[CALENDAR QUERY DEBUG] No events found, telling AI calendar is clear")
         
         chat_history = get_chat_history_from_db()
         
