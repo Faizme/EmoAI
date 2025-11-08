@@ -1,0 +1,118 @@
+Build a visually stunning, privacy-first AI companion web app using React (Vite) + TailwindCSS with a pastel-bold 3D interactive theme.
+
+🪩 Design & Aesthetic Goals
+
+Use a pastel gradient palette with bold contrasts (e.g. lavender + mint + coral + sky blue).
+
+Create a glassmorphism-inspired UI with soft glows and floating card tiles.
+
+Use 3D depth and parallax effects (subtle shadows, hover lift, and motion).
+
+Each tile (login, chat, reminder, profile) should look like a floating glass card with smooth transitions.
+
+The background should feature an animated gradient + particle or wave motion (Vanta.js or Three.js).
+
+Add scroll animations (AOS) and hover micro-interactions (scale, glow, shadow shifts).
+
+Include a small 3D element (like a glowing heart or rotating orb) using Three.js in the chat screen.
+
+🎨 Color Palette
+
+Use the following pastel-yet-bold tones:
+
+#E3FDFD (Mint Ice)
+
+#FFE6EB (Rose Pink)
+
+#E4FBFF (Sky Blue)
+
+#CABBE9 (Lavender Glow)
+
+#FFB6B9 (Soft Coral)
+
+Accent gradient: linear-gradient(135deg, #FFB6B9, #CABBE9, #E4FBFF)
+
+These colors should feel dreamy, modern, and optimistic.
+
+🪶 Fonts
+
+Use “Poppins” for headings and “Inter” for body text:
+
+Import from Google Fonts
+
+Apply large rounded titles and high readability
+
+🧩 UI Components
+
+Landing Page: Welcome text, animated gradient background, 3D parallax shapes floating gently.
+
+Login/Signup Page: Glass card with blur effect and gradient outline glow; animated form inputs.
+
+Chat Interface: Clean bubble layout with glowing send button, typing dots animation, and floating 3D object (Three.js crystal or heart).
+
+Reminder/Calendar Section: Soft gradient tiles with hover pop; cards slide in via AOS animation.
+
+Settings Page: Toggle buttons for dark/light mode, animation speed, and memory retention.
+
+🧠 Interactivity
+
+Add parallax background using Rellax.js or CSS perspective layers.
+
+Use AOS for scroll-in animations.
+
+Use Vanta.js (WAVES) or Particles.js for animated backgrounds.
+
+Smooth hover transitions with Tailwind’s transition-all duration-300 ease-in-out.
+
+Buttons and icons should respond with glow or slight lift.
+
+⚙️ Technical Details
+
+Stack: React + TailwindCSS + Vite
+
+Install: npm install three aos vanta rellax
+
+Include Poppins and Inter from Google Fonts
+
+Structure:
+
+/src
+ ├── components/
+ │   ├── Landing.jsx
+ │   ├── Login.jsx
+ │   ├── Chat.jsx
+ │   ├── Reminder.jsx
+ │   ├── Settings.jsx
+ ├── App.jsx
+ ├── index.css
+ └── main.jsx
+
+
+Configure Tailwind with pastel-bold palette and custom font setup.
+
+Use CSS animations for fade, slide, and gradient motion.
+
+🪄 Effects to Add
+
+Gradient background animation (@keyframes gradientShift)
+
+Card hover: shadow pop + scale 1.03
+
+Button hover: glow + color shift
+
+Floating objects via Three.js (a spinning orb or soft pulsing light)
+
+Background scroll parallax layers (stars, waves, or pastel blobs)
+
+✅ Deliverables
+
+All pages functional and visually cohesive
+
+Mobile-responsive layout
+
+Include accessibility features (aria labels, large tap areas)
+
+Provide consistent transitions between pages
+
+Output only the code and file structure — no explanations.
+Include example environment variable placeholders (dummy keys).
