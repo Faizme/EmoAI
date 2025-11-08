@@ -38,8 +38,25 @@ The application features an elegant, sophisticated Wix Studio-inspired aesthetic
     - Habits activities: Deep Breathing, Take a Walk, Journal Entry
     - Achievement activities: Practice Session, Complete Lesson, Do Exercise
 -   **Positive Reinforcement**: Swiggy-style motivational toast notifications that appear after completing activities, with context-aware encouraging messages
--   **Sleep Tracker**: Full sleep monitoring interface with bedtime/wake time logging, quality ratings, sleep insights dashboard, 14-day history, and sleep improvement tips
+-   **Sleep Tracker**: Advanced sleep intelligence system with:
+    - Automatic sleep quality scoring (0-100 scale) based on duration and quality
+    - Premium circular score visualization with animated SVG rings
+    - Intelligent, score-based sleep recommendations
+    - Quality slider interface for rating sleep experience
+    - Automatic hour calculation from bedtime/wake time
+    - Color-coded sleep scores (Excellent/Good/Fair/Poor)
+    - Personalized tips that adapt to individual sleep patterns
+    - Sleep metrics: Duration Quality, Consistency, Sleep Efficiency
+    - 14-day sleep history with quality badges
 -   **Journaling**: AI-generated conversation summaries, mood tracking, goal progress notes, and historical journal entry viewing.
+-   **Journal Analytics**: Comprehensive insights dashboard with:
+    - Multiple interactive graphs (mood trends, sentiment distribution, entry frequency, word frequency)
+    - AI-powered insights analyzing emotional profile, dominant themes, thought patterns, and growth areas
+    - Statistical analysis: total entries, average words, most common mood, journaling streak
+    - Pattern recognition identifying themes like goal-setting, emotional awareness, growth, relationships
+    - Smart sentiment detection categorizing entries as positive, neutral, reflective, or growth-focused
+    - Word frequency analysis showing most meaningful terms (filters stop words)
+    - Requires minimum 1 journal entry to unlock analytics
 -   **Reminders & Habits**: Daily personalized reminder popups, custom reminder creation and management, habit progress tracking, and a 7-day streak visualization.
 -   **Data Management**: Chat history and habit progress are stored in the database, with automatic cleanup of habit progress older than 30 days.
 
