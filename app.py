@@ -1222,37 +1222,55 @@ def check_event_followups():
 @login_required
 def check_time_reminders():
     """Check if any reminders should be shown based on current time"""
-    if not current_user.profile or not current_user.profile.reminder_enabled:
+    current_datetime = get_ist_now()
+    current_time = current_datetime.strftime('%H:%M')
+    
+    print(f"[REMINDER CHECK] Current IST time: {current_datetime.strftime('%Y-%m-%d %H:%M:%S')}")
+    
+    if not current_user.profile:
+        print(f"[REMINDER CHECK] No user profile found")
         return jsonify({'show_reminder': False})
     
-    current_time = get_ist_now().strftime('%H:%M')
+    if not current_user.profile.reminder_enabled:
+        print(f"[REMINDER CHECK] Reminders disabled for user")
+        return jsonify({'show_reminder': False})
     
     active_reminders = Reminder.query.filter_by(
         user_id=current_user.id,
         is_active=True
     ).all()
     
+    print(f"[REMINDER CHECK] Found {len(active_reminders)} active reminders")
+    for r in active_reminders:
+        print(f"  - Reminder: '{r.message}' at {r.time}")
+    
     time_matched_reminders = [r for r in active_reminders if r.time and r.time == current_time[:5]]
     
+    print(f"[REMINDER CHECK] Matched {len(time_matched_reminders)} reminders for time {current_time[:5]}")
+    
     if time_matched_reminders:
-        reminder = random.choice(time_matched_reminders)
+        reminders_list = [{
+            'id': r.id,
+            'message': r.message,
+            'time': r.time
+        } for r in time_matched_reminders]
+        
+        print(f"[REMINDER CHECK] Returning {len(reminders_list)} reminders")
         return jsonify({
             'show_reminder': True,
-            'reminder': {
-                'id': reminder.id,
-                'message': reminder.message,
-                'time': reminder.time
-            }
+            'reminders': reminders_list
         })
     
     if current_user.profile.reminder_time and current_user.profile.reminder_time == current_time[:5]:
+        print(f"[REMINDER CHECK] Showing daily reminder at {current_time[:5]}")
         return jsonify({
             'show_reminder': True,
-            'reminder': {
+            'reminders': [{
                 'message': f"Time to check in on your goal: {current_user.profile.goal}"
-            }
+            }]
         })
     
+    print(f"[REMINDER CHECK] No reminders to show")
     return jsonify({'show_reminder': False})
 
 @app.route('/google_auth')
