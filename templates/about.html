@@ -7,69 +7,66 @@
 {% endblock %}
 
 {% block content %}
-<div class="parallax-bg"></div>
-<div class="floating-orbs">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-</div>
-
-<div class="about-container">
+<div class="about-page">
     <section class="hero-section">
-        <h1 class="glow-text">Vibe Journal AI</h1>
-        <p class="hero-subtitle">Your Companion for Emotional Clarity</p>
+        <h1 class="hero-title">Vibe Journal AI</h1>
+        <p class="hero-subtitle">Your intelligent companion for emotional clarity and personal growth</p>
     </section>
     
-    <section class="features-grid">
-        <div class="feature-card glass card-hover">
-            <div class="feature-icon">💬</div>
-            <h3>AI Conversations</h3>
-            <p>Chat with VILUN, your empathetic AI companion who listens and understands</p>
-        </div>
-        
-        <div class="feature-card glass card-hover">
-            <div class="feature-icon">📝</div>
-            <h3>Auto Journaling</h3>
-            <p>Your conversations automatically become beautiful journal entries</p>
-        </div>
-        
-        <div class="feature-card glass card-hover">
-            <div class="feature-icon">🎯</div>
-            <h3>Goal Tracking</h3>
-            <p>Set personal goals and track your daily progress with habit streaks</p>
-        </div>
-        
-        <div class="feature-card glass card-hover">
-            <div class="feature-icon">🌟</div>
-            <h3>Mood Analytics</h3>
-            <p>Understand your emotional patterns over time with mood tracking</p>
-        </div>
-    </section>
-    
-    <section class="info-section glass">
-        <h2>Why Journaling Helps</h2>
-        <div class="benefits-list">
-            <div class="benefit-item">
-                <span class="benefit-icon">✨</span>
-                <p>Process complex emotions safely</p>
+    <section class="features-section">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3>AI Conversations</h3>
+                <p>Chat with VILUN, your empathetic AI companion who listens and understands your feelings</p>
             </div>
-            <div class="benefit-item">
-                <span class="benefit-icon">🎯</span>
-                <p>Track progress toward your goals</p>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>Auto Journaling</h3>
+                <p>Your conversations automatically transform into beautiful, thoughtful journal entries</p>
             </div>
-            <div class="benefit-item">
-                <span class="benefit-icon">🧠</span>
-                <p>Gain deeper self-awareness</p>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Goal Tracking</h3>
+                <p>Set personal goals and track your daily progress with visual habit streaks</p>
             </div>
-            <div class="benefit-item">
-                <span class="benefit-icon">💪</span>
-                <p>Build consistent self-improvement habits</p>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Mood Analytics</h3>
+                <p>Understand your emotional patterns over time with comprehensive mood tracking</p>
             </div>
         </div>
     </section>
     
-    <div class="continue-btn-container">
-        <a href="{{ url_for('onboarding') }}" class="btn-primary glow-btn">Continue →</a>
-    </div>
+    <section class="benefits-section">
+        <div class="benefits-container">
+            <h2 class="benefits-title">Why Journaling Helps</h2>
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <span class="benefit-icon">✨</span>
+                    <p>Process complex emotions in a safe, private space</p>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">🎯</span>
+                    <p>Track meaningful progress toward your personal goals</p>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">🧠</span>
+                    <p>Gain deeper self-awareness and clarity of thought</p>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">💪</span>
+                    <p>Build consistent self-improvement habits</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="cta-section">
+        <a href="{{ url_for('onboarding') }}" class="cta-button">Get Started →</a>
+    </section>
 </div>
 {% endblock %}

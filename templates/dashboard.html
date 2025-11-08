@@ -7,74 +7,68 @@
 {% endblock %}
 
 {% block content %}
-<div class="parallax-bg"></div>
-<div class="floating-orbs">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
-</div>
-
-<div class="dashboard-container">
-    <div class="dashboard-header">
-        <h1 class="glow-text">Your Habit Journey</h1>
-        <p class="subtitle">Track your daily progress toward: <strong>{{ habit_goal }}</strong></p>
-    </div>
-
-    <div class="streak-card glass card-hover">
-        <div class="streak-header">
-            <div class="streak-count animated-number">{{ current_streak }}</div>
-            <div class="streak-label">day{{ 's' if current_streak != 1 else '' }} streak 🔥</div>
+<div class="dashboard-page">
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Your Habit Journey</h1>
+            <p class="dashboard-subtitle">Track your daily progress toward: <strong>{{ habit_goal }}</strong></p>
         </div>
 
-        <div class="week-grid">
-            {% for day in streak_data %}
-            <div class="day-box {{ 'completed' if day.has_progress else '' }}" 
-                 title="{{ day.date.strftime('%B %d, %Y') }}{% if day.progress %}: {{ day.progress.progress_note }}{% endif %}"
-                 data-index="{{ loop.index }}">
-                <div class="day-name">{{ day.day_name }}</div>
-                <div class="day-icon">{{ '✓' if day.has_progress else '○' }}</div>
+        <div class="streak-card">
+            <div class="streak-header">
+                <div class="streak-count">{{ current_streak }}</div>
+                <div class="streak-label">day{{ 's' if current_streak != 1 else '' }} streak 🔥</div>
             </div>
-            {% endfor %}
+
+            <div class="week-grid">
+                {% for day in streak_data %}
+                <div class="day-box {{ 'completed' if day.has_progress else '' }}" 
+                     title="{{ day.date.strftime('%B %d, %Y') }}{% if day.progress %}: {{ day.progress.progress_note }}{% endif %}">
+                    <div class="day-name">{{ day.day_name }}</div>
+                    <div class="day-icon">{{ '✓' if day.has_progress else '○' }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if current_streak == 0 %}
+            <div class="supportive-message">
+                <span class="message-icon">🌱</span>
+                <p>No worries, tomorrow is a fresh chance!<br>Every journey starts with a single step.</p>
+            </div>
+            {% elif current_streak < 3 %}
+            <div class="supportive-message">
+                <span class="message-icon">🌟</span>
+                <p>Great start, {{ user_name }}!<br>Keep the momentum going.</p>
+            </div>
+            {% elif current_streak < 7 %}
+            <div class="supportive-message">
+                <span class="message-icon">💪</span>
+                <p>You're building an amazing habit, {{ user_name }}!<br>Consistency is the key to transformation.</p>
+            </div>
+            {% else %}
+            <div class="supportive-message">
+                <span class="message-icon">🎉</span>
+                <p>Incredible dedication, {{ user_name }}!<br>You're truly committed to your growth.</p>
+            </div>
+            {% endif %}
         </div>
 
-        {% if current_streak == 0 %}
-        <div class="supportive-message glass">
-            <span class="message-icon">🌱</span>
-            <p>No worries, tomorrow is a fresh chance!<br>Every journey starts with a single step!</p>
+        <div class="goal-card">
+            <div class="goal-icon">🎯</div>
+            <h3>Your Goal</h3>
+            <p>{{ habit_goal }}</p>
         </div>
-        {% elif current_streak < 3 %}
-        <div class="supportive-message glass">
-            <span class="message-icon">🌟</span>
-            <p>Great start, {{ user_name }}!<br>Keep the momentum going!</p>
-        </div>
-        {% elif current_streak < 7 %}
-        <div class="supportive-message glass">
-            <span class="message-icon">💪</span>
-            <p>You're building an amazing habit, {{ user_name }}!<br>Consistency is the key to transformation.</p>
-        </div>
-        {% else %}
-        <div class="supportive-message glass">
-            <span class="message-icon">🎉</span>
-            <p>Incredible dedication, {{ user_name }}!<br>You're truly committed to your growth!</p>
-        </div>
-        {% endif %}
-    </div>
 
-    <div class="goal-reminder glass card-hover">
-        <div class="goal-icon">🎯</div>
-        <h3>Your Goal</h3>
-        <p>{{ habit_goal }}</p>
-    </div>
-
-    <div class="quick-actions">
-        <a href="{{ url_for('chatbot') }}" class="quick-action-btn glass card-hover">
-            <span class="action-icon">💬</span>
-            <span>Chat with VILUN</span>
-        </a>
-        <a href="{{ url_for('journal_view') }}" class="quick-action-btn glass card-hover">
-            <span class="action-icon">📚</span>
-            <span>View Journal</span>
-        </a>
+        <div class="quick-actions">
+            <a href="{{ url_for('chatbot') }}" class="action-btn">
+                <span class="action-icon">💬</span>
+                <span>Chat with VILUN</span>
+            </a>
+            <a href="{{ url_for('journal_view') }}" class="action-btn">
+                <span class="action-icon">📚</span>
+                <span>View Journal</span>
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}

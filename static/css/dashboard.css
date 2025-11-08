@@ -1,55 +1,49 @@
-/* Dashboard Specific Styles */
-.dashboard-container {
+/* Dashboard Page Styles */
+.dashboard-page {
+    background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%);
     min-height: 100vh;
     padding: 3rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2.5rem;
-    position: relative;
-    z-index: 1;
 }
 
+.dashboard-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Header */
 .dashboard-header {
     text-align: center;
-    margin-bottom: 1rem;
-    animation: fadeInDown 0.8s ease backwards;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.6s ease backwards;
 }
 
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.dashboard-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
 }
 
-.dashboard-header .subtitle {
-    margin-top: 1rem;
+.dashboard-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+    font-weight: 400;
 }
 
-/* Streak Card with 3D Effect */
+.dashboard-subtitle strong {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+/* Streak Card */
 .streak-card {
-    max-width: 700px;
-    width: 100%;
-    padding: 2.5rem;
-    border-radius: 32px;
-    animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
-    transform-style: preserve-3d;
-}
-
-.card-hover {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card-hover:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 
-        0 20px 50px rgba(139, 92, 246, 0.3),
-        0 0 40px rgba(139, 92, 246, 0.2);
+    background: var(--bg-primary);
+    padding: 3rem 2.5rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
+    animation: fadeInUp 0.6s ease 0.1s backwards;
 }
 
 .streak-header {
@@ -58,36 +52,20 @@
 }
 
 .streak-count {
-    font-size: clamp(3rem, 8vw, 5rem);
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--primary-purple), var(--secondary-blue), var(--tertiary-teal));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: countUp 1s ease-out;
-    position: relative;
-}
-
-@keyframes countUp {
-    from {
-        opacity: 0;
-        transform: scale(0.5) rotate(-5deg);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) rotate(0deg);
-    }
+    font-size: clamp(3.5rem, 10vw, 5rem);
+    font-weight: 800;
+    color: var(--accent-color);
+    line-height: 1;
+    margin-bottom: 0.5rem;
 }
 
 .streak-label {
     color: var(--text-secondary);
     font-size: 1.25rem;
-    margin-top: 0.75rem;
-    font-weight: 600;
-    animation: fadeIn 0.8s ease 0.3s backwards;
+    font-weight: 500;
 }
 
-/* Week Grid with Staggered Animation */
+/* Week Grid */
 .week-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
@@ -97,243 +75,145 @@
 
 .day-box {
     aspect-ratio: 1;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.3s ease;
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    animation: scaleIn 0.5s ease backwards;
-}
-
-.day-box:nth-child(1) { animation-delay: 0.4s; }
-.day-box:nth-child(2) { animation-delay: 0.5s; }
-.day-box:nth-child(3) { animation-delay: 0.6s; }
-.day-box:nth-child(4) { animation-delay: 0.7s; }
-.day-box:nth-child(5) { animation-delay: 0.8s; }
-.day-box:nth-child(6) { animation-delay: 0.9s; }
-.day-box:nth-child(7) { animation-delay: 1.0s; }
-
-@keyframes scaleIn {
-    from {
-        opacity: 0;
-        transform: scale(0) rotate(-180deg);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) rotate(0deg);
-    }
-}
-
-.day-box::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--glow-purple), transparent);
-    transition: all 0.6s ease;
-    transform: translate(-50%, -50%);
-}
-
-.day-box:hover::before {
-    width: 200%;
-    height: 200%;
-}
-
-.day-box.completed {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(20, 184, 166, 0.4));
-    border-color: var(--tertiary-teal);
-    box-shadow: 
-        0 0 30px rgba(20, 184, 166, 0.5),
-        inset 0 0 20px rgba(20, 184, 166, 0.2);
-    animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { 
-        box-shadow: 0 0 30px rgba(20, 184, 166, 0.5);
-    }
-    50% { 
-        box-shadow: 0 0 40px rgba(20, 184, 166, 0.7);
-    }
 }
 
 .day-box:hover {
-    transform: scale(1.15) rotate(5deg);
-    border-color: var(--primary-purple);
-    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent-color);
+}
+
+.day-box.completed {
+    background: linear-gradient(135deg, #667EEA, #7F9CF5);
+    border-color: var(--accent-color);
+    color: white;
+    box-shadow: var(--shadow-md);
 }
 
 .day-name {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
     font-weight: 600;
-    z-index: 1;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.day-box.completed .day-name {
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .day-icon {
-    font-size: 1.75rem;
-    z-index: 1;
-    transition: transform 0.3s ease;
+    font-size: 1.5rem;
 }
 
-.day-box:hover .day-icon {
-    transform: scale(1.3) rotate(360deg);
-}
-
-/* Supportive Message with Animation */
+/* Supportive Message */
 .supportive-message {
-    text-align: center;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
     padding: 2rem;
-    border-radius: 20px;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(20, 184, 166, 0.1));
-    animation: slideInUp 0.6s ease 1.2s backwards;
-    position: relative;
-    overflow: hidden;
-}
-
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    text-align: center;
 }
 
 .message-icon {
-    font-size: 3rem;
+    font-size: 2.5rem;
     display: block;
     margin-bottom: 1rem;
-    animation: bounce 2s ease-in-out infinite;
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
 }
 
 .supportive-message p {
     color: var(--text-secondary);
-    line-height: 1.8;
-    font-size: 1.125rem;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    margin: 0;
 }
 
-/* Goal Reminder Card */
-.goal-reminder {
-    max-width: 700px;
-    width: 100%;
+/* Goal Reminder */
+.goal-card {
+    background: var(--bg-primary);
     padding: 2rem;
-    border-radius: 24px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    margin-bottom: 2rem;
     text-align: center;
-    animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+    animation: fadeInUp 0.6s ease 0.2s backwards;
 }
 
 .goal-icon {
-    font-size: 4rem;
+    font-size: 3rem;
     margin-bottom: 1rem;
-    animation: rotate360 3s linear infinite;
 }
 
-@keyframes rotate360 {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.goal-reminder h3 {
-    color: var(--primary-purple);
+.goal-card h3 {
+    color: var(--text-primary);
     font-size: 1.5rem;
-    margin-bottom: 1rem;
-    font-weight: 700;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
 }
 
-.goal-reminder p {
+.goal-card p {
     color: var(--text-secondary);
-    font-size: 1.125rem;
+    font-size: 1.0625rem;
     line-height: 1.6;
 }
 
-/* Quick Actions with Hover Effects */
+/* Quick Actions */
 .quick-actions {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1.5rem;
-    width: 100%;
-    max-width: 700px;
-    animation: fadeIn 0.8s ease 0.6s backwards;
+    animation: fadeInUp 0.6s ease 0.3s backwards;
 }
 
-.quick-action-btn {
+.action-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
-    padding: 1.5rem 2rem;
-    border-radius: 20px;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(59, 130, 246, 0.15));
-    border: 2px solid rgba(139, 92, 246, 0.3);
+    padding: 1.25rem 2rem;
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
     color: var(--text-primary);
-    font-weight: 700;
-    font-size: 1.125rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1.0625rem;
     text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
-    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all 0.2s ease;
 }
 
-.quick-action-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s;
-}
-
-.quick-action-btn:hover::before {
-    left: 100%;
-}
-
-.quick-action-btn:hover {
-    transform: translateY(-5px) scale(1.05);
-    border-color: var(--primary-purple);
-    box-shadow: 
-        0 15px 40px rgba(139, 92, 246, 0.4),
-        0 0 30px rgba(139, 92, 246, 0.3);
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(59, 130, 246, 0.3));
+.action-btn:hover {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
 }
 
 .action-icon {
-    font-size: 1.75rem;
-    transition: transform 0.3s ease;
+    font-size: 1.5rem;
 }
 
-.quick-action-btn:hover .action-icon {
-    transform: scale(1.2) rotate(10deg);
-}
-
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 768px) {
-    .dashboard-container {
+    .dashboard-page {
         padding: 2rem 1rem;
-        gap: 2rem;
     }
     
     .streak-card,
-    .goal-reminder {
+    .goal-card {
         padding: 2rem 1.5rem;
     }
     
@@ -341,8 +221,8 @@
         gap: 0.5rem;
     }
     
-    .day-box {
-        font-size: 0.875rem;
+    .day-name {
+        font-size: 0.625rem;
     }
     
     .day-icon {
@@ -355,19 +235,11 @@
 }
 
 @media (max-width: 480px) {
-    .streak-count {
-        font-size: 3rem;
-    }
-    
     .week-grid {
         gap: 0.375rem;
     }
     
-    .day-name {
-        font-size: 0.75rem;
-    }
-    
-    .day-icon {
-        font-size: 1rem;
+    .day-box {
+        border-width: 1px;
     }
 }
