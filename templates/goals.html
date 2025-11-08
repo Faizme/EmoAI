@@ -1,0 +1,502 @@
+{% extends "base.html" %}
+
+{% block title %}My Goals - EmoAI{% endblock %}
+
+{% block content %}
+<div class="goals-page">
+    <div class="goals-header">
+        <h1>My Goals & Habits</h1>
+        <p class="subtitle">Track your journey to a better you</p>
+        <div class="header-actions">
+            <button onclick="showCreateGoal()" class="btn-primary">+ New Goal</button>
+            <button onclick="window.location.href='/chatbot'" class="btn-outline">Back to Chat</button>
+        </div>
+    </div>
+    
+    <div class="goals-tabs">
+        <button class="tab-btn active" onclick="switchTab('habit')">Quit Bad Habits</button>
+        <button class="tab-btn" onclick="switchTab('achievement')">Build New Skills</button>
+    </div>
+    
+    <div id="habit-goals" class="goals-container active">
+        <div class="goals-grid">
+            {% for goal in goals %}
+            {% if goal.goal_type == 'habit' %}
+            <div class="goal-card">
+                <div class="goal-icon habit-icon">🎯</div>
+                <h3>{{ goal.title }}</h3>
+                <p class="goal-desc">{{ goal.description }}</p>
+                <div class="goal-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%"></div>
+                    </div>
+                    <span class="progress-text">Day 18 of {{goal.target_days}}</span>
+                </div>
+                <div class="activity-buttons">
+                    <button onclick="logActivity({{goal.id}}, 'breathing')" class="activity-btn">
+                        Deep Breathing
+                    </button>
+                    <button onclick="logActivity({{goal.id}}, 'walk')" class="activity-btn">
+                        Take a Walk
+                    </button>
+                    <button onclick="logActivity({{goal.id}}, 'journal')" class="activity-btn">
+                        Journal Entry
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div id="achievement-goals" class="goals-container">
+        <div class="goals-grid">
+            {% for goal in goals %}
+            {% if goal.goal_type == 'achievement' %}
+            <div class="goal-card">
+                <div class="goal-icon achievement-icon">⭐</div>
+                <h3>{{ goal.title }}</h3>
+                <p class="goal-desc">{{ goal.description }}</p>
+                <div class="goal-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill achievement-fill" style="width: 45%"></div>
+                    </div>
+                    <span class="progress-text">Day 13 of {{goal.target_days}}</span>
+                </div>
+                <div class="activity-buttons">
+                    <button onclick="logActivity({{goal.id}}, 'practice')" class="activity-btn achievement-btn">
+                        Practice Session
+                    </button>
+                    <button onclick="logActivity({{goal.id}}, 'lesson')" class="activity-btn achievement-btn">
+                        Complete Lesson
+                    </button>
+                    <button onclick="logActivity({{goal.id}}, 'exercise')" class="activity-btn achievement-btn">
+                        Do Exercise
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div id="createGoalModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeCreateGoal()">&times;</span>
+            <h2>Create New Goal</h2>
+            
+            <div class="form-group">
+                <label>Goal Type</label>
+                <select id="goalType" class="form-input" onchange="updateGoalForm()">
+                    <option value="habit">Quit a Bad Habit</option>
+                    <option value="achievement">Build a New Skill</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label id="goalTitleLabel">What habit do you want to quit?</label>
+                <input type="text" id="goalTitle" class="form-input" placeholder="E.g., Smoking, Excessive social media">
+            </div>
+            
+            <div class="form-group">
+                <label>Additional Details (optional)</label>
+                <textarea id="goalDescription" class="form-input" rows="3" placeholder="Why is this important to you?"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Target Days</label>
+                <input type="number" id="targetDays" class="form-input" value="30" min="1" max="365">
+            </div>
+            
+            <button onclick="createGoal()" class="btn-primary full-width">Create Goal</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchTab(type) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.goals-container').forEach(container => container.classList.remove('active'));
+    
+    event.target.classList.add('active');
+    document.getElementById(type + '-goals').classList.add('active');
+}
+
+function showCreateGoal() {
+    document.getElementById('createGoalModal').classList.remove('hidden');
+}
+
+function closeCreateGoal() {
+    document.getElementById('createGoalModal').classList.add('hidden');
+}
+
+function updateGoalForm() {
+    const goalType = document.getElementById('goalType').value;
+    const label = document.getElementById('goalTitleLabel');
+    
+    if (goalType === 'habit') {
+        label.textContent = 'What habit do you want to quit?';
+    } else {
+        label.textContent = 'What skill do you want to build?';
+    }
+}
+
+async function createGoal() {
+    const title = document.getElementById('goalTitle').value.trim();
+    const goalType = document.getElementById('goalType').value;
+    const description = document.getElementById('goalDescription').value.trim();
+    const targetDays = parseInt(document.getElementById('targetDays').value);
+    
+    if (!title) {
+        alert('Please enter a goal title');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/create_goal', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({title, goal_type: goalType, description, target_days: targetDays})
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            location.reload();
+        }
+    } catch (error) {
+        alert('Failed to create goal');
+    }
+}
+
+async function logActivity(goalId, activityType) {
+    try {
+        const response = await fetch('/log_activity', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({goal_id: goalId, activity_type: activityType})
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            showMotivationToast(data.motivation);
+        }
+    } catch (error) {
+        console.error('Failed to log activity');
+    }
+}
+
+function showMotivationToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'motivation-toast';
+    toast.innerHTML = `
+        <div class="toast-icon">✨</div>
+        <p>${message}</p>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add('show'), 100);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+</script>
+
+<style>
+.goals-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgb(249, 244, 233) 0%, rgb(255, 250, 240) 100%);
+    padding: 2rem;
+}
+
+.goals-header {
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+    text-align: center;
+}
+
+.goals-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: rgb(173, 119, 72);
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: rgb(107, 107, 107);
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.goals-tabs {
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    display: flex;
+    gap: 1rem;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    background: transparent;
+    color: rgb(107, 107, 107);
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, rgb(173, 119, 72), rgb(193, 139, 92));
+    color: white;
+}
+
+.goals-container {
+    display: none;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.goals-container.active {
+    display: block;
+}
+
+.goals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.goal-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+}
+
+.goal-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.goal-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.goal-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: rgb(173, 119, 72);
+    margin-bottom: 0.75rem;
+}
+
+.goal-desc {
+    color: rgb(107, 107, 107);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.progress-bar {
+    height: 8px;
+    background: rgb(230, 230, 230);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, rgb(107, 169, 159), rgb(127, 189, 179));
+    transition: width 0.3s;
+}
+
+.progress-fill.achievement-fill {
+    background: linear-gradient(90deg, rgb(173, 119, 72), rgb(232, 181, 166));
+}
+
+.progress-text {
+    font-size: 0.875rem;
+    color: rgb(107, 107, 107);
+}
+
+.activity-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.activity-btn {
+    padding: 0.75rem 1rem;
+    border: 2px solid rgb(107, 169, 159);
+    background: white;
+    color: rgb(47, 100, 87);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.activity-btn:hover {
+    background: rgb(107, 169, 159);
+    color: white;
+}
+
+.activity-btn.achievement-btn {
+    border-color: rgb(173, 119, 72);
+    color: rgb(173, 119, 72);
+}
+
+.activity-btn.achievement-btn:hover {
+    background: rgb(173, 119, 72);
+    color: white;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.close-btn {
+    float: right;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: rgb(107, 107, 107);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: rgb(47, 100, 87);
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid rgb(220, 215, 205);
+    border-radius: 8px;
+    font-family: inherit;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: rgb(173, 119, 72);
+}
+
+.btn-primary {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, rgb(173, 119, 72), rgb(193, 139, 92));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(173, 119, 72, 0.3);
+}
+
+.btn-outline {
+    padding: 1rem 2rem;
+    background: white;
+    color: rgb(173, 119, 72);
+    border: 2px solid rgb(173, 119, 72);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-outline:hover {
+    background: rgb(173, 119, 72);
+    color: white;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.motivation-toast {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    background: linear-gradient(135deg, rgb(107, 169, 159), rgb(127, 189, 179));
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    opacity: 0;
+    transform: translateX(100px);
+    transition: all 0.3s;
+    z-index: 9999;
+}
+
+.motivation-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-icon {
+    font-size: 2rem;
+}
+
+@media (max-width: 768px) {
+    .goals-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .activity-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

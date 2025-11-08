@@ -1,0 +1,475 @@
+{% extends "base.html" %}
+
+{% block title %}Sleep Tracker - EmoAI{% endblock %}
+
+{% block content %}
+<div class="sleep-page">
+    <div class="sleep-header">
+        <h1>Sleep Tracker</h1>
+        <p class="subtitle">Monitor and improve your sleep quality</p>
+        <button onclick="window.location.href='/chatbot'" class="btn-outline">Back to Chat</button>
+    </div>
+    
+    <div class="sleep-container">
+        <div class="sleep-log-card">
+            <h2>Log Today's Sleep</h2>
+            <form id="sleepForm" class="sleep-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Bedtime</label>
+                        <input type="time" id="bedtime" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Wake Time</label>
+                        <input type="time" id="wake-time" class="form-input" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Hours Slept</label>
+                    <input type="number" id="hours-slept" class="form-input" step="0.5" min="0" max="24" placeholder="8.5">
+                </div>
+                
+                <div class="form-group">
+                    <label>Sleep Quality (1-5)</label>
+                    <div class="quality-rating">
+                        <button type="button" class="star-btn" data-value="1">⭐</button>
+                        <button type="button" class="star-btn" data-value="2">⭐</button>
+                        <button type="button" class="star-btn" data-value="3">⭐</button>
+                        <button type="button" class="star-btn" data-value="4">⭐</button>
+                        <button type="button" class="star-btn" data-value="5">⭐</button>
+                    </div>
+                    <input type="hidden" id="quality-rating" value="3">
+                </div>
+                
+                <div class="form-group">
+                    <label>Notes (Optional)</label>
+                    <textarea id="notes" class="form-input" rows="3" placeholder="How did you feel? Any dreams?"></textarea>
+                </div>
+                
+                <button type="submit" class="btn-primary full-width">Log Sleep</button>
+            </form>
+        </div>
+        
+        <div class="sleep-stats-card">
+            <h2>Your Sleep Insights</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon">😴</div>
+                    <div class="stat-value">7.5h</div>
+                    <div class="stat-label">Avg Hours</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-value">4.2/5</div>
+                    <div class="stat-label">Avg Quality</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-value">85%</div>
+                    <div class="stat-label">Consistency</div>
+                </div>
+            </div>
+            
+            <div class="sleep-tips">
+                <h3>Tips for Better Sleep</h3>
+                <ul>
+                    <li>Aim for 7-9 hours per night</li>
+                    <li>Keep a consistent sleep schedule</li>
+                    <li>Avoid screens 1 hour before bed</li>
+                    <li>Keep your room cool and dark</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="sleep-history-section">
+        <h2>Sleep History</h2>
+        <div class="history-grid">
+            {% for log in sleep_logs %}
+            <div class="history-card">
+                <div class="history-date">{{ log.date.strftime('%b %d, %Y') }}</div>
+                <div class="history-details">
+                    <div class="detail-row">
+                        <span class="label">Hours:</span>
+                        <span class="value">{{ log.hours_slept }}h</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Quality:</span>
+                        <span class="value">
+                            {% for i in range(log.quality_rating or 0) %}⭐{% endfor %}
+                        </span>
+                    </div>
+                    {% if log.notes %}
+                    <div class="history-notes">{{ log.notes }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+const starBtns = document.querySelectorAll('.star-btn');
+const qualityInput = document.getElementById('quality-rating');
+
+starBtns.forEach((btn, index) => {
+    btn.addEventListener('click', () => {
+        const value = btn.getAttribute('data-value');
+        qualityInput.value = value;
+        
+        starBtns.forEach((star, i) => {
+            if (i < value) {
+                star.classList.add('active');
+            } else {
+                star.classList.remove('active');
+            }
+        });
+    });
+});
+
+starBtns.forEach((star, i) => {
+    if (i < 3) star.classList.add('active');
+});
+
+document.getElementById('sleepForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const bedtime = document.getElementById('bedtime').value;
+    const wakeTime = document.getElementById('wake-time').value;
+    const hoursSlept = parseFloat(document.getElementById('hours-slept').value);
+    const qualityRating = parseInt(document.getElementById('quality-rating').value);
+    const notes = document.getElementById('notes').value.trim();
+    
+    try {
+        const response = await fetch('/log_sleep', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                bedtime,
+                wake_time: wakeTime,
+                hours_slept: hoursSlept,
+                quality_rating: qualityRating,
+                notes,
+                date: new Date().toISOString().split('T')[0]
+            })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            showToast('Sleep logged successfully!');
+            setTimeout(() => location.reload(), 1500);
+        }
+    } catch (error) {
+        showToast('Failed to log sleep');
+    }
+});
+
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add('show'), 100);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+
+function calculateHours() {
+    const bedtime = document.getElementById('bedtime').value;
+    const wakeTime = document.getElementById('wake-time').value;
+    
+    if (bedtime && wakeTime) {
+        const bed = new Date(`2000-01-01 ${bedtime}`);
+        let wake = new Date(`2000-01-01 ${wakeTime}`);
+        
+        if (wake < bed) {
+            wake = new Date(`2000-01-02 ${wakeTime}`);
+        }
+        
+        const diff = (wake - bed) / (1000 * 60 * 60);
+        document.getElementById('hours-slept').value = diff.toFixed(1);
+    }
+}
+
+document.getElementById('bedtime').addEventListener('change', calculateHours);
+document.getElementById('wake-time').addEventListener('change', calculateHours);
+</script>
+
+<style>
+.sleep-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgb(249, 244, 233) 0%, rgb(255, 250, 240) 100%);
+    padding: 2rem;
+}
+
+.sleep-header {
+    max-width: 1200px;
+    margin: 0 auto 2rem;
+    text-align: center;
+}
+
+.sleep-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: rgb(173, 119, 72);
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: rgb(107, 107, 107);
+    font-size: 1.125rem;
+    margin-bottom: 1.5rem;
+}
+
+.sleep-container {
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.sleep-log-card, .sleep-stats-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.sleep-log-card h2, .sleep-stats-card h2 {
+    font-family: 'Playfair Display', serif;
+    color: rgb(173, 119, 72);
+    margin-bottom: 1.5rem;
+}
+
+.sleep-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: rgb(47, 100, 87);
+    margin-bottom: 0.5rem;
+}
+
+.form-input {
+    padding: 0.75rem 1rem;
+    border: 2px solid rgb(220, 215, 205);
+    border-radius: 8px;
+    font-family: inherit;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: rgb(173, 119, 72);
+}
+
+.quality-rating {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.star-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    opacity: 0.3;
+    transition: all 0.2s;
+}
+
+.star-btn.active {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: rgb(173, 119, 72);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: rgb(107, 107, 107);
+}
+
+.sleep-tips {
+    background: rgb(249, 244, 233);
+    padding: 1.5rem;
+    border-radius: 12px;
+}
+
+.sleep-tips h3 {
+    color: rgb(47, 100, 87);
+    margin-bottom: 1rem;
+}
+
+.sleep-tips ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sleep-tips li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.sleep-tips li:before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: rgb(107, 169, 159);
+    font-weight: bold;
+}
+
+.sleep-history-section {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.sleep-history-section h2 {
+    font-family: 'Playfair Display', serif;
+    color: rgb(173, 119, 72);
+    margin-bottom: 1.5rem;
+}
+
+.history-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.history-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.history-date {
+    font-weight: 600;
+    color: rgb(173, 119, 72);
+    margin-bottom: 0.75rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+}
+
+.history-notes {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgb(220, 215, 205);
+    color: rgb(107, 107, 107);
+    font-size: 0.875rem;
+}
+
+.btn-primary {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, rgb(173, 119, 72), rgb(193, 139, 92));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(173, 119, 72, 0.3);
+}
+
+.btn-outline {
+    padding: 1rem 2rem;
+    background: white;
+    color: rgb(173, 119, 72);
+    border: 2px solid rgb(173, 119, 72);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-outline:hover {
+    background: rgb(173, 119, 72);
+    color: white;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.toast {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    background: rgb(107, 169, 159);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateX(100px);
+    transition: all 0.3s;
+    z-index: 9999;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+@media (max-width: 968px) {
+    .sleep-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

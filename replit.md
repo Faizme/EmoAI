@@ -31,6 +31,14 @@ The application features an elegant, sophisticated Wix Studio-inspired aesthetic
 
 -   **User Management**: Secure signup/login, onboarding for collecting user goals.
 -   **AI Chat**: Personalized, empathetic conversational AI companion for habit-quitting, life improvement, and emotional support. Includes voice-to-text input and text-to-speech responses using Web Speech API.
+-   **Goals & Activities**: 
+    - Separate interfaces for "Quit Bad Habits" vs "Build New Skills"
+    - Different activity types for each goal category
+    - Visual progress tracking with colored progress bars
+    - Habits activities: Deep Breathing, Take a Walk, Journal Entry
+    - Achievement activities: Practice Session, Complete Lesson, Do Exercise
+-   **Positive Reinforcement**: Swiggy-style motivational toast notifications that appear after completing activities, with context-aware encouraging messages
+-   **Sleep Tracker**: Full sleep monitoring interface with bedtime/wake time logging, quality ratings, sleep insights dashboard, 14-day history, and sleep improvement tips
 -   **Journaling**: AI-generated conversation summaries, mood tracking, goal progress notes, and historical journal entry viewing.
 -   **Reminders & Habits**: Daily personalized reminder popups, custom reminder creation and management, habit progress tracking, and a 7-day streak visualization.
 -   **Data Management**: Chat history and habit progress are stored in the database, with automatic cleanup of habit progress older than 30 days.

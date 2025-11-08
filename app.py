@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import Bcrypt
-from models import db, User, UserProfile, Journal, ChatMessage, HabitProgress, Reminder
+from models import db, User, UserProfile, Journal, ChatMessage, HabitProgress, Reminder, Goal, Activity, MotivationMessage, SleepLog
 import os
 import sys
 import secrets
@@ -557,6 +557,191 @@ def delete_reminder(reminder_id):
     db.session.commit()
     
     return jsonify({'success': True, 'message': 'Reminder deleted'})
+
+@app.route('/goals')
+@login_required
+def goals_page():
+    """Goals management page"""
+    goals = Goal.query.filter_by(user_id=current_user.id, is_active=True).all()
+    return render_template('goals.html', goals=goals)
+
+@app.route('/create_goal', methods=['POST'])
+@login_required
+def create_goal():
+    """Create a new goal"""
+    data = request.json
+    title = data.get('title', '').strip()
+    goal_type = data.get('goal_type', 'habit')
+    description = data.get('description', '').strip()
+    target_days = data.get('target_days', 30)
+    
+    if not title:
+        return jsonify({'success': False, 'error': 'Title is required'}), 400
+    
+    goal = Goal(
+        user_id=current_user.id,
+        title=title,
+        goal_type=goal_type,
+        description=description,
+        target_days=target_days,
+        is_active=True
+    )
+    db.session.add(goal)
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'goal': {
+            'id': goal.id,
+            'title': goal.title,
+            'goal_type': goal.goal_type,
+            'description': goal.description,
+            'target_days': goal.target_days
+        }
+    })
+
+@app.route('/log_activity', methods=['POST'])
+@login_required
+def log_activity():
+    """Log an activity for a goal"""
+    data = request.json
+    
+    goal_id = data.get('goal_id')
+    activity_type = data.get('activity_type', '').strip()
+    description = data.get('description', '').strip()
+    
+    if not goal_id:
+        return jsonify({'success': False, 'error': 'Goal ID is required'}), 400
+    
+    if not activity_type:
+        return jsonify({'success': False, 'error': 'Activity type is required'}), 400
+    
+    goal = Goal.query.filter_by(id=goal_id, user_id=current_user.id, is_active=True).first()
+    if not goal:
+        return jsonify({'success': False, 'error': 'Goal not found or access denied'}), 404
+    
+    activity = Activity(
+        goal_id=goal_id,
+        user_id=current_user.id,
+        date=date.today(),
+        activity_type=activity_type,
+        description=description,
+        completed=True
+    )
+    db.session.add(activity)
+    db.session.commit()
+    
+    motivation_msg = MotivationMessage(
+        user_id=current_user.id,
+        message=generate_motivation_message(activity_type),
+        message_type='activity_completed',
+        is_read=False
+    )
+    db.session.add(motivation_msg)
+    db.session.commit()
+    
+    return jsonify({'success': True, 'motivation': motivation_msg.message})
+
+@app.route('/sleep')
+@login_required
+def sleep_tracker():
+    """Sleep tracking page"""
+    sleep_logs = SleepLog.query.filter_by(user_id=current_user.id).order_by(SleepLog.date.desc()).limit(14).all()
+    return render_template('sleep.html', sleep_logs=sleep_logs, user_name=current_user.profile.name if current_user.profile else 'User')
+
+@app.route('/log_sleep', methods=['POST'])
+@login_required
+def log_sleep():
+    """Log sleep data"""
+    data = request.json
+    sleep_date = datetime.strptime(data.get('date', str(date.today())), '%Y-%m-%d').date()
+    
+    existing_log = SleepLog.query.filter_by(user_id=current_user.id, date=sleep_date).first()
+    
+    if existing_log:
+        existing_log.bedtime = data.get('bedtime')
+        existing_log.wake_time = data.get('wake_time')
+        existing_log.hours_slept = data.get('hours_slept')
+        existing_log.quality_rating = data.get('quality_rating')
+        existing_log.notes = data.get('notes', '')
+    else:
+        sleep_log = SleepLog(
+            user_id=current_user.id,
+            date=sleep_date,
+            bedtime=data.get('bedtime'),
+            wake_time=data.get('wake_time'),
+            hours_slept=data.get('hours_slept'),
+            quality_rating=data.get('quality_rating'),
+            notes=data.get('notes', '')
+        )
+        db.session.add(sleep_log)
+    
+    db.session.commit()
+    return jsonify({'success': True})
+
+@app.route('/get_motivations')
+@login_required
+def get_motivations():
+    """Get unread motivation messages"""
+    messages = MotivationMessage.query.filter_by(user_id=current_user.id, is_read=False).order_by(MotivationMessage.created_at.desc()).limit(5).all()
+    return jsonify({
+        'success': True,
+        'motivations': [{
+            'id': m.id,
+            'message': m.message,
+            'message_type': m.message_type,
+            'created_at': m.created_at.strftime('%Y-%m-%d %H:%M')
+        } for m in messages]
+    })
+
+@app.route('/mark_motivation_read/<int:msg_id>', methods=['POST'])
+@login_required
+def mark_motivation_read(msg_id):
+    """Mark motivation message as read"""
+    msg = MotivationMessage.query.filter_by(id=msg_id, user_id=current_user.id).first()
+    if msg:
+        msg.is_read = True
+        db.session.commit()
+        return jsonify({'success': True})
+    return jsonify({'success': False}), 404
+
+def generate_motivation_message(activity_type):
+    """Generate positive reinforcement messages"""
+    messages = {
+        'breathing': [
+            "You're building such a powerful habit! Every breath brings more calm into your life.",
+            "That's incredible progress! Your mind and body thank you for this moment of peace.",
+            "You're doing amazing! Each breathing session strengthens your inner resilience."
+        ],
+        'walk': [
+            "Way to go! Every step you take is a victory for your health and happiness.",
+            "You're unstoppable! Your commitment to moving your body is truly inspiring.",
+            "Fantastic work! You're building momentum one step at a time."
+        ],
+        'journal': [
+            "Beautiful reflection! Your self-awareness is growing with each word you write.",
+            "You're creating something meaningful! This practice is transforming you from within.",
+            "Wonderful dedication! Journaling is one of the most powerful tools for growth."
+        ],
+        'meditation': [
+            "Phenomenal! You're mastering the art of being present. This is real growth.",
+            "You're glowing with progress! Each meditation deepens your inner peace.",
+            "Incredible consistency! Your practice is building a foundation of calm strength."
+        ],
+        'exercise': [
+            "You're crushing it! Your body is getting stronger, and so is your willpower.",
+            "Absolutely amazing! You showed up for yourself today, and that's everything.",
+            "You're on fire! Every workout brings you closer to your best self."
+        ]
+    }
+    
+    category_messages = messages.get(activity_type.lower(), [
+        "Fantastic effort! You're making real progress toward your goals.",
+        "You're doing wonderfully! Keep up this amazing momentum.",
+        "Great work! Every positive action adds up to big transformations."
+    ])
+    
+    return random.choice(category_messages)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
