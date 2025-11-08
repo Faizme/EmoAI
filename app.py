@@ -936,6 +936,37 @@ def confirm_event(event_id):
         'synced_to_google': event.is_in_google_calendar
     }})
 
+@app.route('/update_event/<int:event_id>', methods=['PUT'])
+@login_required
+def update_event(event_id):
+    """Update an existing event"""
+    event = Event.query.filter_by(id=event_id, user_id=current_user.id).first()
+    if not event:
+        return jsonify({'success': False, 'error': 'Event not found'}), 404
+    
+    data = request.json
+    
+    if 'title' in data:
+        event.title = data['title']
+    if 'date' in data:
+        event.event_date = datetime.strptime(data['date'], '%Y-%m-%d').date()
+    if 'time' in data:
+        event.event_time = data['time'] if data['time'] else None
+    if 'location' in data:
+        event.location = data['location'] if data['location'] else None
+    if 'description' in data:
+        event.description = data['description'] if data['description'] else None
+    
+    db.session.commit()
+    return jsonify({'success': True, 'event': {
+        'id': event.id,
+        'title': event.title,
+        'date': event.event_date.isoformat(),
+        'time': event.event_time,
+        'location': event.location,
+        'description': event.description
+    }})
+
 @app.route('/delete_event/<int:event_id>', methods=['DELETE'])
 @login_required
 def delete_event(event_id):
