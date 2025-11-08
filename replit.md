@@ -66,10 +66,10 @@ The application features an elegant, sophisticated Wix Studio-inspired aesthetic
     - Word frequency analysis showing most meaningful terms (filters stop words)
     - Requires minimum 1 journal entry to unlock analytics
 -   **Reminders & Habits**: Daily personalized reminder popups, custom reminder creation and management, habit progress tracking, and a 7-day streak visualization.
--   **Time-based Reminder System**: Browser-based popup notifications with alarm sounds:
+-   **Time-based Reminder System**: Browser-based popup notifications:
     - Automatic check every 60 seconds for due reminders
     - Popup notifications at exact scheduled times
-    - Web Audio API alarm sound (dual-tone notification) when reminders trigger
+    - Silent popup messages (no alarm sound)
     - Delete functionality for managing reminder list
     - Auto-dismisses after 30 seconds if not interacted with
 -   **Calendar Event Extraction & Visual Calendar**: Comprehensive calendar system with AI-powered event detection and visual interface:

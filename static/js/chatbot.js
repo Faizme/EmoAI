@@ -528,8 +528,6 @@ async function checkTimeBasedReminders() {
 }
 
 function showTimeReminderPopup(reminder) {
-    playAlarmSound();
-    
     const popup = document.getElementById('reminderPopup');
     document.getElementById('reminderGreeting').textContent = `Reminder`;
     document.getElementById('reminderMessage').textContent = reminder.message;
