@@ -6,6 +6,10 @@
 <div class="onboarding-container">
     <div class="floating-shapes"></div>
     
+    <div class="onboarding-visual">
+        <img src="{{ url_for('static', filename='images/onboarding_hero.jpg') }}" alt="Begin Your Journey" class="onboarding-hero-img">
+    </div>
+    
     <div class="onboarding-card glass">
         <h1 class="glow-text">✨ Tell us about you</h1>
         <p class="subtitle">Help us personalize your journey</p>
@@ -40,6 +44,23 @@
     align-items: center;
     justify-content: center;
     padding: 20px;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.onboarding-visual {
+    max-width: 400px;
+    width: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.onboarding-hero-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
 }
 
 .onboarding-card {

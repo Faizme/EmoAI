@@ -8,11 +8,17 @@
 
 {% block content %}
 <div class="dashboard-page">
-    <div class="dashboard-container">
-        <div class="dashboard-header">
+    <div class="dashboard-hero">
+        <div class="hero-image-container">
+            <img src="{{ url_for('static', filename='images/dashboard_hero.jpg') }}" alt="Your Growth Journey" class="dashboard-hero-img">
+        </div>
+        <div class="hero-overlay">
             <h1 class="dashboard-title">Your Habit Journey</h1>
             <p class="dashboard-subtitle">Track your daily progress toward: <strong>{{ habit_goal }}</strong></p>
         </div>
+    </div>
+    
+    <div class="dashboard-container">
 
         <div class="streak-card">
             <div class="streak-header">

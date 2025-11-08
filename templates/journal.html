@@ -6,6 +6,10 @@
 <div class="journal-container">
     <div class="floating-shapes"></div>
     
+    <div class="journal-hero">
+        <img src="{{ url_for('static', filename='images/journal_hero.jpg') }}" alt="Your Journal" class="journal-hero-img">
+    </div>
+    
     <div class="journal-header glass">
         <h1 class="glow-text">📖 My Journal</h1>
         <a href="{{ url_for('chatbot') }}" class="btn-back">← Back to Chat</a>
@@ -48,6 +52,22 @@
     padding: 40px 20px;
     max-width: 1000px;
     margin: 0 auto;
+}
+
+.journal-hero {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 40px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.journal-hero-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
 }
 
 .journal-header {
