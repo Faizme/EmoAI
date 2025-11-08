@@ -1,0 +1,82 @@
+Task: Add a Daily Reminders & Habit Progress feature into the existing Flask + SQLite journaling app.
+
+Requirements:
+1️⃣ Add reminder fields to the UserProfile table:
+
+reminder_enabled (BOOLEAN, default TRUE)
+
+reminder_time (STRING, default NULL)
+
+habit_goal (STRING, use the goal already collected during onboarding)
+
+2️⃣ Add a new table HabitProgress:
+| id (int PK) | user_id (FK) | date (DATE) | progress_note (TEXT) | mood (STRING) | timestamp |
+
+3️⃣ On login → show a daily reminder toast:
+
+If reminder_enabled = True
+
+Show at reminder_time if set, else on page load
+UI message template:
+“Hey {name}, did you take one small step for your goal: {habit_goal} today?”
+
+Buttons inside popup:
+✅ “Yes, add progress” → opens a mini form (textarea: progress_note)
+❌ “Not today” → dismiss popup
+
+4️⃣ Save progress into HabitProgress table with:
+
+Current date
+
+Optional short note
+
+Latest mood from journal if available
+
+5️⃣ Dashboard page addition:
+
+Show last 7 days as a streak bar or checkmarks
+
+If streak breaks → show a supportive message
+(“No worries, tomorrow is a fresh chance 🌱”)
+
+6️⃣ Reminder Toggle UI:
+
+Place a glowing bell icon in navbar
+
+Clicking opens a modal:
+
+Switch: Reminder ON/OFF
+
+Optional time picker to choose reminder_time
+
+Save to DB via POST without reloading the page
+
+7️⃣ Privacy Requirements:
+
+Data linked only to user_id
+
+Retention 30 days by default (auto-delete older)
+
+Allow user to see and delete progress history
+
+8️⃣ Design Style:
+
+Dark mode
+
+Soft neon accents (#8A2EFF → #00FFC6 gradient)
+
+Smooth fade & scale animation for popup
+
+Mobile responsive
+
+✅ Maintain current project structure & routes
+✅ No breaking changes to Login / Chat / Journal pages
+✅ Comment the code where logic is added
+
+Deliverables:
+✔ DB migrations/changes
+✔ Updated models
+✔ New backend routes for reminder settings + progress saving
+✔ UI popup component + streak/sidebar on dashboard
+✔ Toggle logic + animation
+✔ Optional CRON-like check for reminder_time (frontend-local timeout acceptable for MVP)
