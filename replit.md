@@ -1,8 +1,8 @@
-# VIBE JOURNAL AI - Full-Stack Emotional Wellness App
+# EMOAI - Full-Stack Emotional Wellness App
 
 ## Overview
 
-Vibe Journal AI is a comprehensive full-stack web application that helps users reflect on their emotions daily through conversational AI. The app stores journal entries automatically, tracks personal goals, and provides gentle reminders for self-improvement. Built with Flask for the backend, SQLite for data persistence, and vanilla JavaScript for the frontend, it uses Google's Generative AI (Gemini 2.0) to power an empathetic conversational companion.
+EmoAI is a comprehensive full-stack web application that helps users reflect on their emotions daily through conversational AI. The app stores journal entries automatically, tracks personal goals, and provides gentle reminders for self-improvement. Built with Flask for the backend, SQLite for data persistence, and vanilla JavaScript for the frontend, it uses Google's Generative AI (Gemini 2.0) to power an emotionally intelligent conversational companion.
 
 ## Recent Changes (November 2025)
 
@@ -33,13 +33,21 @@ Vibe Journal AI is a comprehensive full-stack web application that helps users r
   - Removed duplicate goal progress prompts (now only in reminder/dashboard flow)
   - Journal summary save screen now only asks for mood (streamlined)
   - Progress tracking consolidated to single location: daily reminder popup → dashboard
-- **Dramatically Improved AI Personality** (November 8, 2025):
-  - VILUN now talks like a real friend, not a formal AI assistant
-  - Uses casual language, emojis, and conversational fillers
-  - Short responses (2-4 sentences) for natural conversation flow
-  - Asks genuine follow-up questions and validates feelings
-  - No more "as an AI" disclaimers or therapy-speak
-  - Empathetic, warm, and present in conversations
+- **Rebranded to EmoAI with Premium Features** (November 8, 2025):
+  - Complete rebrand from VILUN to EmoAI across entire application
+  - Premium chatbot interface redesign with elegant, emoji-free UI
+  - Added peaceful meditation hero image to login page
+  - Voice assistant integration using Web Speech API
+  - Chat history sidebar for conversation management
+  - User profile badge in bottom left corner
+  - Sophisticated, professional aesthetic matching warm color palette
+- **Dramatically Enhanced AI Personality** (November 8, 2025):
+  - EmoAI possesses deep emotional intelligence and psychological understanding
+  - Premium, sophisticated tone without emojis or casual text-speak
+  - Reads emotional subtext and understands what users truly mean
+  - Short but meaningful responses (2-4 sentences) with depth and nuance
+  - No "as an AI" disclaimers - responds as genuine emotional companion
+  - Thoughtful, elegant language that feels premium yet accessible
 - **Complete Frontend Redesign - Warm Wix Studio Aesthetic** (November 8, 2025):
   - Completely redesigned UI with elegant, sophisticated Wix Studio-inspired aesthetic
   - Warm color palette: Beige backgrounds (#F4EEE3), sage green accents (#6BA99F), peach highlights (#E8B5A6), lavender touches (#C9B5E3)
