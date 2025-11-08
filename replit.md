@@ -22,12 +22,17 @@ Vibe Journal AI is a comprehensive full-stack web application that helps users r
   - Auto-cleanup of progress older than 30 days
   - Bell icon with animated notification
 - **Added Multiple Custom Reminders System** (November 8, 2025):
-  - Create unlimited custom reminder messages
+  - Create unlimited custom reminder messages with inline form
   - Each reminder can have optional time and active/inactive status
-  - ➕ Add button in reminder settings modal
+  - Simple, always-visible "Create New Reminder" card
   - Manage reminders: activate/deactivate and delete individually
   - Random selection from active reminders for daily popup
   - Comprehensive CRUD backend with user-scoped data
+- **Simplified User Experience** (November 8, 2025):
+  - Removed redundant ➕ Add button from reminder modal
+  - Removed duplicate goal progress prompts (now only in reminder/dashboard flow)
+  - Journal summary save screen now only asks for mood (streamlined)
+  - Progress tracking consolidated to single location: daily reminder popup → dashboard
 - **Dramatically Improved AI Personality** (November 8, 2025):
   - VILUN now talks like a real friend, not a formal AI assistant
   - Uses casual language, emojis, and conversational fillers
