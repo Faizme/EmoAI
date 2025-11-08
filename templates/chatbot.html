@@ -9,8 +9,62 @@
     <div class="chat-header glass">
         <h2 class="glow-text">💜 VILUN</h2>
         <div class="header-buttons">
+            <button onclick="openReminderSettings()" class="icon-btn bell-btn" title="Reminder Settings">🔔</button>
+            <button onclick="window.location.href='/dashboard'" class="icon-btn">📊 Dashboard</button>
             <button onclick="viewJournal()" class="icon-btn">📚 Journal</button>
             <button onclick="logout()" class="icon-btn">🚪 Logout</button>
+        </div>
+    </div>
+    
+    <!-- Daily Reminder Popup -->
+    <div id="reminderPopup" class="reminder-popup hidden">
+        <div class="reminder-content glass">
+            <div class="reminder-icon">🌟</div>
+            <h3 id="reminderGreeting">Hey there!</h3>
+            <p id="reminderMessage">Did you take one small step for your goal today?</p>
+            <div class="reminder-buttons">
+                <button onclick="showProgressForm()" class="btn-primary glow-btn">✅ Yes, add progress</button>
+                <button onclick="dismissReminder()" class="btn-secondary">❌ Not today</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Progress Note Form (shown after clicking Yes) -->
+    <div id="progressForm" class="modal hidden">
+        <div class="modal-content glass">
+            <span class="close-modal" onclick="closeProgressForm()">&times;</span>
+            <h2 class="glow-text">Log Your Progress 📝</h2>
+            <p style="color: #b4a5d9; margin-bottom: 1rem;">What did you do today?</p>
+            <textarea id="progressNote" class="glass-input" rows="4" placeholder="Write a short note about your progress..."></textarea>
+            <button onclick="saveProgress()" class="btn-primary glow-btn">Save Progress ✅</button>
+        </div>
+    </div>
+    
+    <!-- Reminder Settings Modal -->
+    <div id="reminderSettingsModal" class="modal hidden">
+        <div class="modal-content glass">
+            <span class="close-modal" onclick="closeReminderSettings()">&times;</span>
+            <h2 class="glow-text">Reminder Settings 🔔</h2>
+            
+            <div class="setting-row">
+                <label class="toggle-label">
+                    <span>Daily Reminders</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="reminderToggle" onchange="updateReminderToggle()">
+                        <span class="slider"></span>
+                    </div>
+                </label>
+            </div>
+            
+            <div class="setting-row" id="timePickerRow">
+                <label>Reminder Time (optional)</label>
+                <input type="time" id="reminderTime" class="glass-input" onchange="updateReminderTime()">
+                <p style="color: #b4a5d9; font-size: 0.9rem; margin-top: 0.5rem;">
+                    Leave blank for reminders on page load
+                </p>
+            </div>
+            
+            <button onclick="closeReminderSettings()" class="btn-primary">Done</button>
         </div>
     </div>
     

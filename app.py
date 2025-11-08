@@ -1,11 +1,11 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_bcrypt import Bcrypt
-from models import db, User, UserProfile, Journal, ChatMessage
+from models import db, User, UserProfile, Journal, ChatMessage, HabitProgress
 import os
 import sys
 import secrets
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'attached_assets'))
 from ai_core_1762554001118 import get_ai_chat_response, summarize_chat_as_journal
@@ -284,6 +284,158 @@ def clear_chat():
     session['chat_session_id'] = secrets.token_hex(16)
     session.modified = True
     return jsonify({'success': True})
+
+# ========== HABIT REMINDER & PROGRESS ROUTES ==========
+
+@app.route('/update_reminder_settings', methods=['POST'])
+@login_required
+def update_reminder_settings():
+    """Update reminder enabled status and optional reminder time"""
+    data = request.json
+    enabled = data.get('enabled')
+    reminder_time = data.get('reminder_time')
+    
+    if current_user.profile:
+        if enabled is not None:
+            current_user.profile.reminder_enabled = enabled
+        if reminder_time is not None:
+            current_user.profile.reminder_time = reminder_time
+        db.session.commit()
+        return jsonify({
+            'success': True,
+            'enabled': current_user.profile.reminder_enabled,
+            'reminder_time': current_user.profile.reminder_time
+        })
+    return jsonify({'success': False}), 400
+
+@app.route('/save_habit_progress', methods=['POST'])
+@login_required
+def save_habit_progress():
+    """Save daily habit progress with optional note"""
+    data = request.json
+    progress_note = data.get('progress_note', '')
+    
+    today = date.today()
+    
+    # Check if progress already recorded today
+    existing = HabitProgress.query.filter_by(
+        user_id=current_user.id,
+        date=today
+    ).first()
+    
+    if existing:
+        # Update existing entry
+        existing.progress_note = progress_note
+        existing.timestamp = datetime.utcnow()
+    else:
+        # Get latest mood from journal if available
+        latest_journal = Journal.query.filter_by(
+            user_id=current_user.id
+        ).order_by(Journal.timestamp.desc()).first()
+        
+        mood = latest_journal.mood if latest_journal else None
+        
+        # Create new progress entry
+        progress = HabitProgress(
+            user_id=current_user.id,
+            date=today,
+            progress_note=progress_note,
+            mood=mood
+        )
+        db.session.add(progress)
+    
+    db.session.commit()
+    return jsonify({'success': True, 'message': 'Progress saved!'})
+
+@app.route('/get_reminder_status', methods=['GET'])
+@login_required
+def get_reminder_status():
+    """Check if reminder should be shown today"""
+    if not current_user.profile or not current_user.profile.reminder_enabled:
+        return jsonify({'show_reminder': False})
+    
+    today = date.today()
+    
+    # Check if progress already recorded today
+    existing = HabitProgress.query.filter_by(
+        user_id=current_user.id,
+        date=today
+    ).first()
+    
+    return jsonify({
+        'show_reminder': not existing,
+        'user_name': current_user.profile.name,
+        'habit_goal': current_user.profile.goal,
+        'reminder_time': current_user.profile.reminder_time
+    })
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    """Dashboard page with 7-day habit streak visualization"""
+    if not current_user.profile:
+        return redirect(url_for('onboarding'))
+    
+    # Get last 7 days of progress
+    today = date.today()
+    seven_days_ago = today - timedelta(days=6)
+    
+    progress_records = HabitProgress.query.filter(
+        HabitProgress.user_id == current_user.id,
+        HabitProgress.date >= seven_days_ago
+    ).order_by(HabitProgress.date.desc()).all()
+    
+    # Create a dictionary for easy lookup
+    progress_dict = {p.date: p for p in progress_records}
+    
+    # Build 7-day streak data
+    streak_data = []
+    for i in range(6, -1, -1):
+        check_date = today - timedelta(days=i)
+        has_progress = check_date in progress_dict
+        streak_data.append({
+            'date': check_date,
+            'day_name': check_date.strftime('%a'),
+            'has_progress': has_progress,
+            'progress': progress_dict.get(check_date)
+        })
+    
+    # Calculate current streak
+    current_streak = 0
+    for day in reversed(streak_data):
+        if day['has_progress']:
+            current_streak += 1
+        else:
+            break
+    
+    # Auto-cleanup: Delete progress older than 30 days
+    thirty_days_ago = today - timedelta(days=30)
+    HabitProgress.query.filter(
+        HabitProgress.user_id == current_user.id,
+        HabitProgress.date < thirty_days_ago
+    ).delete()
+    db.session.commit()
+    
+    return render_template('dashboard.html', 
+                         streak_data=streak_data,
+                         current_streak=current_streak,
+                         user_name=current_user.profile.name,
+                         habit_goal=current_user.profile.goal)
+
+@app.route('/delete_progress/<int:progress_id>', methods=['DELETE'])
+@login_required
+def delete_progress(progress_id):
+    """Allow user to delete a specific progress entry"""
+    progress = HabitProgress.query.filter_by(
+        id=progress_id,
+        user_id=current_user.id
+    ).first()
+    
+    if progress:
+        db.session.delete(progress)
+        db.session.commit()
+        return jsonify({'success': True})
+    return jsonify({'success': False, 'error': 'Progress not found'}), 404
 
 @app.route('/toggle_reminder', methods=['POST'])
 @login_required

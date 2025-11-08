@@ -24,6 +24,7 @@ class UserProfile(db.Model):
     age = db.Column(db.Integer, nullable=True)
     goal = db.Column(db.Text, nullable=False)
     reminder_enabled = db.Column(db.Boolean, default=True)
+    reminder_time = db.Column(db.String(10), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Journal(db.Model):
@@ -51,3 +52,16 @@ class ChatMessage(db.Model):
     
     def __repr__(self):
         return f'<ChatMessage {self.id} - {self.role}>'
+
+class HabitProgress(db.Model):
+    __tablename__ = 'habit_progress'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    date = db.Column(db.Date, nullable=False)
+    progress_note = db.Column(db.Text, nullable=True)
+    mood = db.Column(db.String(50), nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<HabitProgress {self.id} - {self.date}>'

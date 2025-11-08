@@ -285,11 +285,200 @@ select.glass-input {
     cursor: pointer;
 }
 
+/* ========== REMINDER COMPONENTS ========== */
+
+.bell-btn {
+    position: relative;
+    animation: bellRing 2s ease-in-out infinite;
+}
+
+@keyframes bellRing {
+    0%, 100% { transform: rotate(0deg); }
+    10%, 30% { transform: rotate(-15deg); }
+    20%, 40% { transform: rotate(15deg); }
+    50%, 100% { transform: rotate(0deg); }
+}
+
+.reminder-popup {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    z-index: 999;
+    animation: slideInRight 0.5s ease-out;
+}
+
+.reminder-popup.hidden {
+    display: none;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.reminder-content {
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 400px;
+    box-shadow: 0 10px 40px rgba(168, 85, 247, 0.4);
+    border: 2px solid rgba(168, 85, 247, 0.3);
+}
+
+.reminder-icon {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 15px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.reminder-content h3 {
+    text-align: center;
+    color: var(--accent-purple);
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.reminder-content p {
+    text-align: center;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.reminder-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-secondary {
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: var(--light-purple);
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 600;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Settings Modal Specific Styles */
+.setting-row {
+    margin-bottom: 25px;
+}
+
+.setting-row label {
+    display: block;
+    color: var(--light-purple);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.toggle-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+}
+
+.toggle-switch input {
+    display: none;
+}
+
+.toggle-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(168, 85, 247, 0.3);
+    border-radius: 30px;
+    transition: 0.4s;
+}
+
+.toggle-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: var(--light-purple);
+    border-radius: 50%;
+    transition: 0.4s;
+}
+
+.toggle-switch input:checked + .slider {
+    background: linear-gradient(135deg, var(--accent-purple), var(--teal));
+    border-color: var(--teal);
+}
+
+.toggle-switch input:checked + .slider:before {
+    transform: translateX(30px);
+    background: white;
+}
+
+input[type="time"].glass-input {
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(168, 85, 247, 0.3);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    width: 100%;
+    outline: none;
+    transition: all 0.3s;
+}
+
+input[type="time"].glass-input:focus {
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+/* Mobile Responsiveness for Reminders */
 @media (max-width: 768px) {
+    .reminder-popup {
+        top: 20px;
+        right: 20px;
+        left: 20px;
+    }
+    
+    .reminder-content {
+        max-width: 100%;
+    }
+    
     .chat-header {
         flex-direction: column;
         gap: 15px;
         text-align: center;
+    }
+    
+    .header-buttons {
+        flex-wrap: wrap;
+        justify-content: center;
     }
     
     .chat-input-area {
