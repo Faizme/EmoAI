@@ -1,0 +1,287 @@
+Skip to content
+
+
+AI
+
+
+
+
+mvp
+
+mvp
+
+
+
+SH
+
+shihanshereef2
+
+Access
+
+Republish
+
+
+Files
+
+
+
+Commands
+Search
+Packager files
+Preview your app here
+The app is running, but has no external ports configured.
+Use
+Networking
+tool to configure them.
+Developer Tools
+Access debugging tools, monitor resources, and manage your development environment
+Networking
+Configure web server ports for your App
+Resources
+Monitor CPU, memory usage and upgrade resources
+Dependencies
+Imports
+Import and manage language-specific packages and dependencies
+System
+Manage system-level packages and dependencies using Nix package manager
+SSH
+Connect
+Establish SSH connections to remote servers and manage active sessions
+Keys
+Manage SSH public and private keys for secure authentication
+
+python app.py
+
+Ask Agent…
+24m
+ • 
+24 minutes ago
+
+
+Overview
+
+Analytics
+
+Domains
+
+Manage
+
+Republish
+
+Advanced settings
+
+Run security scan
+Publishing
+Started less than a minute ago by Mohammed Faiz
+Provision
+Build
+Bundle
+Promote
+Your app failed to build
+Common issues for build stage errors can be an error occurring while trying to run your build command or an compilation issue with your application code.
+
+Ways to debug:
+Make sure your repl runs in the Workspace.
+View our troubleshooting tips.
+Look for errors in your deploy logs.
+Production
+Status
+Mohammed Faiz failed to publish less than a minute ago
+
+Visibility
+Public
+Domain
+https://emoai.replit.app
+
+
+
+Buy a new domain
+Beta
+Type
+Static
+
+Saved your changes before starting work
+
+Agent 3
+
+
+Show previous events
+
+8 messages & 20 actions
+Let me update the models.py file to use IST timezone:
+Checkpoint made
+7 hours ago
+Ensure the entire application operates on IST for all datetime operations
+
+Rollback here
+
+Changes
+
+Preview
+11 minutes of work
+Checkpoint made
+7 hours ago
+Update application to use IST timezone
+
+Rollback here
+
+Changes
+
+Preview
+it is not fetching the data from calendar (for eg: i have added through extraction that i have exam of 9th november, later in a different journal, if i ask for is there anything i have to do on 9th novmber, it should fetch and give.
+
+7 hours ago
+
+13 messages & 32 actions
+Let me check the logs to see what's happening:
+Checkpoint made
+7 hours ago
+Improve calendar query analysis to include specific dates and date ranges
+
+Rollback here
+
+Changes
+
+Preview
+4 minutes of work
+Creating checkpoint
+it is still not fetching. can we add a db or something
+
+7 hours ago
+
+5 messages & 14 actions
+Let me check the logs to see what's happening:
+Checkpoint made
+7 hours ago
+Update calendar to show all events and pending confirmations
+
+Rollback here
+
+Changes
+
+Preview
+2 minutes of work
+Checkpoint made
+7 hours ago
+Add a new database to store journal entries
+
+Rollback here
+
+Changes
+
+Preview
+Can you fix the error that is associated with the reminder interface,I am not getting a pop-up notification when I tried giving reminders for different events,can you do a pop notification or a message showing reminder ,the event on the correcttime.
+
+7 hours ago
+
+8 messages & 30 actions
+Let me check the logs and investigate the reminder system:
+Checkpoint made
+7 hours ago
+Saved progress at the end of the loop
+
+Rollback here
+
+Changes
+
+Preview
+3 minutes of work
+no need for a alaram sound,just a message popping up would be fine for reminders
+
+7 hours ago
+
+2 messages & 11 actions
+Let me remove the alarm sound and keep just the popup notification:
+Checkpoint made
+7 hours ago
+Update reminder system to use silent popups instead of alarm sounds
+
+Rollback here
+
+Changes
+
+Preview
+1 minute of work
+Checkpoint made
+7 hours ago
+Update reminder settings to display messages instead of playing sounds
+
+Rollback here
+
+Changes
+
+Preview
+now can you also make the responses of my chatbot short and crisp yet containing all the required things.
+
+7 hours ago
+
+Decided on response conciseness strategy
+Let me update the AI chatbot's instructions to make responses shorter and more concise:
+
+
+Show 11 more
+
+Decided on chatbot response length
+Perfect! ✅ Your AI chatbot now gives short, crisp responses!
+
+📝 What Changed
+I've updated your AI companion to be much more concise while still being emotionally intelligent and helpful.
+
+Before:
+Responses were 2-4 sentences
+More detailed explanations
+Longer, thoughtful paragraphs
+After:
+Maximum 1-2 sentences per response
+Direct, warm, and impactful
+No fluff - every word counts
+Still emotionally intelligent and feeling-first
+Like getting a text from a wise friend who values your time
+🎯 New Communication Style
+Your AI will now:
+
+Cut straight to the point while staying warm
+Deliver complete thoughts in minimal words
+Keep the emotional intelligence and empathy
+Provide actionable guidance without over-explaining
+Sound like a concise, caring friend
+✨ Example Transformation
+Old style: "I hear you're feeling stressed about the exam. That's completely normal - tests can bring up a lot of anxiety. Have you tried some breathing exercises to help calm your nerves? Maybe take a quick walk before studying?"
+
+New style: "That exam stress is real. Try a 5-minute walk or some deep breaths before you study - it'll help calm your mind."
+
+🚀 Try It Now
+Start chatting with your AI companion and you'll notice the responses are now much shorter and to the point, while still being supportive and helpful!
+
+Your AI is ready with its new crisp, concise personality! 🎉
+
+Checkpoint made
+7 hours ago
+Make chatbot responses short and meaningful
+
+Rollback here
+
+Changes
+
+Preview
+1 minute of work
+Checkpoint made
+22 minutes ago
+Update chatbot to provide concise and informative responses
+
+Rollback here
+
+Changes
+
+Preview
+
+Scroll to latest
+
+Make, test, iterate…
+
+Build
+
+Build
+
+
+
