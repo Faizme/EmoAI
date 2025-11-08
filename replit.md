@@ -21,6 +21,20 @@ Vibe Journal AI is a comprehensive full-stack web application that helps users r
   - Reminder settings modal with toggle and time picker
   - Auto-cleanup of progress older than 30 days
   - Bell icon with animated notification
+- **Added Multiple Custom Reminders System** (November 8, 2025):
+  - Create unlimited custom reminder messages
+  - Each reminder can have optional time and active/inactive status
+  - ➕ Add button in reminder settings modal
+  - Manage reminders: activate/deactivate and delete individually
+  - Random selection from active reminders for daily popup
+  - Comprehensive CRUD backend with user-scoped data
+- **Dramatically Improved AI Personality** (November 8, 2025):
+  - VILUN now talks like a real friend, not a formal AI assistant
+  - Uses casual language, emojis, and conversational fillers
+  - Short responses (2-4 sentences) for natural conversation flow
+  - Asks genuine follow-up questions and validates feelings
+  - No more "as an AI" disclaimers or therapy-speak
+  - Empathetic, warm, and present in conversations
 
 ## User Preferences
 
@@ -62,6 +76,7 @@ The backend follows an MVC pattern with route-based organization:
 3. **Journal**: Mood, summary, goal progress, timestamps (many:1 with User)
 4. **ChatMessage**: Session ID, role, content, timestamps (many:1 with User)
 5. **HabitProgress**: Date, progress note, mood, timestamps (many:1 with User)
+6. **Reminder**: User ID, message, time, is_active, timestamps (many:1 with User)
 
 **Key Design Decisions**:
 - **Chat History in Database**: Prevents session cookie overflow for long conversations
@@ -206,8 +221,11 @@ No external frontend libraries or CDNs required - uses native browser APIs exclu
 ✅ **Daily Habit Reminders**: Personalized popup on login with Yes/Not today buttons  
 ✅ **Habit Progress Tracking**: Save daily progress notes with timestamps  
 ✅ **7-Day Streak Dashboard**: Visual tracker with supportive messages  
-✅ **Reminder Settings**: Toggle and time picker with bell icon in navbar  
+✅ **Custom Reminders System**: Create unlimited custom reminder messages with ➕ button  
+✅ **Reminder Management**: Activate/deactivate and delete individual reminders  
+✅ **Random Reminder Selection**: Daily popup shows random active reminder  
 ✅ **Auto Data Cleanup**: Automatically deletes progress older than 30 days  
+✅ **Human-like AI**: VILUN talks like a real friend with casual, warm responses  
 ✅ **Premium Dark UI**: Neo-noir theme with glassmorphism  
 ✅ **Responsive Design**: Works on desktop and mobile  
 ✅ **Session Management**: Isolated conversations per user
@@ -224,11 +242,14 @@ No external frontend libraries or CDNs required - uses native browser APIs exclu
 
 ## Database Migration Notes
 
-**Important**: When updating to the version with Daily Reminders & Habit Progress:
+**Important**: When updating to the latest version:
 - The database schema has been updated with new fields and tables
 - For development: Delete `instance/vibe_journal.db` and restart the app to recreate with new schema
 - For production: Use proper database migration tools (Alembic/Flask-Migrate) to preserve existing data
-- New schema adds: `reminder_time` column to UserProfile and `HabitProgress` table
+- Schema updates:
+  - `reminder_time` column added to UserProfile
+  - `HabitProgress` table for daily progress tracking
+  - `Reminder` table for custom reminder messages (NEW)
 
 ## Future Enhancements
 
