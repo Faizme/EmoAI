@@ -3,198 +3,34 @@
 {% block title %}Dashboard - Vibe Journal AI{% endblock %}
 
 {% block extra_css %}
-<style>
-    .dashboard-container {
-        min-height: 100vh;
-        padding: 2rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 2rem;
-    }
-
-    .dashboard-header {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .dashboard-header h1 {
-        font-size: 2.5rem;
-        background: linear-gradient(135deg, #a855f7, #00ffc6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-bottom: 0.5rem;
-    }
-
-    .dashboard-header p {
-        color: #b4a5d9;
-        font-size: 1.1rem;
-    }
-
-    .streak-card {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        padding: 2rem;
-        max-width: 600px;
-        width: 100%;
-        box-shadow: 0 8px 32px rgba(138, 46, 255, 0.2);
-    }
-
-    .streak-header {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .streak-count {
-        font-size: 3rem;
-        font-weight: bold;
-        background: linear-gradient(135deg, #a855f7, #00ffc6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .streak-label {
-        color: #b4a5d9;
-        margin-top: 0.5rem;
-    }
-
-    .week-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 0.75rem;
-        margin-bottom: 2rem;
-    }
-
-    .day-box {
-        aspect-ratio: 1;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-
-    .day-box.completed {
-        background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(0, 255, 198, 0.3));
-        border-color: #00ffc6;
-        box-shadow: 0 0 20px rgba(0, 255, 198, 0.4);
-    }
-
-    .day-box:hover {
-        transform: scale(1.05);
-        border-color: #a855f7;
-    }
-
-    .day-name {
-        font-size: 0.8rem;
-        color: #b4a5d9;
-        margin-bottom: 0.25rem;
-    }
-
-    .day-icon {
-        font-size: 1.5rem;
-    }
-
-    .supportive-message {
-        text-align: center;
-        padding: 1.5rem;
-        background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(0, 255, 198, 0.1));
-        border-radius: 12px;
-        color: #b4a5d9;
-        line-height: 1.6;
-    }
-
-    .goal-reminder {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 15px;
-        padding: 1.5rem;
-        max-width: 600px;
-        width: 100%;
-        margin-top: 1rem;
-    }
-
-    .goal-reminder h3 {
-        color: #a855f7;
-        margin-bottom: 0.5rem;
-    }
-
-    .goal-reminder p {
-        color: #b4a5d9;
-        line-height: 1.6;
-    }
-
-    .quick-actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        margin-top: 2rem;
-        flex-wrap: wrap;
-    }
-
-    .quick-action-btn {
-        padding: 0.75rem 1.5rem;
-        border-radius: 12px;
-        border: none;
-        background: linear-gradient(135deg, #a855f7, #6366f1);
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-    }
-
-    .quick-action-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(168, 85, 247, 0.4);
-    }
-
-    .quick-action-btn.secondary {
-        background: rgba(255, 255, 255, 0.1);
-    }
-
-    @media (max-width: 768px) {
-        .dashboard-header h1 {
-            font-size: 2rem;
-        }
-
-        .week-grid {
-            gap: 0.5rem;
-        }
-
-        .day-box {
-            font-size: 0.9rem;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 {% endblock %}
 
 {% block content %}
+<div class="parallax-bg"></div>
+<div class="floating-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+</div>
+
 <div class="dashboard-container">
     <div class="dashboard-header">
-        <h1>Your Habit Journey</h1>
-        <p>Track your daily progress toward: <strong>{{ habit_goal }}</strong></p>
+        <h1 class="glow-text">Your Habit Journey</h1>
+        <p class="subtitle">Track your daily progress toward: <strong>{{ habit_goal }}</strong></p>
     </div>
 
-    <div class="streak-card">
+    <div class="streak-card glass card-hover">
         <div class="streak-header">
-            <div class="streak-count">{{ current_streak }}</div>
+            <div class="streak-count animated-number">{{ current_streak }}</div>
             <div class="streak-label">day{{ 's' if current_streak != 1 else '' }} streak 🔥</div>
         </div>
 
         <div class="week-grid">
             {% for day in streak_data %}
             <div class="day-box {{ 'completed' if day.has_progress else '' }}" 
-                 title="{{ day.date.strftime('%B %d, %Y') }}{% if day.progress %}: {{ day.progress.progress_note }}{% endif %}">
+                 title="{{ day.date.strftime('%B %d, %Y') }}{% if day.progress %}: {{ day.progress.progress_note }}{% endif %}"
+                 data-index="{{ loop.index }}">
                 <div class="day-name">{{ day.day_name }}</div>
                 <div class="day-icon">{{ '✓' if day.has_progress else '○' }}</div>
             </div>
@@ -202,36 +38,43 @@
         </div>
 
         {% if current_streak == 0 %}
-        <div class="supportive-message">
-            No worries, tomorrow is a fresh chance 🌱<br>
-            Every journey starts with a single step!
+        <div class="supportive-message glass">
+            <span class="message-icon">🌱</span>
+            <p>No worries, tomorrow is a fresh chance!<br>Every journey starts with a single step!</p>
         </div>
         {% elif current_streak < 3 %}
-        <div class="supportive-message">
-            Great start, {{ user_name }}! 🌟<br>
-            Keep the momentum going!
+        <div class="supportive-message glass">
+            <span class="message-icon">🌟</span>
+            <p>Great start, {{ user_name }}!<br>Keep the momentum going!</p>
         </div>
         {% elif current_streak < 7 %}
-        <div class="supportive-message">
-            You're building an amazing habit, {{ user_name }}! 💪<br>
-            Consistency is the key to transformation.
+        <div class="supportive-message glass">
+            <span class="message-icon">💪</span>
+            <p>You're building an amazing habit, {{ user_name }}!<br>Consistency is the key to transformation.</p>
         </div>
         {% else %}
-        <div class="supportive-message">
-            Incredible dedication, {{ user_name }}! 🎉<br>
-            You're truly committed to your growth!
+        <div class="supportive-message glass">
+            <span class="message-icon">🎉</span>
+            <p>Incredible dedication, {{ user_name }}!<br>You're truly committed to your growth!</p>
         </div>
         {% endif %}
     </div>
 
-    <div class="goal-reminder">
+    <div class="goal-reminder glass card-hover">
+        <div class="goal-icon">🎯</div>
         <h3>Your Goal</h3>
         <p>{{ habit_goal }}</p>
     </div>
 
     <div class="quick-actions">
-        <a href="{{ url_for('chatbot') }}" class="quick-action-btn">Chat with VILUN</a>
-        <a href="{{ url_for('journal_view') }}" class="quick-action-btn secondary">View Journal</a>
+        <a href="{{ url_for('chatbot') }}" class="quick-action-btn glass card-hover">
+            <span class="action-icon">💬</span>
+            <span>Chat with VILUN</span>
+        </a>
+        <a href="{{ url_for('journal_view') }}" class="quick-action-btn glass card-hover">
+            <span class="action-icon">📚</span>
+            <span>View Journal</span>
+        </a>
     </div>
 </div>
 {% endblock %}
