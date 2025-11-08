@@ -724,7 +724,9 @@ def sleep_tracker():
 @app.route('/log_sleep', methods=['POST'])
 @login_required
 def log_sleep():
-    """Log sleep data"""
+    """Log sleep data with AI analysis"""
+    import ai_core_1762554001118 as ai_core
+    
     data = request.json
     sleep_date = datetime.strptime(data.get('date', str(date.today())), '%Y-%m-%d').date()
     
@@ -749,7 +751,41 @@ def log_sleep():
         db.session.add(sleep_log)
     
     db.session.commit()
-    return jsonify({'success': True})
+    
+    recent_logs = SleepLog.query.filter_by(user_id=current_user.id).order_by(SleepLog.date.desc()).limit(7).all()
+    
+    ai_insights = None
+    if recent_logs:
+        try:
+            sleep_data = [{
+                'date': log.date.isoformat(),
+                'hours': log.hours_slept,
+                'quality': log.quality_rating,
+                'bedtime': log.bedtime,
+                'wake_time': log.wake_time,
+                'notes': log.notes
+            } for log in recent_logs]
+            
+            prompt = f"""Analyze this user's sleep data from the past week and provide personalized insights and recommendations.
+
+Sleep Data:
+{sleep_data}
+
+Provide a brief analysis (2-3 sentences) covering:
+1. Sleep patterns and trends
+2. Quality assessment
+3. One specific, actionable recommendation to improve sleep
+
+Keep it warm, supportive, and feeling-first. No medical advice."""
+            
+            ai_insights = ai_core.get_ai_response_simple(prompt)
+        except Exception as e:
+            print(f"Error generating AI sleep insights: {e}")
+    
+    return jsonify({
+        'success': True,
+        'ai_insights': ai_insights
+    })
 
 @app.route('/get_motivations')
 @login_required

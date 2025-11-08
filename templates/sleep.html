@@ -43,6 +43,17 @@
         </div>
     </div>
     
+    <div class="ai-insights-banner" id="aiInsightsBanner" style="display: none;">
+        <div class="insights-header">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                <path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </svg>
+            <h3>AI Sleep Analysis</h3>
+        </div>
+        <p id="aiInsightsText" class="insights-text"></p>
+    </div>
+    
     <div class="sleep-container">
         <div class="sleep-log-card">
             <h2>Log Sleep Session</h2>
@@ -256,6 +267,9 @@ document.getElementById('sleepForm').addEventListener('submit', async (e) => {
         
         const data = await response.json();
         if (data.success) {
+            if (data.ai_insights) {
+                displayAIInsights(data.ai_insights);
+            }
             showToast('Sleep data analyzed and saved successfully');
             setTimeout(() => location.reload(), 2000);
         }
@@ -378,6 +392,14 @@ function updateMetrics(hours, quality, score) {
     document.getElementById('efficiencyScore').textContent = `${Math.round((quality / 5) * 100)}%`;
 }
 
+function displayAIInsights(insights) {
+    const banner = document.getElementById('aiInsightsBanner');
+    const insightsText = document.getElementById('aiInsightsText');
+    
+    insightsText.textContent = insights;
+    banner.style.display = 'block';
+}
+
 function showToast(message) {
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -425,6 +447,41 @@ function showToast(message) {
     border-radius: 20px;
     padding: 3rem;
     box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.ai-insights-banner {
+    max-width: 1400px;
+    margin: 0 auto 2rem;
+    background: linear-gradient(135deg, rgb(107, 169, 159) 0%, rgb(47, 100, 87) 100%);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    color: white;
+}
+
+.insights-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.insights-header svg {
+    stroke: white;
+}
+
+.insights-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    margin: 0;
+    color: white;
+}
+
+.insights-text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.95);
+    margin: 0;
 }
 
 .score-container {
