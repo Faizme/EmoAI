@@ -48,10 +48,16 @@ EmoAI is a comprehensive full-stack web application that helps users reflect on 
   - Short but meaningful responses (2-4 sentences) with depth and nuance
   - No "as an AI" disclaimers - responds as genuine emotional companion
   - Thoughtful, elegant language that feels premium yet accessible
+  - **FEELING-FIRST approach**: Understands emotions, not just literal words
+  - Detects hidden feelings: anxiety behind excitement, sadness behind jokes, overwhelm behind "I'm fine"
+  - Senses what people really mean versus what they actually say
+  - Responds to emotional tone and context, not surface statements
 - **Complete Frontend Redesign - Warm Wix Studio Aesthetic** (November 8, 2025):
   - Completely redesigned UI with elegant, sophisticated Wix Studio-inspired aesthetic
-  - Warm color palette: Beige backgrounds (#F4EEE3), sage green accents (#6BA99F), peach highlights (#E8B5A6), lavender touches (#C9B5E3)
+  - **Updated Color Scheme**: Warm browns and teals - Primary RGB(173,119,72), Secondary RGB(47,100,87), Background RGB(249,244,233)
   - Elegant typography: Playfair Display serif for headings, Inter for body text
+  - Removed chat history sidebar for cleaner interface
+  - Profile badge properly positioned at bottom left corner (fixed positioning)
   - Split-screen auth pages with 3D illustrations and floating decorative shapes
   - Soft gradients, subtle shadows, and warm glow effects throughout
   - 8 high-quality 3D stock images integrated across hero sections and features
