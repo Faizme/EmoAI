@@ -242,7 +242,7 @@ def get_summary():
     
     try:
         full_chat_text = "\n".join([
-            f"{'User' if msg['role'] == 'user' else 'VILUN'}: {msg['parts'][0]}"
+            f"{'User' if msg['role'] == 'user' else 'EmoAI'}: {msg['parts'][0]}"
             for msg in chat_history
         ])
         

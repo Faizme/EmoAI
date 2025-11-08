@@ -1,139 +1,175 @@
 {% extends "base.html" %}
 
-{% block title %}Chat - Vibe Journal AI{% endblock %}
+{% block title %}Chat - EmoAI{% endblock %}
 
 {% block content %}
-<div class="chatbot-container">
-    <div class="animated-bg"></div>
+<div class="premium-chat-container">
+    <div class="chat-sidebar-right">
+        <div class="sidebar-header">
+            <h3>Conversation History</h3>
+        </div>
+        <div class="history-list" id="historyList">
+            <div class="history-item active">
+                <div class="history-date">Today</div>
+                <div class="history-preview">Current conversation</div>
+            </div>
+        </div>
+    </div>
     
-    <div class="chat-header glass">
-        <h2 class="glow-text">💜 VILUN</h2>
-        <div class="header-buttons">
-            <button onclick="openReminderSettings()" class="icon-btn bell-btn" title="Reminder Settings">🔔</button>
-            <button onclick="window.location.href='/dashboard'" class="icon-btn">📊 Dashboard</button>
-            <button onclick="viewJournal()" class="icon-btn">📚 Journal</button>
-            <button onclick="logout()" class="icon-btn">🚪 Logout</button>
+    <div class="main-chat-area">
+        <div class="elegant-chat-header">
+            <div class="header-left">
+                <h1 class="app-name">EmoAI</h1>
+                <p class="app-tagline">Your Emotional Intelligence Companion</p>
+            </div>
+            <div class="header-actions">
+                <button onclick="window.location.href='/dashboard'" class="elegant-btn btn-outline">
+                    Dashboard
+                </button>
+                <button onclick="viewJournal()" class="elegant-btn btn-outline">
+                    Journal
+                </button>
+                <button onclick="openReminderSettings()" class="elegant-btn btn-outline">
+                    Settings
+                </button>
+                <button onclick="logout()" class="elegant-btn btn-outline">
+                    Logout
+                </button>
+            </div>
+        </div>
+        
+        <div class="conversation-area" id="chatBox">
+            <div class="ai-message-elegant fade-in">
+                <div class="message-content">
+                    <div class="message-sender">EmoAI</div>
+                    <div class="message-text">Hello {{ user_name }}, how are you feeling today?</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-section">
+            <div class="input-container">
+                <button onclick="toggleVoiceInput()" class="voice-btn" id="voiceBtn" title="Voice input">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                        <line x1="12" y1="19" x2="12" y2="23"></line>
+                        <line x1="8" y1="23" x2="16" y2="23"></line>
+                    </svg>
+                </button>
+                <input type="text" id="userInput" placeholder="Share your thoughts with EmoAI..." 
+                       class="premium-input" autocomplete="off">
+                <button onclick="sendMessage()" id="sendBtn" class="send-btn-elegant">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+            <div class="input-actions">
+                <button onclick="getSummary()" class="action-link">Save as Journal Entry</button>
+                <button onclick="clearChat()" class="action-link">New Conversation</button>
+            </div>
+        </div>
+        
+        <div class="user-info-badge">
+            <div class="user-avatar">{{ user_name[0].upper() }}</div>
+            <div class="user-details">
+                <div class="user-name">{{ user_name }}</div>
+                <div class="user-status">Online</div>
+            </div>
         </div>
     </div>
     
     <!-- Daily Reminder Popup -->
-    <div id="reminderPopup" class="reminder-popup hidden">
-        <div class="reminder-content glass">
-            <div class="reminder-icon">🌟</div>
-            <h3 id="reminderGreeting">Hey there!</h3>
-            <p id="reminderMessage">Did you take one small step for your goal today?</p>
-            <div class="reminder-buttons">
-                <button onclick="showProgressForm()" class="btn-primary glow-btn">✅ Yes, add progress</button>
-                <button onclick="dismissReminder()" class="btn-secondary">❌ Not today</button>
+    <div id="reminderPopup" class="elegant-modal hidden">
+        <div class="elegant-modal-content">
+            <div class="modal-icon">🌟</div>
+            <h3 id="reminderGreeting">Daily Check-in</h3>
+            <p id="reminderMessage">Have you made progress on your goal today?</p>
+            <div class="modal-actions">
+                <button onclick="showProgressForm()" class="elegant-btn btn-primary">Yes, add progress</button>
+                <button onclick="dismissReminder()" class="elegant-btn btn-outline">Not today</button>
             </div>
         </div>
     </div>
     
-    <!-- Progress Note Form (shown after clicking Yes) -->
-    <div id="progressForm" class="modal hidden">
-        <div class="modal-content glass">
-            <span class="close-modal" onclick="closeProgressForm()">&times;</span>
-            <h2 class="glow-text">Log Your Progress 📝</h2>
-            <p style="color: #b4a5d9; margin-bottom: 1rem;">What did you do today?</p>
-            <textarea id="progressNote" class="glass-input" rows="4" placeholder="Write a short note about your progress..."></textarea>
-            <button onclick="saveProgress()" class="btn-primary glow-btn">Save Progress ✅</button>
+    <!-- Progress Note Form -->
+    <div id="progressForm" class="elegant-modal hidden">
+        <div class="elegant-modal-content">
+            <span class="close-btn" onclick="closeProgressForm()">&times;</span>
+            <h2>Log Your Progress</h2>
+            <p class="modal-subtitle">What did you accomplish today?</p>
+            <textarea id="progressNote" class="premium-textarea" rows="4" 
+                      placeholder="Describe your progress..."></textarea>
+            <button onclick="saveProgress()" class="elegant-btn btn-primary full-width">Save Progress</button>
         </div>
     </div>
     
     <!-- Reminder Settings Modal -->
-    <div id="reminderSettingsModal" class="modal hidden">
-        <div class="modal-content glass reminder-modal-large">
-            <span class="close-modal" onclick="closeReminderSettings()">&times;</span>
+    <div id="reminderSettingsModal" class="elegant-modal hidden">
+        <div class="elegant-modal-content large-modal">
+            <span class="close-btn" onclick="closeReminderSettings()">&times;</span>
             
-            <div class="reminder-header">
-                <h2 class="glow-text">My Reminders 🔔</h2>
+            <h2>Reminder Settings</h2>
+            
+            <div class="settings-section">
+                <h3>Create New Reminder</h3>
+                <textarea id="newReminderMessage" class="premium-textarea" rows="3" 
+                          placeholder="What would you like to be reminded about?"></textarea>
+                <input type="time" id="newReminderTime" class="premium-input" 
+                       placeholder="Time (optional)">
+                <button onclick="createReminder()" class="elegant-btn btn-primary">Create Reminder</button>
             </div>
             
-            <!-- Inline Create New Reminder Card (always visible) -->
-            <div id="addReminderForm" class="add-reminder-form">
-                <h3 style="color: #c4b5fd; margin-bottom: 1rem;">➕ Create New Reminder</h3>
-                <textarea id="newReminderMessage" class="glass-input" rows="3" 
-                          placeholder="What would you like to be reminded about?"></textarea>
-                <input type="time" id="newReminderTime" class="glass-input" 
-                       placeholder="Time (optional)" style="margin-top: 0.5rem;">
-                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                    <button onclick="createReminder()" class="btn-primary">Create Reminder</button>
+            <div class="settings-section">
+                <h3>Your Reminders</h3>
+                <div id="remindersList" class="reminders-list-elegant">
+                    <p class="loading-text">Loading reminders...</p>
                 </div>
             </div>
             
-            <!-- Reminders List -->
-            <div id="remindersList" class="reminders-list">
-                <p class="no-reminders">Loading reminders...</p>
-            </div>
-            
-            <hr style="border-color: rgba(196, 181, 253, 0.2); margin: 1.5rem 0;">
-            
-            <!-- Global Settings -->
-            <div class="reminder-settings-section">
-                <h3 style="color: #c4b5fd; margin-bottom: 1rem;">Settings</h3>
-                
+            <div class="settings-section">
+                <h3>Global Settings</h3>
                 <div class="setting-row">
-                    <label class="toggle-label">
-                        <span>Enable Daily Reminders</span>
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="reminderToggle" onchange="updateReminderToggle()">
-                            <span class="slider"></span>
-                        </div>
+                    <span>Enable Daily Reminders</span>
+                    <label class="toggle-switch-elegant">
+                        <input type="checkbox" id="reminderToggle" onchange="updateReminderToggle()">
+                        <span class="toggle-slider"></span>
                     </label>
                 </div>
-                
-                <div class="setting-row" id="timePickerRow">
-                    <label>Default Reminder Time (optional)</label>
-                    <input type="time" id="reminderTime" class="glass-input" onchange="updateReminderTime()">
-                    <p style="color: #b4a5d9; font-size: 0.9rem; margin-top: 0.5rem;">
-                        Leave blank for reminders on page load
-                    </p>
+                <div class="setting-row">
+                    <label>Default Reminder Time</label>
+                    <input type="time" id="reminderTime" class="premium-input" onchange="updateReminderTime()">
                 </div>
             </div>
             
-            <button onclick="closeReminderSettings()" class="btn-primary" style="margin-top: 1rem;">Done</button>
+            <button onclick="closeReminderSettings()" class="elegant-btn btn-primary full-width">Done</button>
         </div>
     </div>
     
-    <div class="chat-box" id="chatBox">
-        <div class="ai-message fade-in">
-            <div class="message-bubble">
-                <strong>VILUN:</strong> Hi {{ user_name }}! 👋 How are you feeling today?
-            </div>
-        </div>
-    </div>
-    
-    <div class="chat-input-area glass">
-        <input type="text" id="userInput" placeholder="Share your thoughts..." class="chat-input" autocomplete="off">
-        <button onclick="sendMessage()" id="sendBtn" class="send-btn">Send</button>
-    </div>
-    
-    <div class="action-buttons">
-        <button onclick="getSummary()" class="action-btn glow-btn">📝 Get Journal Summary</button>
-        <button onclick="clearChat()" class="action-btn-secondary">🔄 New Conversation</button>
-    </div>
-    
-    <div id="summaryModal" class="modal">
-        <div class="modal-content glass">
-            <span class="close-modal" onclick="closeSummary()">&times;</span>
-            <h2 class="glow-text">Your Journal Entry</h2>
-            <div id="summaryText" class="summary-text"></div>
+    <!-- Journal Summary Modal -->
+    <div id="summaryModal" class="elegant-modal hidden">
+        <div class="elegant-modal-content">
+            <span class="close-btn" onclick="closeSummary()">&times;</span>
+            <h2>Your Journal Entry</h2>
+            <div id="summaryText" class="summary-content"></div>
             
-            <div class="save-journal-form">
-                <label>How are you feeling? <span class="mood-emoji" id="moodEmoji">😊</span></label>
-                <select id="moodSelect" class="glass-input" onchange="updateMoodEmoji()">
-                    <option value="😊 Happy">😊 Happy</option>
-                    <option value="😌 Calm">😌 Calm</option>
-                    <option value="😔 Sad">😔 Sad</option>
-                    <option value="😰 Anxious">😰 Anxious</option>
-                    <option value="😤 Frustrated">😤 Frustrated</option>
-                    <option value="🤔 Thoughtful">🤔 Thoughtful</option>
-                    <option value="😴 Tired">😴 Tired</option>
-                    <option value="🔥 Motivated">🔥 Motivated</option>
+            <div class="mood-selection">
+                <label>How are you feeling?</label>
+                <select id="moodSelect" class="premium-input">
+                    <option value="Happy">Happy</option>
+                    <option value="Calm">Calm</option>
+                    <option value="Sad">Sad</option>
+                    <option value="Anxious">Anxious</option>
+                    <option value="Frustrated">Frustrated</option>
+                    <option value="Thoughtful">Thoughtful</option>
+                    <option value="Tired">Tired</option>
+                    <option value="Motivated">Motivated</option>
                 </select>
-                
-                <button onclick="saveJournal()" class="btn-primary glow-btn">Save to Journal ✅</button>
             </div>
+            
+            <button onclick="saveJournal()" class="elegant-btn btn-primary full-width">Save to Journal</button>
         </div>
     </div>
 </div>

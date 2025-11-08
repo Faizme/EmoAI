@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard - Vibe Journal AI{% endblock %}
+{% block title %}Dashboard - EmoAI{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
@@ -62,7 +62,7 @@
         <div class="quick-actions">
             <a href="{{ url_for('chatbot') }}" class="action-btn">
                 <span class="action-icon">💬</span>
-                <span>Chat with VILUN</span>
+                <span>Chat with EmoAI</span>
             </a>
             <a href="{{ url_for('journal_view') }}" class="action-btn">
                 <span class="action-icon">📚</span>

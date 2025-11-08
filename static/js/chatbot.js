@@ -1,7 +1,68 @@
+// Chat Elements
 const chatBox = document.getElementById('chatBox');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
+const voiceBtn = document.getElementById('voiceBtn');
 
+// Voice Recognition Setup
+let recognition = null;
+let isListening = false;
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    
+    recognition.onstart = () => {
+        isListening = true;
+        voiceBtn.classList.add('listening');
+    };
+    
+    recognition.onend = () => {
+        isListening = false;
+        voiceBtn.classList.remove('listening');
+    };
+    
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        userInput.value = transcript;
+        sendMessage();
+    };
+    
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        isListening = false;
+        voiceBtn.classList.remove('listening');
+    };
+}
+
+function toggleVoiceInput() {
+    if (!recognition) {
+        alert('Voice input is not supported in your browser. Please use Chrome, Safari, or Edge.');
+        return;
+    }
+    
+    if (isListening) {
+        recognition.stop();
+    } else {
+        recognition.start();
+    }
+}
+
+// Text-to-Speech for AI responses
+function speakText(text) {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        utterance.volume = 0.8;
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+// Enter key to send
 userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -35,6 +96,8 @@ async function sendMessage() {
         
         if (data.success) {
             addMessageToChat('ai', data.response);
+            // Optionally speak AI response
+            // speakText(data.response);
         } else {
             addMessageToChat('error', data.error || 'Something went wrong');
         }
@@ -49,34 +112,40 @@ async function sendMessage() {
 
 function addMessageToChat(sender, message) {
     const messageDiv = document.createElement('div');
-    messageDiv.className = sender === 'user' ? 'user-message' : 'ai-message';
+    messageDiv.className = sender === 'user' ? 'user-message-elegant' : 'ai-message-elegant';
     
-    const bubble = document.createElement('div');
-    bubble.className = 'message-bubble';
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
     
-    if (sender === 'user') {
-        bubble.innerHTML = `<strong>You:</strong> ${escapeHtml(message)}`;
-    } else if (sender === 'ai') {
-        bubble.innerHTML = `<strong>VILUN:</strong> ${escapeHtml(message)}`;
-    } else {
-        bubble.innerHTML = `<strong>Error:</strong> ${escapeHtml(message)}`;
-        bubble.style.background = 'rgba(239, 68, 68, 0.2)';
-        bubble.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+    const messageSender = document.createElement('div');
+    messageSender.className = 'message-sender';
+    messageSender.textContent = sender === 'user' ? 'YOU' : 'EMOAI';
+    
+    const messageText = document.createElement('div');
+    messageText.className = 'message-text';
+    messageText.textContent = message;
+    
+    if (sender === 'error') {
+        messageSender.textContent = 'ERROR';
+        messageContent.style.background = 'rgba(239, 68, 68, 0.1)';
+        messageContent.style.borderColor = 'rgba(239, 68, 68, 0.3)';
     }
     
-    messageDiv.appendChild(bubble);
+    messageContent.appendChild(messageSender);
+    messageContent.appendChild(messageText);
+    messageDiv.appendChild(messageContent);
     chatBox.appendChild(messageDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 function addTypingIndicator() {
     const typingDiv = document.createElement('div');
-    typingDiv.className = 'ai-message';
+    typingDiv.className = 'ai-message-elegant';
     typingDiv.innerHTML = `
-        <div class="typing-indicator">
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
-            <div class="typing-dot"></div>
+        <div class="typing-indicator-elegant">
+            <div class="typing-dot-elegant"></div>
+            <div class="typing-dot-elegant"></div>
+            <div class="typing-dot-elegant"></div>
         </div>
     `;
     chatBox.appendChild(typingDiv);
@@ -97,7 +166,7 @@ async function getSummary() {
         
         if (data.success) {
             document.getElementById('summaryText').innerText = data.summary;
-            document.getElementById('summaryModal').style.display = 'block';
+            document.getElementById('summaryModal').classList.remove('hidden');
         } else {
             alert(data.error || 'Failed to generate summary');
         }
@@ -107,14 +176,7 @@ async function getSummary() {
 }
 
 function closeSummary() {
-    document.getElementById('summaryModal').style.display = 'none';
-}
-
-function updateMoodEmoji() {
-    const moodSelect = document.getElementById('moodSelect');
-    const moodEmoji = document.getElementById('moodEmoji');
-    const selectedMood = moodSelect.value;
-    moodEmoji.textContent = selectedMood.split(' ')[0];
+    document.getElementById('summaryModal').classList.add('hidden');
 }
 
 async function saveJournal() {
@@ -133,28 +195,19 @@ async function saveJournal() {
         const data = await response.json();
         
         if (data.success) {
-            alert('✅ Journal entry saved successfully!');
+            alert(data.message);
             closeSummary();
-            
-            chatBox.innerHTML = `
-                <div class="ai-message fade-in">
-                    <div class="message-bubble">
-                        <strong>VILUN:</strong> Great! Your journal entry has been saved. How else can I help you today?
-                    </div>
-                </div>
-            `;
+            clearChat();
         } else {
-            alert(data.error || 'Failed to save journal');
+            alert('Failed to save journal entry');
         }
     } catch (error) {
-        alert('Failed to save journal. Please try again.');
+        alert('Failed to save journal entry. Please try again.');
     }
 }
 
 async function clearChat() {
-    if (!confirm('Are you sure you want to start a new conversation?')) {
-        return;
-    }
+    if (!confirm('Start a new conversation? This will clear your current chat.')) return;
     
     try {
         const response = await fetch('/clear_chat', {
@@ -164,11 +217,20 @@ async function clearChat() {
             },
         });
         
-        if (response.ok) {
-            location.reload();
+        const data = await response.json();
+        
+        if (data.success) {
+            chatBox.innerHTML = `
+                <div class="ai-message-elegant fade-in">
+                    <div class="message-content">
+                        <div class="message-sender">EMOAI</div>
+                        <div class="message-text">Hello! How are you feeling today?</div>
+                    </div>
+                </div>
+            `;
         }
     } catch (error) {
-        alert('Failed to clear chat');
+        console.error('Error clearing chat:', error);
     }
 }
 
@@ -177,9 +239,7 @@ function viewJournal() {
 }
 
 function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        window.location.href = '/logout';
-    }
+    window.location.href = '/logout';
 }
 
 function escapeHtml(text) {
@@ -188,168 +248,161 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-window.onclick = function(event) {
-    const modal = document.getElementById('summaryModal');
-    if (event.target === modal) {
-        modal.style.display = 'none';
-    }
-    
-    const progressModal = document.getElementById('progressForm');
-    if (event.target === progressModal) {
-        progressModal.classList.add('hidden');
-    }
-    
-    const settingsModal = document.getElementById('reminderSettingsModal');
-    if (event.target === settingsModal) {
-        settingsModal.classList.add('hidden');
-    }
-}
-
-// ========== REMINDER & HABIT PROGRESS FUNCTIONS ==========
-
-// Check reminder status on page load
-window.addEventListener('DOMContentLoaded', async () => {
+// Reminder functionality
+async function checkReminderStatus() {
     try {
         const response = await fetch('/get_reminder_status');
         const data = await response.json();
         
-        if (data.show_reminder) {
-            // Update reminder popup with custom message
-            document.getElementById('reminderGreeting').textContent = `Hey ${data.user_name}! 👋`;
-            document.getElementById('reminderMessage').textContent = data.reminder_message || "How are you doing today?";
-            
-            // Show reminder popup after a short delay
-            setTimeout(() => {
-                document.getElementById('reminderPopup').classList.remove('hidden');
-            }, 1000);
+        if (data.reminder_enabled && data.show_popup) {
+            showReminderPopup(data.reminder_message, data.user_name);
         }
-        
-        // Load reminder settings
-        await loadReminderSettings();
     } catch (error) {
-        console.error('Failed to check reminder status:', error);
+        console.error('Error checking reminder status:', error);
     }
-});
+}
+
+function showReminderPopup(message, userName) {
+    document.getElementById('reminderGreeting').textContent = `Hey ${userName}!`;
+    document.getElementById('reminderMessage').textContent = message;
+    document.getElementById('reminderPopup').classList.remove('hidden');
+}
 
 function dismissReminder() {
     document.getElementById('reminderPopup').classList.add('hidden');
+    markReminderAsSeen();
+}
+
+async function markReminderAsSeen() {
+    try {
+        await fetch('/mark_reminder_seen', { method: 'POST' });
+    } catch (error) {
+        console.error('Error marking reminder as seen:', error);
+    }
 }
 
 function showProgressForm() {
     document.getElementById('reminderPopup').classList.add('hidden');
     document.getElementById('progressForm').classList.remove('hidden');
-    document.getElementById('progressForm').style.display = 'block';
 }
 
 function closeProgressForm() {
     document.getElementById('progressForm').classList.add('hidden');
-    document.getElementById('progressForm').style.display = 'none';
     document.getElementById('progressNote').value = '';
 }
 
 async function saveProgress() {
-    const progressNote = document.getElementById('progressNote').value.trim();
+    const note = document.getElementById('progressNote').value.trim();
     
-    if (!progressNote) {
-        alert('Please write a short note about your progress!');
+    if (!note) {
+        alert('Please write something about your progress');
         return;
     }
     
     try {
-        const response = await fetch('/save_habit_progress', {
+        const response = await fetch('/save_progress', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ progress_note: progressNote }),
+            body: JSON.stringify({ progress_note: note }),
         });
         
         const data = await response.json();
         
         if (data.success) {
-            alert('🎉 Progress saved! Keep up the great work!');
+            alert('Progress saved! Keep up the great work!');
             closeProgressForm();
+            markReminderAsSeen();
         } else {
-            alert('Failed to save progress. Please try again.');
+            alert('Failed to save progress');
         }
     } catch (error) {
         alert('Failed to save progress. Please try again.');
     }
 }
 
-// Reminder Settings Modal Functions
-async function openReminderSettings() {
-    await loadRemindersList();
-    await loadReminderSettings();
+function openReminderSettings() {
     document.getElementById('reminderSettingsModal').classList.remove('hidden');
-    document.getElementById('reminderSettingsModal').style.display = 'block';
+    loadReminderSettings();
+    loadReminders();
 }
 
 function closeReminderSettings() {
     document.getElementById('reminderSettingsModal').classList.add('hidden');
-    document.getElementById('reminderSettingsModal').style.display = 'none';
 }
 
 async function loadReminderSettings() {
     try {
-        const response = await fetch('/get_reminder_status');
+        const response = await fetch('/get_reminder_settings');
         const data = await response.json();
         
-        // Set toggle state
-        const toggle = document.getElementById('reminderToggle');
-        if (toggle) {
-            toggle.checked = data.show_reminder !== false;
-        }
-        
-        // Set time if available
-        const timeInput = document.getElementById('reminderTime');
-        if (timeInput && data.reminder_time) {
-            timeInput.value = data.reminder_time;
-        }
+        document.getElementById('reminderToggle').checked = data.reminder_enabled;
+        document.getElementById('reminderTime').value = data.reminder_time || '';
     } catch (error) {
-        console.error('Failed to load reminder settings:', error);
+        console.error('Error loading reminder settings:', error);
     }
 }
 
-async function loadRemindersList() {
+async function updateReminderToggle() {
+    const enabled = document.getElementById('reminderToggle').checked;
+    
+    try {
+        await fetch('/update_reminder_settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ reminder_enabled: enabled }),
+        });
+    } catch (error) {
+        console.error('Error updating reminder toggle:', error);
+    }
+}
+
+async function updateReminderTime() {
+    const time = document.getElementById('reminderTime').value;
+    
+    try {
+        await fetch('/update_reminder_settings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ reminder_time: time }),
+        });
+    } catch (error) {
+        console.error('Error updating reminder time:', error);
+    }
+}
+
+async function loadReminders() {
     try {
         const response = await fetch('/get_reminders');
         const data = await response.json();
         
         const remindersList = document.getElementById('remindersList');
-        if (!remindersList) return;
-        
-        remindersList.innerHTML = '';
         
         if (data.reminders && data.reminders.length > 0) {
-            data.reminders.forEach(reminder => {
-                const reminderCard = document.createElement('div');
-                reminderCard.className = 'reminder-card';
-                reminderCard.innerHTML = `
-                    <div class="reminder-content">
-                        <p class="reminder-text">${escapeHtml(reminder.message)}</p>
-                        ${reminder.time ? `<span class="reminder-time">⏰ ${reminder.time}</span>` : ''}
+            remindersList.innerHTML = data.reminders.map(reminder => `
+                <div class="reminder-card ${!reminder.is_active ? 'inactive' : ''}">
+                    <div class="reminder-text">
+                        <div>${escapeHtml(reminder.message)}</div>
+                        ${reminder.time ? `<small>Time: ${reminder.time}</small>` : ''}
                     </div>
                     <div class="reminder-actions">
-                        <button onclick="toggleReminderActive(${reminder.id}, ${!reminder.is_active})" 
-                                class="reminder-btn ${reminder.is_active ? 'active' : 'inactive'}" 
-                                title="${reminder.is_active ? 'Deactivate' : 'Activate'}">
-                            ${reminder.is_active ? '✓' : '○'}
+                        <button class="elegant-btn btn-outline" onclick="toggleReminder(${reminder.id}, ${!reminder.is_active})">
+                            ${reminder.is_active ? 'Deactivate' : 'Activate'}
                         </button>
-                        <button onclick="deleteReminderItem(${reminder.id})" 
-                                class="reminder-btn delete" 
-                                title="Delete">
-                            🗑️
-                        </button>
+                        <button class="elegant-btn btn-outline" onclick="deleteReminder(${reminder.id})">Delete</button>
                     </div>
-                `;
-                remindersList.appendChild(reminderCard);
-            });
+                </div>
+            `).join('');
         } else {
-            remindersList.innerHTML = '<p class="no-reminders">No reminders yet. Create one above!</p>';
+            remindersList.innerHTML = '<p class="loading-text">No reminders yet</p>';
         }
     } catch (error) {
-        console.error('Failed to load reminders list:', error);
+        console.error('Error loading reminders:', error);
     }
 }
 
@@ -358,7 +411,7 @@ async function createReminder() {
     const time = document.getElementById('newReminderTime').value;
     
     if (!message) {
-        alert('Please enter a reminder message!');
+        alert('Please enter a reminder message');
         return;
     }
     
@@ -374,103 +427,56 @@ async function createReminder() {
         const data = await response.json();
         
         if (data.success) {
-            // Clear the form
             document.getElementById('newReminderMessage').value = '';
             document.getElementById('newReminderTime').value = '';
-            // Reload the list
-            await loadRemindersList();
+            loadReminders();
         } else {
-            alert(data.error || 'Failed to create reminder');
+            alert('Failed to create reminder');
         }
     } catch (error) {
         alert('Failed to create reminder. Please try again.');
     }
 }
 
-async function toggleReminderActive(reminderId, newState) {
+async function toggleReminder(id, activate) {
     try {
-        const response = await fetch(`/update_reminder/${reminderId}`, {
-            method: 'PUT',
+        const response = await fetch('/toggle_reminder', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ is_active: newState }),
+            body: JSON.stringify({ reminder_id: id, is_active: activate }),
         });
         
         const data = await response.json();
         
         if (data.success) {
-            await loadRemindersList();
-        } else {
-            alert(data.error || 'Failed to update reminder');
+            loadReminders();
         }
     } catch (error) {
-        alert('Failed to update reminder. Please try again.');
+        console.error('Error toggling reminder:', error);
     }
 }
 
-async function deleteReminderItem(reminderId) {
-    if (!confirm('Are you sure you want to delete this reminder?')) {
-        return;
-    }
+async function deleteReminder(id) {
+    if (!confirm('Delete this reminder?')) return;
     
     try {
-        const response = await fetch(`/delete_reminder/${reminderId}`, {
+        const response = await fetch(`/delete_reminder/${id}`, {
             method: 'DELETE',
         });
         
         const data = await response.json();
         
         if (data.success) {
-            await loadRemindersList();
-        } else {
-            alert(data.error || 'Failed to delete reminder');
+            loadReminders();
         }
     } catch (error) {
-        alert('Failed to delete reminder. Please try again.');
+        console.error('Error deleting reminder:', error);
     }
 }
 
-async function updateReminderToggle() {
-    const enabled = document.getElementById('reminderToggle').checked;
-    
-    try {
-        const response = await fetch('/update_reminder_settings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ enabled }),
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            console.log('Reminder toggle updated:', data.enabled);
-        }
-    } catch (error) {
-        console.error('Failed to update reminder toggle:', error);
-    }
-}
-
-async function updateReminderTime() {
-    const reminderTime = document.getElementById('reminderTime').value;
-    
-    try {
-        const response = await fetch('/update_reminder_settings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ reminder_time: reminderTime }),
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            console.log('Reminder time updated:', data.reminder_time);
-        }
-    } catch (error) {
-        console.error('Failed to update reminder time:', error);
-    }
-}
+// Check reminder status on page load
+window.addEventListener('DOMContentLoaded', () => {
+    checkReminderStatus();
+});
