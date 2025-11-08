@@ -198,20 +198,25 @@ def summarize_chat_as_journal(full_chat_history_text):
 
 def extract_event_from_message(user_message, today_date):
     import json
+    import re
     prompt = f"Today's date is {today_date}. User message: {user_message}"
     try:
         response = event_extractor_model.generate_content(prompt)
         result = response.text.strip()
         
-        if result == "NO_EVENT":
+        if result == "NO_EVENT" or "NO_EVENT" in result:
             return None
         
-        event_data = json.loads(result)
-        if event_data.get('has_event'):
-            return event_data
+        json_match = re.search(r'\{[\s\S]*\}', result)
+        if json_match:
+            json_str = json_match.group(0)
+            event_data = json.loads(json_str)
+            if event_data.get('has_event'):
+                return event_data
         return None
     except Exception as e:
         print(f"Event extraction error: {e}")
+        print(f"Raw response: {result if 'result' in locals() else 'No response'}")
         return None
 
 def analyze_sentiment(user_message):
