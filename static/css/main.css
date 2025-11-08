@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -5,16 +7,18 @@
 }
 
 :root {
-    --primary-purple: #8B5CF6;
-    --secondary-blue: #3B82F6;
-    --tertiary-teal: #14B8A6;
-    --deep-bg: #0F172A;
-    --card-bg: rgba(255, 255, 255, 0.03);
-    --text-primary: #F8FAFC;
-    --text-secondary: #CBD5E1;
-    --glow-purple: rgba(139, 92, 246, 0.5);
-    --glow-blue: rgba(59, 130, 246, 0.5);
-    --glow-teal: rgba(20, 184, 166, 0.5);
+    --mint-ice: #E3FDFD;
+    --rose-pink: #FFE6EB;
+    --sky-blue: #E4FBFF;
+    --lavender-glow: #CABBE9;
+    --soft-coral: #FFB6B9;
+    --deep-bg: #0F0A1E;
+    --card-bg: rgba(255, 255, 255, 0.08);
+    --text-primary: #FFFFFF;
+    --text-secondary: #E3FDFD;
+    --glow-mint: rgba(227, 253, 253, 0.6);
+    --glow-coral: rgba(255, 182, 185, 0.6);
+    --glow-lavender: rgba(202, 187, 233, 0.6);
 }
 
 body {
@@ -26,7 +30,12 @@ body {
     position: relative;
 }
 
-/* 3D Parallax Animated Background */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+}
+
+/* Animated Gradient Background */
 .parallax-bg {
     position: fixed;
     top: 0;
@@ -34,7 +43,23 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
-    background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+    background: linear-gradient(135deg, 
+        #0F0A1E 0%, 
+        #1A0B2E 25%, 
+        #2D1B3D 50%, 
+        #1A0B2E 75%, 
+        #0F0A1E 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
 }
 
 .parallax-bg::before {
@@ -45,21 +70,96 @@ body {
     right: 0;
     bottom: 0;
     background: 
-        radial-gradient(circle at 20% 50%, var(--glow-purple) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, var(--glow-blue) 0%, transparent 50%),
-        radial-gradient(circle at 60% 80%, var(--glow-teal) 0%, transparent 50%);
-    filter: blur(100px);
-    opacity: 0.3;
-    animation: pulse 8s ease-in-out infinite;
+        radial-gradient(circle at 20% 30%, var(--glow-coral) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, var(--glow-lavender) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, var(--glow-mint) 0%, transparent 50%);
+    filter: blur(120px);
+    opacity: 0.4;
+    animation: colorPulse 10s ease-in-out infinite;
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.1); }
+@keyframes colorPulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
 }
 
-/* Floating orbs for depth */
+/* Floating Particles/Waves */
 .floating-orbs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    animation: floatDream 25s infinite ease-in-out;
+    mix-blend-mode: screen;
+}
+
+.orb-1 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, var(--glow-coral), transparent);
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.orb-2 {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, var(--glow-lavender), transparent);
+    top: 50%;
+    right: 10%;
+    animation-delay: 5s;
+}
+
+.orb-3 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, var(--glow-mint), transparent);
+    bottom: 10%;
+    left: 50%;
+    animation-delay: 10s;
+}
+
+.orb-4 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255, 230, 235, 0.5), transparent);
+    top: 70%;
+    left: 20%;
+    animation-delay: 15s;
+}
+
+@keyframes floatDream {
+    0%, 100% { 
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        opacity: 0.8;
+    }
+    25% { 
+        transform: translate(50px, -50px) rotate(90deg) scale(1.1);
+        opacity: 1;
+    }
+    50% { 
+        transform: translate(-30px, 30px) rotate(180deg) scale(0.9);
+        opacity: 0.7;
+    }
+    75% { 
+        transform: translate(60px, 20px) rotate(270deg) scale(1.05);
+        opacity: 0.9;
+    }
+}
+
+/* Dreamy Particles */
+.particles {
     position: fixed;
     top: 0;
     left: 0;
@@ -69,57 +169,45 @@ body {
     pointer-events: none;
 }
 
-.orb {
+.particle {
     position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--mint-ice);
     border-radius: 50%;
-    filter: blur(40px);
-    animation: float 20s infinite ease-in-out;
+    box-shadow: 0 0 10px var(--glow-mint);
+    animation: particleFloat 20s infinite ease-in-out;
 }
 
-.orb-1 {
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, var(--glow-purple), transparent);
-    top: 10%;
-    left: 10%;
-    animation-delay: 0s;
+@keyframes particleFloat {
+    0%, 100% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100vh) translateX(100px);
+        opacity: 0;
+    }
 }
 
-.orb-2 {
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, var(--glow-blue), transparent);
-    top: 50%;
-    right: 10%;
-    animation-delay: 3s;
-}
-
-.orb-3 {
-    width: 350px;
-    height: 350px;
-    background: radial-gradient(circle, var(--glow-teal), transparent);
-    bottom: 10%;
-    left: 50%;
-    animation-delay: 6s;
-}
-
-@keyframes float {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    25% { transform: translate(30px, -30px) rotate(90deg); }
-    50% { transform: translate(-20px, 20px) rotate(180deg); }
-    75% { transform: translate(40px, 10px) rotate(270deg); }
-}
-
-/* Advanced Glassmorphism */
+/* Advanced Glassmorphism with Pastel Glow */
 .glass {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(25px) saturate(200%);
+    -webkit-backdrop-filter: blur(25px) saturate(200%);
+    border: 2px solid rgba(227, 253, 253, 0.15);
     box-shadow: 
-        0 8px 32px 0 rgba(0, 0, 0, 0.37),
-        inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        0 8px 32px 0 rgba(0, 0, 0, 0.4),
+        0 0 40px rgba(202, 187, 233, 0.3),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2);
     position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass::before {
@@ -128,62 +216,94 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent, 
+        var(--mint-ice), 
+        var(--lavender-glow),
+        var(--soft-coral),
+        transparent);
+    opacity: 0.6;
 }
 
-/* Glowing Animations */
-@keyframes glow {
-    0%, 100% { box-shadow: 0 0 20px var(--glow-purple), 0 0 40px var(--glow-purple); }
-    50% { box-shadow: 0 0 30px var(--glow-blue), 0 0 60px var(--glow-blue); }
+.glass::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(135deg, var(--soft-coral), var(--lavender-glow), var(--sky-blue));
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+    filter: blur(20px);
 }
 
+.glass:hover::after {
+    opacity: 0.6;
+}
+
+/* Glowing Text with Pastel Gradient */
 .glow-text {
-    background: linear-gradient(135deg, var(--primary-purple), var(--secondary-blue), var(--tertiary-teal));
+    background: linear-gradient(135deg, 
+        var(--soft-coral), 
+        var(--lavender-glow), 
+        var(--mint-ice));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    animation: shimmer 3s ease-in-out infinite;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    animation: shimmerDream 4s ease-in-out infinite;
+    text-shadow: 0 0 60px var(--glow-lavender);
     margin-bottom: 1rem;
 }
 
-@keyframes shimmer {
-    0%, 100% { filter: brightness(1) hue-rotate(0deg); }
-    50% { filter: brightness(1.2) hue-rotate(10deg); }
+@keyframes shimmerDream {
+    0%, 100% { 
+        filter: brightness(1) hue-rotate(0deg);
+        transform: scale(1);
+    }
+    50% { 
+        filter: brightness(1.3) hue-rotate(15deg);
+        transform: scale(1.02);
+    }
 }
 
-/* Auth Container with Parallax */
+/* Auth Container with 3D Depth */
 .auth-container {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem;
-    perspective: 1000px;
+    perspective: 1500px;
 }
 
 .auth-card {
-    max-width: 480px;
+    max-width: 500px;
     width: 100%;
-    padding: 3rem 2.5rem;
-    border-radius: 32px;
+    padding: 3.5rem 3rem;
+    border-radius: 40px;
     text-align: center;
-    animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: cardFloatIn 1s cubic-bezier(0.34, 1.56, 0.64, 1);
     transform-style: preserve-3d;
-    transition: transform 0.3s ease;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 }
 
 .auth-card:hover {
-    transform: translateY(-5px) rotateX(2deg);
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 
+        0 25px 60px rgba(0, 0, 0, 0.5),
+        0 0 80px var(--glow-lavender),
+        0 0 120px var(--glow-coral);
 }
 
-@keyframes cardEntrance {
+@keyframes cardFloatIn {
     0% {
         opacity: 0;
-        transform: translateY(50px) scale(0.9) rotateX(-10deg);
+        transform: translateY(80px) scale(0.85) rotateX(-15deg);
     }
     100% {
         opacity: 1;
@@ -193,31 +313,38 @@ body {
 
 .subtitle {
     color: var(--text-secondary);
-    font-size: 1.125rem;
-    margin-bottom: 2.5rem;
-    font-weight: 400;
+    font-size: 1.25rem;
+    margin-bottom: 3rem;
+    font-weight: 500;
     opacity: 0;
-    animation: fadeIn 0.8s ease 0.3s forwards;
+    animation: fadeInUp 1s ease 0.3s forwards;
 }
 
-@keyframes fadeIn {
-    to { opacity: 1; }
+@keyframes fadeInUp {
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
 }
 
-/* Advanced Form Inputs with Glow */
+/* Dreamy Form Inputs */
 .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
     position: relative;
-    animation: slideInLeft 0.6s ease backwards;
+    animation: slideInLeft 0.7s ease backwards;
 }
 
-.form-group:nth-child(1) { animation-delay: 0.4s; }
-.form-group:nth-child(2) { animation-delay: 0.5s; }
+.form-group:nth-child(1) { animation-delay: 0.5s; }
+.form-group:nth-child(2) { animation-delay: 0.6s; }
 
 @keyframes slideInLeft {
     from {
         opacity: 0;
-        transform: translateX(-30px);
+        transform: translateX(-40px);
     }
     to {
         opacity: 1;
@@ -227,57 +354,59 @@ body {
 
 .glass-input {
     width: 100%;
-    padding: 1rem 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(139, 92, 246, 0.3);
-    border-radius: 16px;
+    padding: 1.125rem 1.75rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(227, 253, 253, 0.25);
+    border-radius: 20px;
     color: var(--text-primary);
-    font-size: 1rem;
+    font-size: 1.0625rem;
     font-weight: 500;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     outline: none;
     position: relative;
 }
 
 .glass-input:focus {
-    border-color: var(--primary-purple);
-    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--lavender-glow);
+    background: rgba(255, 255, 255, 0.12);
     box-shadow: 
-        0 0 0 4px rgba(139, 92, 246, 0.1),
-        0 0 20px rgba(139, 92, 246, 0.4),
-        0 8px 16px rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
+        0 0 0 5px rgba(202, 187, 233, 0.15),
+        0 0 30px var(--glow-lavender),
+        0 10px 25px rgba(0, 0, 0, 0.3);
+    transform: translateY(-3px) scale(1.01);
 }
 
 .glass-input::placeholder {
-    color: var(--text-secondary);
-    opacity: 0.7;
+    color: var(--mint-ice);
+    opacity: 0.6;
 }
 
-/* Futuristic Glowing Buttons */
+/* Pastel Glowing Buttons */
 .btn-primary {
     width: 100%;
-    padding: 1.125rem 2rem;
-    background: linear-gradient(135deg, var(--primary-purple), var(--secondary-blue));
+    padding: 1.25rem 2.5rem;
+    background: linear-gradient(135deg, var(--soft-coral), var(--lavender-glow), var(--sky-blue));
+    background-size: 200% 200%;
     border: none;
-    border-radius: 16px;
+    border-radius: 20px;
     color: white;
-    font-size: 1.125rem;
+    font-size: 1.25rem;
     font-weight: 700;
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 
-        0 10px 25px rgba(139, 92, 246, 0.3),
-        0 0 20px rgba(139, 92, 246, 0.2);
-    animation: slideInRight 0.6s ease 0.6s backwards;
+        0 15px 35px rgba(255, 182, 185, 0.4),
+        0 0 30px var(--glow-coral);
+    animation: slideInRight 0.7s ease 0.7s backwards;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 @keyframes slideInRight {
     from {
         opacity: 0;
-        transform: translateX(30px);
+        transform: translateX(40px);
     }
     to {
         opacity: 1;
@@ -288,128 +417,144 @@ body {
 .btn-primary::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.5s;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
 }
 
 .btn-primary:hover::before {
-    left: 100%;
+    width: 300px;
+    height: 300px;
 }
 
 .btn-primary:hover {
-    transform: translateY(-3px) scale(1.02);
+    transform: translateY(-5px) scale(1.03);
+    background-position: 100% 50%;
     box-shadow: 
-        0 15px 35px rgba(139, 92, 246, 0.4),
-        0 0 30px rgba(139, 92, 246, 0.3),
-        0 0 60px rgba(59, 130, 246, 0.2);
+        0 20px 50px rgba(255, 182, 185, 0.6),
+        0 0 50px var(--glow-coral),
+        0 0 80px var(--glow-lavender);
+    animation: buttonPulse 1.5s ease-in-out infinite;
 }
 
 .btn-primary:active {
-    transform: translateY(-1px) scale(0.98);
-}
-
-.glow-btn {
-    animation: buttonPulse 2s ease-in-out infinite;
+    transform: translateY(-2px) scale(0.98);
 }
 
 @keyframes buttonPulse {
-    0%, 100% { box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3), 0 0 20px rgba(139, 92, 246, 0.2); }
-    50% { box-shadow: 0 15px 35px rgba(139, 92, 246, 0.4), 0 0 30px rgba(139, 92, 246, 0.3); }
+    0%, 100% { 
+        box-shadow: 0 15px 35px rgba(255, 182, 185, 0.4), 0 0 30px var(--glow-coral);
+    }
+    50% { 
+        box-shadow: 0 20px 50px rgba(255, 182, 185, 0.6), 0 0 50px var(--glow-lavender);
+    }
 }
 
 /* Auth Switch Link */
 .auth-switch {
-    margin-top: 2rem;
+    margin-top: 2.5rem;
     color: var(--text-secondary);
-    font-size: 0.9375rem;
-    animation: fadeIn 0.8s ease 0.7s backwards;
+    font-size: 1rem;
+    animation: fadeIn 1s ease 0.8s backwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .link-glow {
-    color: var(--primary-purple);
+    color: var(--soft-coral);
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 700;
     position: relative;
     transition: all 0.3s ease;
+    text-shadow: 0 0 20px var(--glow-coral);
 }
 
 .link-glow::after {
     content: '';
     position: absolute;
-    bottom: -2px;
+    bottom: -3px;
     left: 0;
     width: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--primary-purple), var(--secondary-blue));
-    transition: width 0.3s ease;
+    height: 3px;
+    background: linear-gradient(90deg, var(--soft-coral), var(--lavender-glow));
+    transition: width 0.4s ease;
+    box-shadow: 0 0 10px var(--glow-coral);
 }
 
 .link-glow:hover {
-    color: var(--secondary-blue);
-    text-shadow: 0 0 10px var(--glow-blue);
+    color: var(--lavender-glow);
+    text-shadow: 0 0 30px var(--glow-lavender);
+    transform: scale(1.05);
 }
 
 .link-glow:hover::after {
     width: 100%;
 }
 
-/* Flash Messages with Animation */
+/* Flash Messages with Pastel Glow */
 .flash-messages {
     position: fixed;
     top: 2rem;
     right: 2rem;
     z-index: 9999;
-    max-width: 400px;
+    max-width: 420px;
 }
 
 .flash-message {
-    padding: 1rem 1.5rem;
-    border-radius: 16px;
+    padding: 1.25rem 2rem;
+    border-radius: 20px;
     margin-bottom: 1rem;
-    backdrop-filter: blur(20px);
-    animation: slideInFromRight 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(25px);
+    animation: slideInFromRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    border: 2px solid;
 }
 
 @keyframes slideInFromRight {
     from {
         opacity: 0;
-        transform: translateX(100px);
+        transform: translateX(120px) scale(0.8);
     }
     to {
         opacity: 1;
-        transform: translateX(0);
+        transform: translateX(0) scale(1);
     }
 }
 
 .flash-message.error {
-    background: rgba(239, 68, 68, 0.2);
-    border: 1px solid rgba(239, 68, 68, 0.5);
-    color: #FCA5A5;
+    background: rgba(255, 182, 185, 0.25);
+    border-color: var(--soft-coral);
+    color: #FFE6EB;
+    box-shadow: 0 15px 40px rgba(255, 182, 185, 0.4);
 }
 
 .flash-message.success {
-    background: rgba(34, 197, 94, 0.2);
-    border: 1px solid rgba(34, 197, 94, 0.5);
-    color: #86EFAC;
+    background: rgba(227, 253, 253, 0.25);
+    border-color: var(--mint-ice);
+    color: var(--mint-ice);
+    box-shadow: 0 15px 40px rgba(227, 253, 253, 0.4);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .auth-card {
-        padding: 2rem 1.5rem;
+        padding: 2.5rem 2rem;
     }
     
     .glow-text {
-        font-size: 2rem;
+        font-size: 2.5rem;
     }
     
     .subtitle {
-        font-size: 1rem;
+        font-size: 1.125rem;
     }
     
     .flash-messages {
@@ -420,6 +565,20 @@ body {
     }
 }
 
+/* 3D Hover Lift Effect */
+.card-hover {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.card-hover:hover {
+    transform: translateY(-12px) scale(1.03);
+    box-shadow: 
+        0 25px 60px rgba(0, 0, 0, 0.5),
+        0 0 60px var(--glow-lavender),
+        0 0 100px var(--glow-mint);
+}
+
 /* Loading Animation */
 @keyframes rotate {
     from { transform: rotate(0deg); }
@@ -428,10 +587,39 @@ body {
 
 .loading {
     display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
+    width: 22px;
+    height: 22px;
+    border: 3px solid rgba(227, 253, 253, 0.3);
     border-radius: 50%;
-    border-top-color: white;
+    border-top-color: var(--mint-ice);
     animation: rotate 1s linear infinite;
+}
+
+/* Scroll Animations */
+.fade-in-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-in-scroll.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Micro-interactions */
+.scale-on-hover {
+    transition: transform 0.3s ease;
+}
+
+.scale-on-hover:hover {
+    transform: scale(1.05);
+}
+
+.glow-on-hover {
+    transition: all 0.3s ease;
+}
+
+.glow-on-hover:hover {
+    filter: drop-shadow(0 0 20px var(--glow-lavender));
 }
