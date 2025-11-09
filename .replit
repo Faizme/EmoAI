@@ -7,7 +7,7 @@ packages = ["static-web-server"]
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["gunicorn", "--bind=0.0.0.0:8080", "--workers=4", "app:app"]
+run = ["bash", "-c", "gunicorn app:app --bind 0.0.0.0:$PORT --workers=4"]
 
 [workflows]
 runButton = "Project"
