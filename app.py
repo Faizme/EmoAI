@@ -25,6 +25,12 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vibe_journal.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+app.config['SESSION_COOKIE_SECURE'] = os.environ.get('REPL_SLUG') is not None
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)
+app.config['SESSION_PERMANENT'] = True
+
 db.init_app(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
@@ -68,7 +74,8 @@ def signup():
         db.session.add(user)
         db.session.commit()
         
-        login_user(user)
+        session.permanent = True
+        login_user(user, remember=True)
         return redirect(url_for('about'))
     
     return render_template('signup.html')
@@ -85,7 +92,8 @@ def login():
         user = User.query.filter_by(email=email).first()
         
         if user and bcrypt.check_password_hash(user.password_hash, password):
-            login_user(user)
+            session.permanent = True
+            login_user(user, remember=True)
             return redirect(url_for('index'))
         else:
             flash('Invalid email or password', 'error')
