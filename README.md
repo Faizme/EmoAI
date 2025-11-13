@@ -2,6 +2,8 @@
 
 EmoAI is an intelligent journaling assistant that extracts emotions, detects events, and automatically creates calendar entries and daily summaries — all through natural conversation.
 
+### 🎥 [Watch the Demo Video](https://drive.google.com/file/d/1nxDC3g8Iizn3pdpxh3XlOrcBxaIvVBwu/view?usp=sharing)
+
 ## 🚀 Core Features
 - **Automatic Event Extraction:** No need to type dates — EmoAI detects and adds events to your calendar in real time.
 - **Smart Journaling:** Converts daily chats into structured diary entries.
